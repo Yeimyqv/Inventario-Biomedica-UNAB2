@@ -968,11 +968,12 @@ function consultarPrestamos() {
   prestamosSection.id = 'prestamos-section';
   prestamosSection.className = 'my-5';
   
-  // Recuperar todos los préstamos para laboratoristas, o solo los del usuario para docentes
+  // Recuperar todos los préstamos
   let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
   
-  // Si es laboratorista, muestra todos los préstamos para poder gestionarlos
+  // Si es laboratorista, muestra todos los préstamos; si es docente, solo los suyos
   const esLaboratorista = currentUser.tipo === 'laboratorista';
+  const prestamosAMostrar = esLaboratorista ? prestamos : prestamos.filter(p => p.usuario_id === currentUser.id);
   
   // Estructura del contenido
   prestamosSection.innerHTML = `
@@ -1004,7 +1005,7 @@ function consultarPrestamos() {
         </div>
         
         <!-- Tabla de préstamos -->
-        ${prestamos.length > 0 ? `
+        ${prestamosAMostrar.length > 0 ? `
           <div class="table-responsive">
             <table class="table table-striped table-hover">
               <thead>
@@ -1019,7 +1020,7 @@ function consultarPrestamos() {
                 </tr>
               </thead>
               <tbody id="prestamos-tbody">
-                ${generarFilasPrestamos(prestamos)}
+                ${generarFilasPrestamos(prestamosAMostrar)}
               </tbody>
             </table>
           </div>
@@ -1099,11 +1100,17 @@ function filtrarPrestamos() {
   const filtroEstado = document.getElementById('filtro-estado').value;
   const filtroUsuario = document.getElementById('filtro-usuario').value;
   
+  // Recuperar todos los préstamos
   const prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
+  
+  // Filtrar según el tipo de usuario
+  const esLaboratorista = currentUser.tipo === 'laboratorista';
+  const prestamosAMostrar = esLaboratorista ? prestamos : prestamos.filter(p => p.usuario_id === currentUser.id);
+  
   const tbody = document.getElementById('prestamos-tbody');
   
   if (tbody) {
-    tbody.innerHTML = generarFilasPrestamos(prestamos, filtroEstado, filtroUsuario);
+    tbody.innerHTML = generarFilasPrestamos(prestamosAMostrar, filtroEstado, filtroUsuario);
   }
 }
 
@@ -1150,7 +1157,7 @@ function registrarDevolucion(prestamoId) {
 
 // Volver a la interfaz principal desde cualquier módulo
 function volverAInterfazPrincipal() {
-  // Ocultar todas las secciones
+  // Ocultar todas las secciones secundarias
   document.getElementById('prestamo-section').style.display = 'none';
   document.getElementById('admin-section').style.display = 'none';
   

@@ -22,9 +22,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Inicializar modales personalizados
   initCustomModals();
   
-  // Asegurarse que se inicia en la selección de laboratorio
-  document.getElementById('lab-selection').style.display = 'block';
-  document.getElementById('user-selection').style.display = 'none';
+  // Iniciar directamente en la selección de usuario
+  document.getElementById('lab-selection').style.display = 'none';
+  document.getElementById('user-selection').style.display = 'block';
 });
 
 // Inicializar listeners de eventos
@@ -185,7 +185,7 @@ function volverAPaginaInicio() {
 function autenticarUsuario() {
   let nombre = '';
   
-  // Para laboratoristas, obtener el nombre del selector
+  // Para laboratoristas, obtener el nombre solo del selector
   if (currentUser.tipo === 'laboratorista') {
     const laboratoristaSelect = document.getElementById('laboratorista-select');
     if (laboratoristaSelect) {
@@ -194,8 +194,6 @@ function autenticarUsuario() {
         mostrarNotificacion('Error', 'Por favor seleccione su nombre de la lista', 'error');
         return;
       }
-    } else {
-      nombre = document.getElementById('user-name').value.trim();
     }
   } else {
     nombre = document.getElementById('user-name').value.trim();

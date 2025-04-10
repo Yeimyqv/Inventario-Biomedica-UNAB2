@@ -8,8 +8,12 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
   
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
   <!-- CSS personalizado -->
   <link href="/css/styles.css" rel="stylesheet">
+  <link href="/css/modals.css" rel="stylesheet">
   
   <!-- Favicon -->
   <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
@@ -21,7 +25,7 @@
     <div class="container-fluid py-2">
       <div class="row align-items-center">
         <div class="col-md-1 text-center text-md-start">
-          <img src="/attached_assets/logo-u-vig.png" alt="Logo UNAB" class="logo">
+          <img src="/img/logo-u-vig.png" alt="Logo UNAB" class="logo">
         </div>
         <div class="col-md-11">
           <h1>Sistema de Gestión de Inventario - Laboratorios Ingeniería Biomédica</h1>
@@ -197,6 +201,16 @@
   <!-- Contenedor para notificaciones tipo toast -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <!-- Los toasts se generan dinámicamente -->
+  </div>
+  
+  <!-- Botón Home fijo -->
+  <button id="home-button" class="home-button" style="display: none;" onclick="volverASeleccionUsuario()">
+    <i class="fas fa-home home-button-icon"></i>
+  </button>
+  
+  <!-- Contenedor para modales personalizados -->
+  <div id="custom-modal-container">
+    <!-- Los modales se generan dinámicamente -->
   </div>
   
   <!-- JavaScript -->

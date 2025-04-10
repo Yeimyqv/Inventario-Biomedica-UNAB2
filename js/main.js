@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Inicializar notificaciones con Bootstrap
   initNotifications();
+  
+  // Inicializar modales personalizados
+  initCustomModals();
 });
 
 // Inicializar listeners de eventos
@@ -1014,8 +1017,143 @@ function realizarPrestamo() {
   }
 }
 
+// Inicializar modales personalizados
+function initCustomModals() {
+  // Mostrar el botón de inicio después de un tiempo
+  setTimeout(() => {
+    const homeButton = document.getElementById('home-button');
+    if (homeButton) {
+      homeButton.style.display = 'flex';
+    }
+  }, 5000);
+}
+
+// Volver a la selección de usuario (pantalla de inicio)
+function volverASeleccionUsuario() {
+  mostrarConfirmacion(
+    'Volver a inicio', 
+    '¿Estás seguro que deseas volver a la pantalla de selección de usuario?<br>Se perderán los cambios no guardados.',
+    () => {
+      // Resetear el estado de la aplicación
+      currentUser = { id: null, tipo: null, nombre: null };
+      elementoSeleccionado = null;
+      categoriaSeleccionada = null;
+      
+      // Ocultar todas las secciones
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('interface').style.display = 'none';
+      document.getElementById('prestamo-section').style.display = 'none';
+      document.getElementById('admin-section').style.display = 'none';
+      
+      // Eliminar secciones dinámicas
+      const inventarioSection = document.getElementById('inventario-section');
+      if (inventarioSection) inventarioSection.remove();
+      
+      const prestamosSection = document.getElementById('prestamos-section');
+      if (prestamosSection) prestamosSection.remove();
+      
+      // Mostrar selección de usuario
+      document.getElementById('user-selection').style.display = 'block';
+    }
+  );
+}
+
 // Mostrar notificación al usuario
 function mostrarNotificacion(titulo, mensaje, tipo = 'info') {
-  // Por ahora, usamos alert simple en vez de Toast de Bootstrap
-  alert(`${titulo}: ${mensaje}`);
+  // Crear el modal personalizado
+  const modalOverlay = document.createElement('div');
+  modalOverlay.className = 'custom-modal-overlay';
+  
+  const modal = document.createElement('div');
+  modal.className = 'custom-modal';
+  
+  modal.innerHTML = `
+    <div class="custom-modal-header ${tipo}">
+      <h3>${titulo}</h3>
+    </div>
+    <div class="custom-modal-body">
+      ${mensaje}
+    </div>
+    <div class="custom-modal-footer">
+      <button class="custom-btn custom-btn-primary" id="modal-ok-btn">Aceptar</button>
+    </div>
+  `;
+  
+  modalOverlay.appendChild(modal);
+  document.getElementById('custom-modal-container').appendChild(modalOverlay);
+  
+  // Animar entrada
+  setTimeout(() => {
+    modalOverlay.classList.add('active');
+    modal.classList.add('active');
+  }, 10);
+  
+  // Manejar cierre
+  document.getElementById('modal-ok-btn').addEventListener('click', () => {
+    modalOverlay.classList.remove('active');
+    modal.classList.remove('active');
+    
+    setTimeout(() => {
+      modalOverlay.remove();
+    }, 300);
+  });
+}
+
+// Mostrar confirmación al usuario
+function mostrarConfirmacion(titulo, mensaje, onConfirm, onCancel) {
+  // Crear el modal personalizado
+  const modalOverlay = document.createElement('div');
+  modalOverlay.className = 'custom-modal-overlay';
+  
+  const modal = document.createElement('div');
+  modal.className = 'custom-modal';
+  
+  modal.innerHTML = `
+    <div class="custom-modal-header warning">
+      <h3>${titulo}</h3>
+    </div>
+    <div class="custom-modal-body">
+      <div class="confirmation-icon">
+        <i class="fas fa-question-circle"></i>
+      </div>
+      <div class="confirmation-text">
+        ${mensaje}
+      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button class="custom-btn custom-btn-secondary" id="modal-cancel-btn">Cancelar</button>
+      <button class="custom-btn custom-btn-primary" id="modal-confirm-btn">Confirmar</button>
+    </div>
+  `;
+  
+  modalOverlay.appendChild(modal);
+  document.getElementById('custom-modal-container').appendChild(modalOverlay);
+  
+  // Animar entrada
+  setTimeout(() => {
+    modalOverlay.classList.add('active');
+    modal.classList.add('active');
+  }, 10);
+  
+  // Manejar confirmación
+  document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+    modalOverlay.classList.remove('active');
+    modal.classList.remove('active');
+    
+    setTimeout(() => {
+      modalOverlay.remove();
+      if (typeof onConfirm === 'function') onConfirm();
+    }, 300);
+  });
+  
+  // Manejar cancelación
+  document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+    modalOverlay.classList.remove('active');
+    modal.classList.remove('active');
+    
+    setTimeout(() => {
+      modalOverlay.remove();
+      if (typeof onCancel === 'function') onCancel();
+    }, 300);
+  });
 }

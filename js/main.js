@@ -132,6 +132,10 @@ function selectUserType(tipo) {
     // Mostrar el PIN
     pinGroup.style.display = 'block';
     
+    // Ocultar el campo de nombre completo
+    const nombreGroup = document.getElementById('nombre-group');
+    nombreGroup.style.display = 'none';
+    
     // Verificar si ya existe el grupo de laboratorista
     if (laboratoristaGroup) {
       laboratoristaGroup.style.display = 'block';
@@ -156,8 +160,9 @@ function selectUserType(tipo) {
       pinField.insertAdjacentElement('afterend', laboratoristaDivGroup);
     }
   } else {
-    // Para docentes, solo mostrar el PIN
+    // Para docentes, mostrar el PIN y el campo de nombre
     pinGroup.style.display = 'block';
+    document.getElementById('nombre-group').style.display = 'block';
   }
   
   // Añadir botón de regreso a la página principal

@@ -73,29 +73,65 @@ function selectUserType(tipo) {
   
   // Configurar según tipo de usuario
   const pinGroup = document.getElementById('pin-group');
+  const estudianteGroup = document.getElementById('estudiante-group');
   
   if (tipo === 'estudiante') {
     pinGroup.style.display = 'none';
+    if (estudianteGroup) {
+      estudianteGroup.style.display = 'block';
+    } else {
+      // Crear los campos adicionales para estudiantes
+      const formGroup = document.querySelector('#auth-form .mb-3').parentNode;
+      
+      const estudianteDivGroup = document.createElement('div');
+      estudianteDivGroup.id = 'estudiante-group';
+      estudianteDivGroup.innerHTML = `
+        <div class="mb-3">
+          <label for="estudiante-id" class="form-label">ID Estudiante:</label>
+          <input type="text" class="form-control" id="estudiante-id" required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="estudiante-semestre" class="form-label">Semestre:</label>
+          <select class="form-select" id="estudiante-semestre" required>
+            <option value="">Seleccione su semestre</option>
+            ${Array.from({length: 9}, (_, i) => i + 1).map(num => 
+              `<option value="${num}">${num}° Semestre</option>`
+            ).join('')}
+          </select>
+        </div>
+      `;
+      
+      // Insertar después del campo de nombre
+      const usernameField = document.getElementById('user-name').parentNode;
+      usernameField.insertAdjacentElement('afterend', estudianteDivGroup);
+    }
   } else {
     pinGroup.style.display = 'block';
+    if (estudianteGroup) {
+      estudianteGroup.style.display = 'none';
+    }
   }
   
   // Añadir botón de regreso a la página principal
+  const formButtons = document.querySelector('#auth-form .d-grid');
+  // Limpiar botones existentes que no sean el principal
+  const existingBackBtn = formButtons.querySelector('.btn-outline-secondary');
+  if (existingBackBtn) {
+    existingBackBtn.remove();
+  }
+  
   const backBtn = document.createElement('button');
   backBtn.className = 'btn btn-outline-secondary mt-3';
   backBtn.textContent = 'Volver a página de inicio';
   backBtn.onclick = volverAPaginaInicio;
   
-  const formButtons = document.querySelector('#auth-form .d-grid');
   formButtons.appendChild(backBtn);
 }
 
-// Función para volver a la página de inicio con confirmación
+// Función para volver a la página de inicio sin confirmación
 function volverAPaginaInicio() {
-  const confirmacion = confirm('¿Estás seguro que deseas volver a la página de inicio?');
-  if (confirmacion) {
-    window.location.reload();
-  }
+  window.location.reload();
 }
 
 // Autenticar al usuario según su tipo
@@ -122,6 +158,25 @@ function autenticarUsuario() {
       mostrarNotificacion('Error', 'PIN incorrecto. Intenta nuevamente.', 'error');
       return;
     }
+  } 
+  // Verificar datos adicionales para estudiantes
+  else if (currentUser.tipo === 'estudiante') {
+    const estudianteId = document.getElementById('estudiante-id').value.trim();
+    const semestre = document.getElementById('estudiante-semestre').value;
+    
+    if (!estudianteId) {
+      mostrarNotificacion('Error', 'Por favor ingresa tu ID de estudiante', 'error');
+      return;
+    }
+    
+    if (!semestre) {
+      mostrarNotificacion('Error', 'Por favor selecciona tu semestre', 'error');
+      return;
+    }
+    
+    // Guardar datos adicionales del estudiante
+    currentUser.id_estudiante = estudianteId;
+    currentUser.semestre = semestre;
   }
   
   // Asignar un ID temporal al usuario (en un sistema real, vendría de la BD)
@@ -292,8 +347,68 @@ async function iniciarPrestamo() {
 
 // Iniciar proceso de retorno
 function iniciarRetorno() {
-  // Esta función será implementada más adelante
-  mostrarNotificacion('Información', 'La funcionalidad de retorno estará disponible próximamente', 'info');
+  // Ocultar la interfaz principal
+  document.getElementById('interface').style.display = 'none';
+  
+  // Recuperar préstamos del usuario actual
+  const prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]')
+    .filter(p => p.usuario_id === currentUser.id && p.estado === 'prestado');
+  
+  // Crear y mostrar la sección de retorno
+  const retornoSection = document.createElement('section');
+  retornoSection.id = 'prestamos-section'; // Reutilizamos el mismo ID
+  retornoSection.className = 'my-5';
+  
+  // Estructura del contenido
+  retornoSection.innerHTML = `
+    <div class="card shadow">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h3>Retorno de elementos</h3>
+        <button class="btn btn-sm btn-light" onclick="volverAInterfazPrincipal()">Volver</button>
+      </div>
+      <div class="card-body">
+        ${prestamos.length > 0 ? `
+          <p class="mb-4">Seleccione los elementos que desea devolver:</p>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Elemento</th>
+                  <th>Cantidad</th>
+                  <th>Fecha préstamo</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${prestamos.map(prestamo => `
+                  <tr>
+                    <td>${prestamo.elemento_nombre}</td>
+                    <td>${prestamo.cantidad}</td>
+                    <td>${prestamo.fecha}</td>
+                    <td>
+                      <button class="btn btn-sm btn-success" onclick="registrarDevolucion(${prestamo.id})">
+                        Devolver elemento
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : `
+          <div class="alert alert-info">
+            <p>No tiene elementos pendientes por devolver.</p>
+          </div>
+        `}
+      </div>
+    </div>
+  `;
+  
+  // Agregar a la página
+  document.getElementById('interface').insertAdjacentElement('afterend', retornoSection);
+  
+  // Mostrar la sección
+  retornoSection.style.display = 'block';
 }
 
 // Consultar inventario completo
@@ -590,33 +705,207 @@ function agregarNuevoElemento() {
 
 // Editar elemento existente
 function editarElemento(elementoId) {
-  mostrarNotificacion('Información', 'Función de edición en desarrollo', 'info');
-  // Esta funcionalidad se implementará en la siguiente fase
+  // Buscar el elemento en todas las categorías
+  let elementoAEditar = null;
+  let categoriaElemento = null;
+  
+  INVENTARIO.forEach(categoria => {
+    const elemento = categoria.elementos.find(elem => elem.id === elementoId);
+    if (elemento) {
+      elementoAEditar = elemento;
+      categoriaElemento = categoria;
+    }
+  });
+  
+  if (!elementoAEditar) {
+    mostrarNotificacion('Error', 'No se pudo encontrar el elemento para editar', 'error');
+    return;
+  }
+  
+  // Crear formulario de edición
+  const adminBody = document.querySelector('#admin-section .card-body');
+  
+  // Ocultar acordeón de inventario
+  const inventarioActual = adminBody.querySelector('.mt-4');
+  if (inventarioActual) {
+    inventarioActual.style.display = 'none';
+  }
+  
+  // Crear y mostrar formulario de edición
+  const formEditarHtml = `
+    <div id="editar-elemento-form" class="mt-4 p-3 border rounded">
+      <h5>Editar elemento</h5>
+      <form id="form-editar-elemento">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="editar-codigo" class="form-label">Código:</label>
+            <input type="text" class="form-control" id="editar-codigo" value="${elementoAEditar.id}" readonly>
+            <small class="form-text text-muted">El código no se puede modificar</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="editar-nombre" class="form-label">Nombre:</label>
+            <input type="text" class="form-control" id="editar-nombre" value="${elementoAEditar.nombre}" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="editar-categoria" class="form-label">Categoría:</label>
+            <select class="form-select" id="editar-categoria" required>
+              ${INVENTARIO.map(cat => `
+                <option value="${cat.categoria}" ${cat.categoria === categoriaElemento.categoria ? 'selected' : ''}>
+                  ${cat.categoria}
+                </option>
+              `).join('')}
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="editar-cantidad" class="form-label">Cantidad:</label>
+            <input type="number" class="form-control" id="editar-cantidad" min="0" value="${elementoAEditar.cantidad}" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="editar-ubicacion" class="form-label">Ubicación:</label>
+            <input type="text" class="form-control" id="editar-ubicacion" value="${elementoAEditar.ubicacion || ''}">
+          </div>
+          <div class="col-12 mb-3">
+            <label for="editar-descripcion" class="form-label">Descripción:</label>
+            <textarea class="form-control" id="editar-descripcion" rows="3">${elementoAEditar.descripcion || ''}</textarea>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-secondary me-2" onclick="cancelarEdicion()">Cancelar</button>
+          <button type="button" class="btn btn-success" onclick="guardarEdicionElemento(${elementoId})">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  // Insertar formulario
+  adminBody.insertAdjacentHTML('beforeend', formEditarHtml);
+  
+  // Ocultar otros formularios
+  const nuevoElementoForm = document.getElementById('nuevo-elemento-form');
+  if (nuevoElementoForm) {
+    nuevoElementoForm.style.display = 'none';
+  }
+  
+  // Scroll hasta el formulario
+  document.getElementById('editar-elemento-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Cancelar edición de elemento
+function cancelarEdicion() {
+  // Eliminar formulario de edición
+  const editarForm = document.getElementById('editar-elemento-form');
+  if (editarForm) {
+    editarForm.remove();
+  }
+  
+  // Mostrar acordeón de inventario
+  const inventarioActual = document.querySelector('#admin-section .card-body .mt-4');
+  if (inventarioActual) {
+    inventarioActual.style.display = 'block';
+  }
+}
+
+// Guardar cambios de edición
+function guardarEdicionElemento(elementoId) {
+  // Recuperar valores del formulario
+  const nombre = document.getElementById('editar-nombre').value;
+  const categoriaNombre = document.getElementById('editar-categoria').value;
+  const cantidad = parseInt(document.getElementById('editar-cantidad').value);
+  const ubicacion = document.getElementById('editar-ubicacion').value;
+  const descripcion = document.getElementById('editar-descripcion').value;
+  
+  // Validaciones básicas
+  if (!nombre || !categoriaNombre || isNaN(cantidad)) {
+    mostrarNotificacion('Error', 'Todos los campos marcados son obligatorios', 'error');
+    return;
+  }
+  
+  // Encontrar elemento y categoría actual
+  let elementoEncontrado = false;
+  let categoriaOriginal = null;
+  let indiceElemento = -1;
+  
+  INVENTARIO.forEach(categoria => {
+    const index = categoria.elementos.findIndex(elem => elem.id === elementoId);
+    if (index !== -1) {
+      elementoEncontrado = true;
+      categoriaOriginal = categoria;
+      indiceElemento = index;
+    }
+  });
+  
+  if (!elementoEncontrado) {
+    mostrarNotificacion('Error', 'No se pudo encontrar el elemento para actualizar', 'error');
+    return;
+  }
+  
+  // Crear objeto con datos actualizados
+  const elementoActualizado = {
+    ...categoriaOriginal.elementos[indiceElemento],
+    nombre: nombre,
+    cantidad: cantidad,
+    ubicacion: ubicacion,
+    descripcion: descripcion
+  };
+  
+  // Si cambió la categoría, mover el elemento
+  if (categoriaNombre !== categoriaOriginal.categoria) {
+    // Encontrar nueva categoría
+    const nuevaCategoria = INVENTARIO.find(cat => cat.categoria === categoriaNombre);
+    if (!nuevaCategoria) {
+      mostrarNotificacion('Error', 'Categoría destino no encontrada', 'error');
+      return;
+    }
+    
+    // Eliminar de categoría original
+    categoriaOriginal.elementos.splice(indiceElemento, 1);
+    
+    // Agregar a nueva categoría
+    nuevaCategoria.elementos.push(elementoActualizado);
+  } else {
+    // Actualizar en misma categoría
+    categoriaOriginal.elementos[indiceElemento] = elementoActualizado;
+  }
+  
+  // Mostrar confirmación y actualizar vista
+  mostrarNotificacion('Éxito', 'Elemento actualizado correctamente', 'success');
+  administrarInventario();
 }
 
 // Eliminar elemento
 function eliminarElemento(elementoId) {
-  const confirmacion = confirm(`¿Estás seguro de eliminar este elemento? Esta acción no se puede deshacer.`);
-  
-  if (confirmacion) {
-    // Buscar elemento
-    let eliminado = false;
-    
-    INVENTARIO.forEach(categoria => {
-      const index = categoria.elementos.findIndex(elem => elem.id === elementoId);
-      if (index !== -1) {
-        categoria.elementos.splice(index, 1);
-        eliminado = true;
-      }
-    });
-    
-    if (eliminado) {
-      mostrarNotificacion('Éxito', 'Elemento eliminado correctamente', 'success');
-      administrarInventario(); // Recargar para ver cambios
-    } else {
-      mostrarNotificacion('Error', 'No se pudo encontrar el elemento', 'error');
+  // Buscar el elemento para mostrar su nombre
+  let nombreElemento = "este elemento";
+  INVENTARIO.forEach(categoria => {
+    const elemento = categoria.elementos.find(elem => elem.id === elementoId);
+    if (elemento) {
+      nombreElemento = elemento.nombre;
     }
-  }
+  });
+  
+  mostrarConfirmacion(
+    'Eliminar elemento',
+    `¿Está seguro que desea eliminar "${nombreElemento}"?<br>Esta acción no se puede deshacer.`,
+    () => {
+      // Buscar elemento
+      let eliminado = false;
+      
+      INVENTARIO.forEach(categoria => {
+        const index = categoria.elementos.findIndex(elem => elem.id === elementoId);
+        if (index !== -1) {
+          categoria.elementos.splice(index, 1);
+          eliminado = true;
+        }
+      });
+      
+      if (eliminado) {
+        mostrarNotificacion('Éxito', 'Elemento eliminado correctamente', 'success');
+        administrarInventario(); // Recargar para ver cambios
+      } else {
+        mostrarNotificacion('Error', 'No se pudo encontrar el elemento', 'error');
+      }
+    }
+  );
 }
 
 // Confirmar eliminación de elemento
@@ -624,27 +913,21 @@ function confirmarEliminarElemento() {
   mostrarNotificacion('Información', 'Seleccione el elemento que desea eliminar en la lista de inventario', 'info');
 }
 
-// Confirmar volver a interfaz principal
+// Volver a interfaz principal sin confirmación
 function confirmarVolverAInterfaz() {
-  mostrarConfirmacion(
-    'Volver a la interfaz principal',
-    '¿Estás seguro que deseas volver a la interfaz principal?',
-    () => {
-      // Eliminar sección de inventario si existe
-      const inventarioSection = document.getElementById('inventario-section');
-      if (inventarioSection) {
-        inventarioSection.remove();
-      }
-      
-      // Eliminar sección de préstamos si existe
-      const prestamosSection = document.getElementById('prestamos-section');
-      if (prestamosSection) {
-        prestamosSection.remove();
-      }
-      
-      volverAInterfazPrincipal();
-    }
-  );
+  // Eliminar sección de inventario si existe
+  const inventarioSection = document.getElementById('inventario-section');
+  if (inventarioSection) {
+    inventarioSection.remove();
+  }
+  
+  // Eliminar sección de préstamos si existe
+  const prestamosSection = document.getElementById('prestamos-section');
+  if (prestamosSection) {
+    prestamosSection.remove();
+  }
+  
+  volverAInterfazPrincipal();
 }
 
 // Consultar préstamos (laboratorista y docente)
@@ -836,30 +1119,24 @@ function registrarDevolucion(prestamoId) {
 
 // Volver a la interfaz principal desde cualquier módulo
 function volverAInterfazPrincipal() {
-  mostrarConfirmacion(
-    'Volver a la página principal',
-    '¿Estás seguro que deseas volver a la página principal?',
-    () => {
-      // Ocultar todas las secciones
-      document.getElementById('prestamo-section').style.display = 'none';
-      document.getElementById('admin-section').style.display = 'none';
-      
-      // Eliminar sección de inventario si existe
-      const inventarioSection = document.getElementById('inventario-section');
-      if (inventarioSection) {
-        inventarioSection.remove();
-      }
-      
-      // Eliminar sección de préstamos si existe
-      const prestamosSection = document.getElementById('prestamos-section');
-      if (prestamosSection) {
-        prestamosSection.remove();
-      }
-      
-      // Mostrar la interfaz principal
-      document.getElementById('interface').style.display = 'block';
-    }
-  );
+  // Ocultar todas las secciones
+  document.getElementById('prestamo-section').style.display = 'none';
+  document.getElementById('admin-section').style.display = 'none';
+  
+  // Eliminar sección de inventario si existe
+  const inventarioSection = document.getElementById('inventario-section');
+  if (inventarioSection) {
+    inventarioSection.remove();
+  }
+  
+  // Eliminar sección de préstamos si existe
+  const prestamosSection = document.getElementById('prestamos-section');
+  if (prestamosSection) {
+    prestamosSection.remove();
+  }
+  
+  // Mostrar la interfaz principal
+  document.getElementById('interface').style.display = 'block';
 }
 
 // Cargar categorías desde la API

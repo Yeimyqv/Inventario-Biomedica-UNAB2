@@ -70,7 +70,7 @@ function selectLaboratory(laboratorio) {
   currentLaboratory = laboratorio;
   
   // Mostrar mensaje de confirmación del laboratorio seleccionado
-  mostrarNotificacion('Laboratorio seleccionado', `Ha seleccionado el laboratorio: Sede ${laboratorio === 'jardin' ? 'Jardín' : 'Bosque'}`, 'info');
+  mostrarNotificacion('Laboratorio seleccionado', `Ha seleccionado el laboratorio de Ingeniería Biomédica`, 'info');
   
   // Ocultar la selección de laboratorio
   document.getElementById('lab-selection').style.display = 'none';
@@ -93,15 +93,18 @@ function selectUserType(tipo) {
   // Configurar según tipo de usuario
   const pinGroup = document.getElementById('pin-group');
   const estudianteGroup = document.getElementById('estudiante-group');
+  const laboratoristaGroup = document.getElementById('laboratorista-group');
+  
+  // Ocultar todos los grupos específicos primero
+  if (estudianteGroup) estudianteGroup.style.display = 'none';
+  if (laboratoristaGroup) laboratoristaGroup.style.display = 'none';
+  pinGroup.style.display = 'none';
   
   if (tipo === 'estudiante') {
-    pinGroup.style.display = 'none';
     if (estudianteGroup) {
       estudianteGroup.style.display = 'block';
     } else {
       // Crear los campos adicionales para estudiantes
-      const formGroup = document.querySelector('#auth-form .mb-3').parentNode;
-      
       const estudianteDivGroup = document.createElement('div');
       estudianteDivGroup.id = 'estudiante-group';
       estudianteDivGroup.innerHTML = `
@@ -125,11 +128,36 @@ function selectUserType(tipo) {
       const usernameField = document.getElementById('user-name').parentNode;
       usernameField.insertAdjacentElement('afterend', estudianteDivGroup);
     }
-  } else {
+  } else if (tipo === 'laboratorista') {
+    // Mostrar el PIN
     pinGroup.style.display = 'block';
-    if (estudianteGroup) {
-      estudianteGroup.style.display = 'none';
+    
+    // Verificar si ya existe el grupo de laboratorista
+    if (laboratoristaGroup) {
+      laboratoristaGroup.style.display = 'block';
+    } else {
+      // Crear el grupo para seleccionar laboratoristas específicos
+      const laboratoristaDivGroup = document.createElement('div');
+      laboratoristaDivGroup.id = 'laboratorista-group';
+      laboratoristaDivGroup.innerHTML = `
+        <div class="mb-3">
+          <label for="laboratorista-select" class="form-label">Seleccione su nombre:</label>
+          <select class="form-select" id="laboratorista-select" required>
+            <option value="">Seleccione su nombre</option>
+            <option value="Lina Alexandra Quiros Obando">Lina Alexandra Quiros Obando</option>
+            <option value="Luis Alexander Vargas Vargas">Luis Alexander Vargas Vargas</option>
+            <option value="Juan Camilo Sierra Martinez">Juan Camilo Sierra Martinez</option>
+          </select>
+        </div>
+      `;
+      
+      // Insertar después del campo de PIN
+      const pinField = document.getElementById('pin-group');
+      pinField.insertAdjacentElement('afterend', laboratoristaDivGroup);
     }
+  } else {
+    // Para docentes, solo mostrar el PIN
+    pinGroup.style.display = 'block';
   }
   
   // Añadir botón de regreso a la página principal
@@ -155,7 +183,23 @@ function volverAPaginaInicio() {
 
 // Autenticar al usuario según su tipo
 function autenticarUsuario() {
-  const nombre = document.getElementById('user-name').value.trim();
+  let nombre = '';
+  
+  // Para laboratoristas, obtener el nombre del selector
+  if (currentUser.tipo === 'laboratorista') {
+    const laboratoristaSelect = document.getElementById('laboratorista-select');
+    if (laboratoristaSelect) {
+      nombre = laboratoristaSelect.value;
+      if (!nombre) {
+        mostrarNotificacion('Error', 'Por favor seleccione su nombre de la lista', 'error');
+        return;
+      }
+    } else {
+      nombre = document.getElementById('user-name').value.trim();
+    }
+  } else {
+    nombre = document.getElementById('user-name').value.trim();
+  }
   
   if (!nombre) {
     mostrarNotificacion('Error', 'Por favor ingresa tu nombre', 'error');
@@ -378,9 +422,15 @@ function iniciarRetorno() {
   // Ocultar la interfaz principal
   document.getElementById('interface').style.display = 'none';
   
-  // Recuperar préstamos del usuario actual
-  const prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]')
-    .filter(p => p.usuario_id === currentUser.id && p.estado === 'prestado');
+  // Recuperar todos los préstamos o solo los del usuario actual según tipo de usuario
+  let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
+  
+  // Si es laboratorista, muestra todos los préstamos activos; si no, solo los del usuario
+  if (currentUser.tipo === 'laboratorista') {
+    prestamos = prestamos.filter(p => p.estado === 'prestado');
+  } else {
+    prestamos = prestamos.filter(p => p.usuario_id === currentUser.id && p.estado === 'prestado');
+  }
   
   // Crear y mostrar la sección de retorno
   const retornoSection = document.createElement('section');
@@ -388,6 +438,8 @@ function iniciarRetorno() {
   retornoSection.className = 'my-5';
   
   // Estructura del contenido
+  const esLaboratorista = currentUser.tipo === 'laboratorista';
+  
   retornoSection.innerHTML = `
     <div class="card shadow">
       <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
@@ -397,10 +449,17 @@ function iniciarRetorno() {
       <div class="card-body">
         ${prestamos.length > 0 ? `
           <p class="mb-4">Seleccione los elementos que desea devolver:</p>
+          ${esLaboratorista ? `
+            <div class="mb-3">
+              <input type="text" class="form-control" id="buscar-prestamo" placeholder="Buscar por nombre de usuario o elemento" 
+                onkeyup="filtrarTablaRetornos()">
+            </div>
+          ` : ''}
           <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="tabla-retornos">
               <thead>
                 <tr>
+                  ${esLaboratorista ? '<th>Usuario</th>' : ''}
                   <th>Elemento</th>
                   <th>Cantidad</th>
                   <th>Fecha préstamo</th>
@@ -410,6 +469,7 @@ function iniciarRetorno() {
               <tbody>
                 ${prestamos.map(prestamo => `
                   <tr>
+                    ${esLaboratorista ? `<td>${prestamo.usuario_nombre}</td>` : ''}
                     <td>${prestamo.elemento_nombre}</td>
                     <td>${prestamo.cantidad}</td>
                     <td>${prestamo.fecha}</td>
@@ -425,7 +485,7 @@ function iniciarRetorno() {
           </div>
         ` : `
           <div class="alert alert-info">
-            <p>No tiene elementos pendientes por devolver.</p>
+            <p>No hay elementos pendientes por devolver.</p>
           </div>
         `}
       </div>

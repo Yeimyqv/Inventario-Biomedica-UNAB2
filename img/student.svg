@@ -1,0 +1,18 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .primary { fill: #28a745; }
+    .secondary { fill: #ffffff; }
+  </style>
+  
+  <!-- Círculo de fondo -->
+  <circle cx="50" cy="50" r="45" class="primary" />
+  
+  <!-- Libro -->
+  <rect x="30" y="60" width="40" height="30" rx="2" ry="2" class="secondary" />
+  <rect x="28" y="58" width="44" height="5" rx="2" ry="2" class="secondary" />
+  
+  <!-- Birrete -->
+  <path d="M50 25 L70 35 L50 45 L30 35 Z" class="secondary" />
+  <rect x="48" y="43" width="4" height="15" class="secondary" />
+  <rect x="40" y="55" width="20" height="4" rx="2" ry="2" class="secondary" />
+</svg>

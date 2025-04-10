@@ -1,0 +1,166 @@
+🧠 PROTOTIPO FUNCIONAL – Módulo de Inventario de Bioinstrumentación
+✅ MÓDULO 1: Selección de Usuario
+Interfaz inicial: Seleccionar tipo de usuario:
+
+👨‍🎓 Estudiante
+
+👩‍🏫 Docente
+
+👩‍🔬 Laboratorista
+
+Autenticación parcial:
+
+Estudiante: solo selecciona su nombre o lo digita.
+
+Docente / Laboratorista: ingresa con un código especial (tipo PIN o clave).
+
+📦 MÓDULO 2: Panel de Acciones según Usuario
+🎓 ESTUDIANTE
+Puede:
+
+Prestar elementos.
+
+Retornar elementos.
+
+Flujo:
+
+Selecciona acción: Prestar o Retornar.
+
+Selecciona categoría (ej. Arduino, Cables).
+
+Selecciona elemento (ej. Arduino UNO R3).
+
+Se muestra la imagen del elemento.
+
+Selecciona cantidad.
+
+Botón de acción: “Prestar” o “Retornar”.
+
+Aparece un mensaje de confirmación y el inventario se actualiza en tiempo real.
+
+Si la cantidad disponible es 0 → el botón se deshabilita.
+
+👨‍🔬 LABORATORISTA
+Puede:
+
+Ver el inventario completo (restringido con código).
+
+Prestar y retornar elementos como estudiante.
+
+Agregar nuevos elementos.
+
+Eliminar elementos.
+
+Extra: módulo de consulta avanzada:
+
+Filtros por categoría, nivel de inventario, histórico de movimientos.
+
+👩‍🏫 DOCENTE
+Igual al laboratorista, pero sin permiso para agregar o eliminar elementos.
+
+📈 MÓDULO 3: Lógica de Inventario
+Cada acción debe:
+
+Disminuir cantidad si es préstamo.
+
+Aumentar cantidad si es retorno.
+
+Mostrar imagen referencial.
+
+Registrar usuario, fecha, hora, acción y cantidad en una bitácora para trazabilidad.
+
+📅 MÓDULO 4: Reportes (futuro)
+(Opcional por ahora, pero fácil de integrar)
+
+Informe mensual con:
+
+Préstamos realizados.
+
+Elementos no retornados.
+
+Top 10 de materiales más prestados.
+
+Stock crítico.
+
+⚙️ SUGERENCIA TECNOLÓGICA PARA IMPLEMENTARLO
+Como ya tienes experiencia con Laravel, propongo:
+
+Backend: Laravel 10
+
+Frontend: Livewire (para reactividad sin necesidad de usar Vue) o Inertia.js + React
+
+Base de datos: MySQL o PostgreSQL
+
+Auth: Laravel Breeze o Fortify para roles
+
+Visualización: Bootstrap o Tailwind (Tailwind recomendado)
+
+Y como puedes usar los computadores del laboratorio, se puede montar localmente en red interna o incluso dejarlo accesible desde la web (según necesidad).
+
+🎁 BONUS: ¿Quieres que te arme el primer esqueleto en Laravel?
+Te puedo generar:
+
+Las rutas básicas
+
+Las vistas principales con Tailwind
+
+Los modelos de datos (categoría, elemento, préstamo, usuario)
+
+Las migraciones de base de datos
+
+Con eso, tú o tus estudiantes podrían seguir desarrollándolo como proyecto real para la universidad.
+
+¿Quieres que armemos ese esqueleto? ¿O prefieres primero un prototipo visual tipo maqueta (mockup) para presentarlo en comité o con tus colegas?
+
+
+
+
+
+
+
+Dijiste:
+Habia pensado que podemos hacer un prototipo en replit con HTML, CSS, Javascript
+
+Me gustaria agregar de una vez la base de datos de excel que te pase y adicionalmente ponerle el logo de la universidad, dejamos para el prototipo la parte deonde se ve la imagen pero todavia sin imagen porque seria mas largo el proceso
+
+
+ChatGPT dijo:
+¡Perfecto! Ya tengo la estructura del archivo que compartiste. Aquí están los datos clave que vamos a usar para el prototipo del laboratorio de bioinstrumentación:
+
+Categorías (como "Amplificador")
+
+Elementos dentro de cada categoría (como "AD620", "INA114", etc.)
+
+Cantidad en inventario
+
+Ubicación física del elemento
+
+Link a imagen de referencia (que por ahora podemos dejar oculto o sin funcionalidad)
+
+Observaciones
+
+💡 Plan para el prototipo en Replit (HTML, CSS, JS)
+1. Pantalla de Inicio
+Selección de usuario: Estudiante / Docente / Laboratorista
+
+Si es docente o laboratorista, solicitar código de acceso
+
+2. Acciones por Rol
+Rol	Ver inventario	Prestar	Retornar	Agregar elementos	Eliminar elementos
+Estudiante	❌	✅	✅	❌	❌
+Docente	✅ (con código)	✅	✅	❌	❌
+Laboratorista	✅ (con código)	✅	✅	✅	✅
+3. Flujo de Préstamo / Retorno
+Selección de categoría
+
+Lista desplegable con elementos disponibles (según categoría)
+
+Mostrar cantidad disponible
+
+Seleccionar cantidad a prestar o retornar
+
+(Opcional) Mostrar imagen del producto
+
+Botón de acción (Prestar / Retornar)
+
+Confirmación y actualización inmediata del inventario (modo local por ahora)

@@ -626,22 +626,25 @@ function confirmarEliminarElemento() {
 
 // Confirmar volver a interfaz principal
 function confirmarVolverAInterfaz() {
-  const confirmacion = confirm('¿Estás seguro que deseas volver a la interfaz principal?');
-  if (confirmacion) {
-    // Eliminar sección de inventario si existe
-    const inventarioSection = document.getElementById('inventario-section');
-    if (inventarioSection) {
-      inventarioSection.remove();
+  mostrarConfirmacion(
+    'Volver a la interfaz principal',
+    '¿Estás seguro que deseas volver a la interfaz principal?',
+    () => {
+      // Eliminar sección de inventario si existe
+      const inventarioSection = document.getElementById('inventario-section');
+      if (inventarioSection) {
+        inventarioSection.remove();
+      }
+      
+      // Eliminar sección de préstamos si existe
+      const prestamosSection = document.getElementById('prestamos-section');
+      if (prestamosSection) {
+        prestamosSection.remove();
+      }
+      
+      volverAInterfazPrincipal();
     }
-    
-    // Eliminar sección de préstamos si existe
-    const prestamosSection = document.getElementById('prestamos-section');
-    if (prestamosSection) {
-      prestamosSection.remove();
-    }
-    
-    volverAInterfazPrincipal();
-  }
+  );
 }
 
 // Consultar préstamos (laboratorista y docente)
@@ -792,67 +795,71 @@ function filtrarPrestamos() {
 
 // Registrar devolución de un elemento
 function registrarDevolucion(prestamoId) {
-  const confirmacion = confirm('¿Confirma la devolución de este elemento?');
-  
-  if (confirmacion) {
-    // Recuperar préstamos
-    let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
-    const index = prestamos.findIndex(p => p.id === prestamoId);
-    
-    if (index !== -1) {
-      const prestamo = prestamos[index];
+  mostrarConfirmacion(
+    'Confirmar devolución',
+    '¿Confirma la devolución de este elemento?',
+    () => {
+      // Recuperar préstamos
+      let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
+      const index = prestamos.findIndex(p => p.id === prestamoId);
       
-      // Actualizar estado del préstamo
-      prestamo.estado = 'devuelto';
-      prestamo.fecha_devolucion = new Date().toLocaleString();
-      prestamos[index] = prestamo;
-      
-      // Actualizar inventario: devolver la cantidad al stock disponible
-      INVENTARIO.forEach(categoria => {
-        const elemento = categoria.elementos.find(e => e.id === prestamo.elemento_id);
-        if (elemento) {
-          elemento.cantidad += prestamo.cantidad;
-        }
-      });
-      
-      // Guardar cambios
-      localStorage.setItem('prestamos', JSON.stringify(prestamos));
-      
-      // Mostrar confirmación
-      mostrarNotificacion('Éxito', 'Elemento devuelto correctamente', 'success');
-      
-      // Actualizar la vista de préstamos
-      consultarPrestamos();
-    } else {
-      mostrarNotificacion('Error', 'No se pudo encontrar el préstamo', 'error');
+      if (index !== -1) {
+        const prestamo = prestamos[index];
+        
+        // Actualizar estado del préstamo
+        prestamo.estado = 'devuelto';
+        prestamo.fecha_devolucion = new Date().toLocaleString();
+        prestamos[index] = prestamo;
+        
+        // Actualizar inventario: devolver la cantidad al stock disponible
+        INVENTARIO.forEach(categoria => {
+          const elemento = categoria.elementos.find(e => e.id === prestamo.elemento_id);
+          if (elemento) {
+            elemento.cantidad += prestamo.cantidad;
+          }
+        });
+        
+        // Guardar cambios
+        localStorage.setItem('prestamos', JSON.stringify(prestamos));
+        
+        // Mostrar confirmación
+        mostrarNotificacion('Éxito', 'Elemento devuelto correctamente', 'success');
+        
+        // Actualizar la vista de préstamos
+        consultarPrestamos();
+      } else {
+        mostrarNotificacion('Error', 'No se pudo encontrar el préstamo', 'error');
+      }
     }
-  }
+  );
 }
 
 // Volver a la interfaz principal desde cualquier módulo
 function volverAInterfazPrincipal() {
-  const confirmacion = confirm('¿Estás seguro que deseas volver a la página principal?');
-  
-  if (confirmacion) {
-    // Ocultar todas las secciones
-    document.getElementById('prestamo-section').style.display = 'none';
-    document.getElementById('admin-section').style.display = 'none';
-    
-    // Eliminar sección de inventario si existe
-    const inventarioSection = document.getElementById('inventario-section');
-    if (inventarioSection) {
-      inventarioSection.remove();
+  mostrarConfirmacion(
+    'Volver a la página principal',
+    '¿Estás seguro que deseas volver a la página principal?',
+    () => {
+      // Ocultar todas las secciones
+      document.getElementById('prestamo-section').style.display = 'none';
+      document.getElementById('admin-section').style.display = 'none';
+      
+      // Eliminar sección de inventario si existe
+      const inventarioSection = document.getElementById('inventario-section');
+      if (inventarioSection) {
+        inventarioSection.remove();
+      }
+      
+      // Eliminar sección de préstamos si existe
+      const prestamosSection = document.getElementById('prestamos-section');
+      if (prestamosSection) {
+        prestamosSection.remove();
+      }
+      
+      // Mostrar la interfaz principal
+      document.getElementById('interface').style.display = 'block';
     }
-    
-    // Eliminar sección de préstamos si existe
-    const prestamosSection = document.getElementById('prestamos-section');
-    if (prestamosSection) {
-      prestamosSection.remove();
-    }
-    
-    // Mostrar la interfaz principal
-    document.getElementById('interface').style.display = 'block';
-  }
+  );
 }
 
 // Cargar categorías desde la API
@@ -984,37 +991,39 @@ function realizarPrestamo() {
   }
   
   // Confirmar el préstamo
-  const confirmacion = confirm(`¿Confirma el préstamo de ${cantidad} unidad(es) de ${elementoSeleccionado.nombre}?`);
-  
-  if (confirmacion) {
-    // Simular préstamo (en un sistema real, se usaría la API)
-    // Actualizar cantidad disponible en tiempo real
-    elementoSeleccionado.cantidad -= cantidad;
-    
-    // Registrar el préstamo (en un sistema real, se almacenaría en la BD)
-    const prestamo = {
-      id: Date.now(),
-      elemento_id: elementoSeleccionado.id,
-      elemento_nombre: elementoSeleccionado.nombre,
-      cantidad: cantidad,
-      fecha: new Date().toLocaleString(),
-      usuario_id: currentUser.id,
-      usuario_nombre: currentUser.nombre,
-      estado: 'prestado'
-    };
-    
-    // Almacenar préstamo en localStorage para simular persistencia
-    // En un sistema real, esto se enviaría al servidor
-    let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
-    prestamos.push(prestamo);
-    localStorage.setItem('prestamos', JSON.stringify(prestamos));
-    
-    // Mostrar confirmación con detalles del préstamo
-    mostrarNotificacion('Éxito', `Se ha registrado el préstamo de ${cantidad} unidad(es) de ${elementoSeleccionado.nombre} a nombre de ${currentUser.nombre}`, 'success');
-    
-    // Volver a la interfaz principal con confirmación
-    volverAInterfazPrincipal();
-  }
+  mostrarConfirmacion(
+    'Confirmar préstamo',
+    `¿Confirma el préstamo de ${cantidad} unidad(es) de ${elementoSeleccionado.nombre}?`,
+    () => {
+      // Simular préstamo (en un sistema real, se usaría la API)
+      // Actualizar cantidad disponible en tiempo real
+      elementoSeleccionado.cantidad -= cantidad;
+      
+      // Registrar el préstamo (en un sistema real, se almacenaría en la BD)
+      const prestamo = {
+        id: Date.now(),
+        elemento_id: elementoSeleccionado.id,
+        elemento_nombre: elementoSeleccionado.nombre,
+        cantidad: cantidad,
+        fecha: new Date().toLocaleString(),
+        usuario_id: currentUser.id,
+        usuario_nombre: currentUser.nombre,
+        estado: 'prestado'
+      };
+      
+      // Almacenar préstamo en localStorage para simular persistencia
+      // En un sistema real, esto se enviaría al servidor
+      let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
+      prestamos.push(prestamo);
+      localStorage.setItem('prestamos', JSON.stringify(prestamos));
+      
+      // Mostrar confirmación con detalles del préstamo
+      mostrarNotificacion('Éxito', `Se ha registrado el préstamo de ${cantidad} unidad(es) de ${elementoSeleccionado.nombre} a nombre de ${currentUser.nombre}`, 'success');
+      
+      // Volver a la interfaz principal con confirmación
+      volverAInterfazPrincipal();
+    }
+  );
 }
 
 // Inicializar modales personalizados

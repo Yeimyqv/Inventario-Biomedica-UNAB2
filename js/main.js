@@ -1215,6 +1215,31 @@ function registrarDevolucion(prestamoId) {
   );
 }
 
+// Filtrar la tabla de retornos (para laboratoristas)
+function filtrarTablaRetornos() {
+  const busqueda = document.getElementById('buscar-prestamo').value.toLowerCase();
+  const tabla = document.getElementById('tabla-retornos');
+  const filas = tabla.getElementsByTagName('tr');
+  
+  for (let i = 1; i < filas.length; i++) { // Empezar desde 1 para saltar el encabezado
+    const fila = filas[i];
+    const celdas = fila.getElementsByTagName('td');
+    let mostrar = false;
+    
+    // Buscar en todas las celdas de la fila
+    for (let j = 0; j < celdas.length; j++) {
+      const texto = celdas[j].textContent.toLowerCase();
+      if (texto.includes(busqueda)) {
+        mostrar = true;
+        break;
+      }
+    }
+    
+    // Mostrar u ocultar la fila
+    fila.style.display = mostrar ? '' : 'none';
+  }
+}
+
 // Volver a la interfaz principal desde cualquier módulo
 function volverAInterfazPrincipal() {
   // Ocultar todas las secciones secundarias

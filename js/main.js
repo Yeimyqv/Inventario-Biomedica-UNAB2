@@ -7,6 +7,7 @@ let currentUser = {
 
 let elementoSeleccionado = null;
 let categoriaSeleccionada = null;
+let currentLaboratory = null; // Para almacenar el laboratorio seleccionado
 
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
@@ -20,6 +21,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Inicializar modales personalizados
   initCustomModals();
+  
+  // Asegurarse que se inicia en la selección de laboratorio
+  document.getElementById('lab-selection').style.display = 'block';
+  document.getElementById('user-selection').style.display = 'none';
 });
 
 // Inicializar listeners de eventos
@@ -58,6 +63,20 @@ function initEventListeners() {
 // Inicializar sistema de notificaciones
 function initNotifications() {
   // Se usa bootstrap para notificaciones tipo toast
+}
+
+// Selección inicial del laboratorio
+function selectLaboratory(laboratorio) {
+  currentLaboratory = laboratorio;
+  
+  // Mostrar mensaje de confirmación del laboratorio seleccionado
+  mostrarNotificacion('Laboratorio seleccionado', `Ha seleccionado el laboratorio: Sede ${laboratorio === 'jardin' ? 'Jardín' : 'Bosque'}`, 'info');
+  
+  // Ocultar la selección de laboratorio
+  document.getElementById('lab-selection').style.display = 'none';
+  
+  // Mostrar la selección de usuario
+  document.getElementById('user-selection').style.display = 'block';
 }
 
 // Selección inicial del tipo de usuario
@@ -949,8 +968,11 @@ function consultarPrestamos() {
   prestamosSection.id = 'prestamos-section';
   prestamosSection.className = 'my-5';
   
-  // Recuperar préstamos (simulación usando localStorage)
-  const prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
+  // Recuperar todos los préstamos para laboratoristas, o solo los del usuario para docentes
+  let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
+  
+  // Si es laboratorista, muestra todos los préstamos para poder gestionarlos
+  const esLaboratorista = currentUser.tipo === 'laboratorista';
   
   // Estructura del contenido
   prestamosSection.innerHTML = `

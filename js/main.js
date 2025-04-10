@@ -155,7 +155,7 @@ function autenticarUsuario() {
     }
     
     if (PINES[currentUser.tipo] !== pin) {
-      mostrarNotificacion('Error', 'PIN incorrecto. Intenta nuevamente.', 'error');
+      mostrarNotificacion('Error', `PIN incorrecto. Para ${currentUser.tipo === 'docente' ? 'docentes' : 'laboratoristas'} el PIN correcto es: ${PINES[currentUser.tipo]}`, 'error');
       return;
     }
   } 
@@ -203,9 +203,12 @@ function cargarInterfazPrincipal() {
   if (currentUser.tipo === 'estudiante') {
     contenido = `
       <div class="card shadow mb-4">
-        <div class="card-header bg-success text-white">
-          <h3>Bienvenido, ${currentUser.nombre}</h3>
-          <p class="mb-0">Panel de Estudiante - Puedes prestar y retornar elementos</p>
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <div>
+            <h3>Bienvenido, ${currentUser.nombre}</h3>
+            <p class="mb-0">Panel de Estudiante - Puedes prestar y retornar elementos</p>
+          </div>
+          <button class="btn btn-sm btn-light" onclick="volverASeleccionUsuario()">Volver</button>
         </div>
         <div class="card-body">
           <div class="row">
@@ -236,9 +239,12 @@ function cargarInterfazPrincipal() {
   else if (currentUser.tipo === 'docente') {
     contenido = `
       <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white">
-          <h3>Bienvenido, ${currentUser.nombre}</h3>
-          <p class="mb-0">Panel de Docente - Gestión de elementos y préstamos</p>
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <div>
+            <h3>Bienvenido, ${currentUser.nombre}</h3>
+            <p class="mb-0">Panel de Docente - Gestión de elementos y préstamos</p>
+          </div>
+          <button class="btn btn-sm btn-light" onclick="volverASeleccionUsuario()">Volver</button>
         </div>
         <div class="card-body">
           <div class="row">
@@ -278,9 +284,12 @@ function cargarInterfazPrincipal() {
   else if (currentUser.tipo === 'laboratorista') {
     contenido = `
       <div class="card shadow mb-4">
-        <div class="card-header bg-warning">
-          <h3>Bienvenido, ${currentUser.nombre}</h3>
-          <p class="mb-0">Panel de Laboratorista - Administración completa del sistema</p>
+        <div class="card-header bg-warning d-flex justify-content-between align-items-center">
+          <div>
+            <h3>Bienvenido, ${currentUser.nombre}</h3>
+            <p class="mb-0">Panel de Laboratorista - Administración completa del sistema</p>
+          </div>
+          <button class="btn btn-sm btn-light" onclick="volverASeleccionUsuario()">Volver</button>
         </div>
         <div class="card-body">
           <div class="row">

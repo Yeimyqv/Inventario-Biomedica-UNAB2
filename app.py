@@ -39,8 +39,13 @@ def index():
 def serve_static(path):
     """Serve static files."""
     # Primero buscar en carpetas específicas
-    if path.startswith(('css/', 'js/', 'img/')):
+    if path.startswith(('css/', 'js/', 'img/', 'static/')):
         folder = path.split('/')[0]
+        file_path = '/'.join(path.split('/')[1:])
+        return send_from_directory(folder, file_path)
+    # Verificar archivos en attached_assets
+    elif path.startswith('attached_assets/'):
+        folder = 'attached_assets'
         file_path = '/'.join(path.split('/')[1:])
         return send_from_directory(folder, file_path)
     return render_template('index.html')

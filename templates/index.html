@@ -37,8 +37,44 @@
   <!-- Contenido principal -->
   <main class="container mt-4">
     
+    <!-- Sección de selección de laboratorio -->
+    <section id="lab-selection" class="my-5">
+      <div class="text-center mb-4">
+        <h2>SISTEMA DE GESTIÓN DE INVENTARIO LABORATORIOS INGENIERÍA BIOMÉDICA</h2>
+        <p class="lead">Seleccione el laboratorio al que desea acceder</p>
+      </div>
+      
+      <div class="row justify-content-center mt-5">
+        <!-- Sede Jardín -->
+        <div class="col-md-5 mb-4">
+          <div class="card text-center h-100 shadow">
+            <div class="card-body">
+              <h3 class="card-title">LABORATORIOS SEDE JARDÍN</h3>
+              <p class="card-text">Acceda al sistema de gestión para los laboratorios de la Sede Jardín.</p>
+              <button class="btn btn-success mt-3" onclick="selectLaboratory('jardin')">
+                Acceder a Sede Jardín
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Sede Bosque -->
+        <div class="col-md-5 mb-4">
+          <div class="card text-center h-100 shadow">
+            <div class="card-body">
+              <h3 class="card-title">LABORATORIOS SEDE BOSQUE</h3>
+              <p class="card-text">Próximamente en desarrollo.</p>
+              <button class="btn btn-secondary mt-3" disabled>
+                Próximamente
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
     <!-- Sección de selección de usuario -->
-    <section id="user-selection" class="my-5">
+    <section id="user-selection" class="my-5" style="display: none;">
       <div class="text-center mb-4">
         <h2>Seleccione su tipo de usuario</h2>
         <p class="lead">El sistema adapta sus funciones según su rol en el laboratorio</p>

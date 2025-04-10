@@ -1325,32 +1325,26 @@ function initCustomModals() {
 
 // Volver a la selección de usuario (pantalla de inicio)
 function volverASeleccionUsuario() {
-  mostrarConfirmacion(
-    'Volver a inicio', 
-    '¿Estás seguro que deseas volver a la pantalla de selección de usuario?<br>Se perderán los cambios no guardados.',
-    () => {
-      // Resetear el estado de la aplicación
-      currentUser = { id: null, tipo: null, nombre: null };
-      elementoSeleccionado = null;
-      categoriaSeleccionada = null;
-      
-      // Ocultar todas las secciones
-      document.getElementById('auth-section').style.display = 'none';
-      document.getElementById('interface').style.display = 'none';
-      document.getElementById('prestamo-section').style.display = 'none';
-      document.getElementById('admin-section').style.display = 'none';
-      
-      // Eliminar secciones dinámicas
-      const inventarioSection = document.getElementById('inventario-section');
-      if (inventarioSection) inventarioSection.remove();
-      
-      const prestamosSection = document.getElementById('prestamos-section');
-      if (prestamosSection) prestamosSection.remove();
-      
-      // Mostrar selección de usuario
-      document.getElementById('user-selection').style.display = 'block';
-    }
-  );
+  // Resetear el estado de la aplicación
+  currentUser = { id: null, tipo: null, nombre: null };
+  elementoSeleccionado = null;
+  categoriaSeleccionada = null;
+  
+  // Ocultar todas las secciones
+  document.getElementById('auth-section').style.display = 'none';
+  document.getElementById('interface').style.display = 'none';
+  document.getElementById('prestamo-section').style.display = 'none';
+  document.getElementById('admin-section').style.display = 'none';
+  
+  // Eliminar secciones dinámicas
+  const inventarioSection = document.getElementById('inventario-section');
+  if (inventarioSection) inventarioSection.remove();
+  
+  const prestamosSection = document.getElementById('prestamos-section');
+  if (prestamosSection) prestamosSection.remove();
+  
+  // Mostrar selección de usuario
+  document.getElementById('user-selection').style.display = 'block';
 }
 
 // Mostrar notificación al usuario

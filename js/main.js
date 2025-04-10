@@ -444,7 +444,7 @@ function iniciarRetorno() {
     <div class="card shadow">
       <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
         <h3>Retorno de elementos</h3>
-        <button class="btn btn-sm btn-light" onclick="volverAInterfazPrincipal()">Volver</button>
+        <button class="btn btn-sm btn-light" onclick="confirmarVolverAInterfaz()">Volver</button>
       </div>
       <div class="card-body">
         ${prestamos.length > 0 ? `
@@ -1001,21 +1001,27 @@ function confirmarEliminarElemento() {
   mostrarNotificacion('Información', 'Seleccione el elemento que desea eliminar en la lista de inventario', 'info');
 }
 
-// Volver a interfaz principal sin confirmación
+// Volver a interfaz principal con confirmación
 function confirmarVolverAInterfaz() {
-  // Eliminar sección de inventario si existe
-  const inventarioSection = document.getElementById('inventario-section');
-  if (inventarioSection) {
-    inventarioSection.remove();
-  }
-  
-  // Eliminar sección de préstamos si existe
-  const prestamosSection = document.getElementById('prestamos-section');
-  if (prestamosSection) {
-    prestamosSection.remove();
-  }
-  
-  volverAInterfazPrincipal();
+  mostrarConfirmacion(
+    'Volver al menú principal',
+    '¿Está seguro que desea volver al menú principal? Los cambios no guardados se perderán.',
+    () => {
+      // Eliminar sección de inventario si existe
+      const inventarioSection = document.getElementById('inventario-section');
+      if (inventarioSection) {
+        inventarioSection.remove();
+      }
+      
+      // Eliminar sección de préstamos si existe
+      const prestamosSection = document.getElementById('prestamos-section');
+      if (prestamosSection) {
+        prestamosSection.remove();
+      }
+      
+      volverAInterfazPrincipal();
+    }
+  );
 }
 
 // Consultar préstamos (laboratorista y docente)

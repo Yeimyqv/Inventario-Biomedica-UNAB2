@@ -15,7 +15,8 @@ header {
 }
 
 .logo {
-  height: 60px;
+  height: auto;
+  width: 120px;
   margin-right: 20px;
   object-fit: contain;
 }

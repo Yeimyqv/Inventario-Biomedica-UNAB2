@@ -1,0 +1,49 @@
+{
+  "categorias": [
+    {
+      "nombre": "Amplificadores",
+      "elementos": [
+        {
+          "id": "amp001",
+          "nombre": "AD620",
+          "cantidad": 5,
+          "descripcion": "Amplificador de instrumentación de baja potencia",
+          "ubicacion": "Estante A, Caja 3"
+        },
+        {
+          "id": "amp002",
+          "nombre": "LM348",
+          "cantidad": 3,
+          "descripcion": "Amplificador operacional cuádruple",
+          "ubicacion": "Estante A, Caja 3"
+        }
+      ]
+    },
+    {
+      "nombre": "Arduino",
+      "elementos": [
+        {
+          "id": "ard001",
+          "nombre": "UNO",
+          "cantidad": 4,
+          "descripcion": "Placa Arduino UNO con microcontrolador ATmega328P",
+          "ubicacion": "Estante B, Caja 1"
+        },
+        {
+          "id": "ard002",
+          "nombre": "UNO R3 Compatible",
+          "cantidad": 2,
+          "descripcion": "Placa compatible con Arduino UNO R3",
+          "ubicacion": "Estante B, Caja 1"
+        },
+        {
+          "id": "ard003",
+          "nombre": "Nano",
+          "cantidad": 6,
+          "descripcion": "Placa Arduino Nano con microcontrolador ATmega328P",
+          "ubicacion": "Estante B, Caja 2"
+        }
+      ]
+    }
+  ]
+}

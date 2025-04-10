@@ -1,0 +1,34 @@
+<svg width="300" height="120" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .logo-bg { fill: #f7941e; }
+    .house { fill: white; }
+    .text { fill: #f7941e; }
+    .line { stroke: #f7941e; stroke-width: 2; }
+    .subtext { font-size: 12px; font-family: Arial, sans-serif; fill: #f7941e; }
+  </style>
+
+  <!-- Rounded rectangle background -->
+  <rect class="logo-bg" x="0" y="0" width="100" height="100" rx="15" ry="15" />
+
+  <!-- House icon with windows -->
+  <g class="house">
+    <!-- Roof -->
+    <polygon points="15,40 50,15 85,40" />
+    
+    <!-- House body -->
+    <rect x="25" y="40" width="50" height="45" />
+    
+    <!-- Windows -->
+    <rect x="35" y="50" width="10" height="20" rx="5" ry="5" />
+    <rect x="55" y="50" width="10" height="20" rx="5" ry="5" />
+  </g>
+
+  <!-- UNAB text -->
+  <text class="text" x="120" y="65" font-family="Arial, sans-serif" font-weight="bold" font-size="40">unab</text>
+
+  <!-- Horizontal line -->
+  <line class="line" x1="120" y1="80" x2="250" y2="80" />
+
+  <!-- Subtext -->
+  <text class="subtext" x="120" y="95">VIGILADA MINEDUCACIÓN</text>
+</svg>

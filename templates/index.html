@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PROTOTIPO GESTOR DE LABORATORIOS ING. BIOMÉDICA UNAB</title>
+  <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header>
+    <img src="/img/logo-unab.svg" alt="Logo UNAB" class="logo" />
+    <h1>PROTOTIPO GESTOR DE LABORATORIOS<br>ING. BIOMÉDICA UNAB</h1>
+  </header>
+
+  <div class="container mt-4">
+    <main>
+      <section id="user-selection">
+        <h2>¿Quién eres?</h2>
+        <select id="user-type" class="form-select mb-3">
+          <option value="">Selecciona una opción</option>
+          <option value="estudiante">Estudiante</option>
+          <option value="docente">Docente</option>
+          <option value="laboratorista">Laboratorista</option>
+        </select>
+        <div id="pin-section" style="display:none;">
+          <input type="password" id="pin-input" class="form-control mb-2" placeholder="Ingresa tu PIN" />
+          <button class="btn btn-primary" onclick="verifyPin()">Acceder</button>
+        </div>
+      </section>
+
+      <section id="interface" style="display:none;">
+        <!-- Aquí se cargará la interfaz dependiendo del tipo de usuario -->
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/data.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,17 +1,28 @@
-from app import db
-from datetime import datetime
+"""
+Modelos para el Sistema de Gestión de Laboratorio de Bioinstrumentación.
+"""
 
-# Modelo para categorías de inventario
+from datetime import datetime
+from app import db
+
 class Categoria(db.Model):
+    """Modelo para categorías de elementos."""
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False, unique=True)
     elementos = db.relationship('Elemento', backref='categoria', lazy=True)
     
     def __repr__(self):
         return f'<Categoria {self.nombre}>'
+    
+    def to_dict(self):
+        """Convertir objeto a diccionario."""
+        return {
+            'id': self.id,
+            'nombre': self.nombre
+        }
 
-# Modelo para elementos del inventario
 class Elemento(db.Model):
+    """Modelo para elementos del inventario."""
     id = db.Column(db.Integer, primary_key=True)
     codigo = db.Column(db.String(20), nullable=False, unique=True)
     nombre = db.Column(db.String(100), nullable=False)
@@ -23,10 +34,34 @@ class Elemento(db.Model):
     prestamos = db.relationship('Prestamo', backref='elemento', lazy=True)
     
     def __repr__(self):
-        return f'<Elemento {self.nombre}>'
+        return f'<Elemento {self.codigo} - {self.nombre}>'
+    
+    def to_dict(self):
+        """Convertir objeto a diccionario."""
+        return {
+            'id': self.id,
+            'codigo': self.codigo,
+            'nombre': self.nombre,
+            'descripcion': self.descripcion,
+            'cantidad': self.cantidad,
+            'ubicacion': self.ubicacion,
+            'imagen_url': self.imagen_url,
+            'categoria_id': self.categoria_id,
+            'categoria_nombre': self.categoria.nombre
+        }
+    
+    def disponibles(self):
+        """Calcular la cantidad disponible teniendo en cuenta los préstamos activos."""
+        prestamos_activos = Prestamo.query.filter_by(
+            elemento_id=self.id, 
+            estado='prestado'
+        ).all()
+        
+        cantidad_prestada = sum(prestamo.cantidad for prestamo in prestamos_activos)
+        return self.cantidad - cantidad_prestada
 
-# Modelo para usuarios
 class Usuario(db.Model):
+    """Modelo para usuarios del sistema."""
     id = db.Column(db.Integer, primary_key=True)
     tipo = db.Column(db.String(20), nullable=False)  # estudiante, docente, laboratorista
     nombre = db.Column(db.String(100), nullable=False)
@@ -35,10 +70,19 @@ class Usuario(db.Model):
     prestamos = db.relationship('Prestamo', backref='usuario', lazy=True)
     
     def __repr__(self):
-        return f'<Usuario {self.nombre} ({self.tipo})>'
+        return f'<Usuario {self.tipo} - {self.nombre}>'
+    
+    def to_dict(self):
+        """Convertir objeto a diccionario."""
+        return {
+            'id': self.id,
+            'tipo': self.tipo,
+            'nombre': self.nombre,
+            'identificacion': self.identificacion
+        }
 
-# Modelo para préstamos
 class Prestamo(db.Model):
+    """Modelo para préstamos de elementos."""
     id = db.Column(db.Integer, primary_key=True)
     elemento_id = db.Column(db.Integer, db.ForeignKey('elemento.id'), nullable=False)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
@@ -50,4 +94,20 @@ class Prestamo(db.Model):
     observaciones = db.Column(db.Text, nullable=True)
     
     def __repr__(self):
-        return f'<Prestamo {self.id} - {self.estado}>'
+        return f'<Prestamo {self.id} - {self.elemento.nombre} a {self.usuario.nombre}>'
+    
+    def to_dict(self):
+        """Convertir objeto a diccionario."""
+        return {
+            'id': self.id,
+            'elemento_id': self.elemento_id,
+            'elemento_nombre': self.elemento.nombre,
+            'usuario_id': self.usuario_id,
+            'usuario_nombre': self.usuario.nombre,
+            'cantidad': self.cantidad,
+            'fecha_prestamo': self.fecha_prestamo.strftime('%Y-%m-%d %H:%M'),
+            'fecha_devolucion_esperada': self.fecha_devolucion_esperada.strftime('%Y-%m-%d %H:%M') if self.fecha_devolucion_esperada else None,
+            'fecha_devolucion_real': self.fecha_devolucion_real.strftime('%Y-%m-%d %H:%M') if self.fecha_devolucion_real else None,
+            'estado': self.estado,
+            'observaciones': self.observaciones
+        }

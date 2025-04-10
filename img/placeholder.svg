@@ -1,0 +1,19 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .bg { fill: #f8f9fa; }
+    .border { fill: none; stroke: #ced4da; stroke-width: 2; }
+    .icon { fill: #6c757d; }
+    .text { fill: #6c757d; font-family: Arial, sans-serif; font-size: 16px; text-anchor: middle; }
+  </style>
+  
+  <!-- Fondo y borde -->
+  <rect x="10" y="10" width="180" height="180" rx="10" ry="10" class="bg border" />
+  
+  <!-- Ícono de imagen -->
+  <rect x="70" y="60" width="60" height="50" class="icon" />
+  <polyline points="70,90 85,75 95,85 115,65 130,80" class="bg" stroke="#fff" stroke-width="2" />
+  <circle cx="105" cy="70" r="5" class="bg" />
+  
+  <!-- Texto -->
+  <text x="100" y="130" class="text">Imagen no disponible</text>
+</svg>

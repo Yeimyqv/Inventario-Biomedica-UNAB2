@@ -1,0 +1,22 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .primary { fill: #ffc107; }
+    .secondary { fill: #ffffff; }
+  </style>
+  
+  <!-- Círculo de fondo -->
+  <circle cx="50" cy="50" r="45" class="primary" />
+  
+  <!-- Matraz -->
+  <path d="M40 25 L40 50 C40 65 60 65 60 50 L60 25 Z" class="secondary" />
+  <rect x="36" y="20" width="28" height="5" rx="2" ry="2" class="secondary" />
+  
+  <!-- Burbujas dentro del matraz -->
+  <circle cx="45" cy="40" r="3" class="primary" />
+  <circle cx="55" cy="50" r="4" class="primary" />
+  <circle cx="48" cy="55" r="2" class="primary" />
+  
+  <!-- Microscopio base -->
+  <rect x="30" y="70" width="40" height="5" rx="2" ry="2" class="secondary" />
+  <rect x="45" y="60" width="10" height="15" class="secondary" />
+</svg>

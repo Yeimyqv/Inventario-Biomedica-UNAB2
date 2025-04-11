@@ -41,6 +41,17 @@ function initEventListeners() {
     authButton.addEventListener('click', autenticarUsuario);
   }
   
+  // Eventos de tecla Enter para el formulario de autenticación
+  const authForm = document.getElementById('auth-form');
+  if (authForm) {
+    authForm.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Evitar envío del formulario por defecto
+        autenticarUsuario();
+      }
+    });
+  }
+  
   // Selección de categoría en préstamo
   const categoriaSelect = document.getElementById('categoria-select');
   if (categoriaSelect) {
@@ -129,9 +140,6 @@ function selectUserType(tipo) {
       usernameField.insertAdjacentElement('afterend', estudianteDivGroup);
     }
   } else if (tipo === 'laboratorista') {
-    // Mostrar el PIN
-    pinGroup.style.display = 'block';
-    
     // Ocultar el campo de nombre completo
     const nombreGroup = document.getElementById('nombre-group');
     nombreGroup.style.display = 'none';
@@ -155,10 +163,13 @@ function selectUserType(tipo) {
         </div>
       `;
       
-      // Insertar después del campo de PIN
-      const pinField = document.getElementById('pin-group');
-      pinField.insertAdjacentElement('afterend', laboratoristaDivGroup);
+      // Insertar en la parte superior del formulario (antes de todos los campos)
+      const authForm = document.getElementById('auth-form');
+      authForm.insertAdjacentElement('afterbegin', laboratoristaDivGroup);
     }
+    
+    // Mostrar el PIN después del nombre
+    pinGroup.style.display = 'block';
   } else {
     // Para docentes, mostrar el PIN y el campo de nombre
     pinGroup.style.display = 'block';
@@ -272,7 +283,7 @@ function cargarInterfazPrincipal() {
         <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
           <div>
             <h3>Bienvenido, ${currentUser.nombre}</h3>
-            <p class="mb-0">Panel de Estudiante - Puedes prestar y retornar elementos</p>
+            <p class="mb-0">Panel de Estudiante - Puedes solicitar préstamos de elementos</p>
           </div>
           <button class="btn btn-sm btn-light" onclick="volverASeleccionUsuario()">Volver</button>
         </div>
@@ -290,9 +301,9 @@ function cargarInterfazPrincipal() {
             <div class="col-md-6 mb-3">
               <div class="card h-100">
                 <div class="card-body text-center">
-                  <h4>Retorno de elementos</h4>
-                  <p>Devuelve elementos prestados</p>
-                  <button class="btn btn-secondary" onclick="iniciarRetorno()">Retornar elementos</button>
+                  <h4>Consultar mis préstamos</h4>
+                  <p>Ver elementos que tienes prestados</p>
+                  <button class="btn btn-secondary" onclick="iniciarRetorno()">Ver préstamos</button>
                 </div>
               </div>
             </div>
@@ -326,9 +337,9 @@ function cargarInterfazPrincipal() {
             <div class="col-md-4 mb-3">
               <div class="card h-100">
                 <div class="card-body text-center">
-                  <h4>Retorno de elementos</h4>
-                  <p>Devuelve elementos prestados</p>
-                  <button class="btn btn-secondary" onclick="iniciarRetorno()">Retornar elementos</button>
+                  <h4>Consultar mis préstamos</h4>
+                  <p>Ver elementos que tienes prestados</p>
+                  <button class="btn btn-secondary" onclick="iniciarRetorno()">Ver préstamos</button>
                 </div>
               </div>
             </div>
@@ -442,16 +453,20 @@ function iniciarRetorno() {
   
   // Estructura del contenido
   const esLaboratorista = currentUser.tipo === 'laboratorista';
+  const puedeDevolver = esLaboratorista; // Solo el laboratorista puede devolver elementos
+  
+  // Título para la sección
+  const tituloSeccion = esLaboratorista ? 'Retorno de elementos' : 'Mis préstamos activos';
   
   retornoSection.innerHTML = `
     <div class="card shadow">
       <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-        <h3>Retorno de elementos</h3>
+        <h3>${tituloSeccion}</h3>
         <button class="btn btn-sm btn-light" onclick="confirmarVolverAInterfaz()">Volver</button>
       </div>
       <div class="card-body">
         ${prestamos.length > 0 ? `
-          <p class="mb-4">Seleccione los elementos que desea devolver:</p>
+          <p class="mb-4">${esLaboratorista ? 'Seleccione los elementos que desea devolver:' : 'Estos son tus elementos en préstamo actualmente:'}</p>
           ${esLaboratorista ? `
             <div class="mb-3">
               <input type="text" class="form-control" id="buscar-prestamo" placeholder="Buscar por nombre de usuario o elemento" 
@@ -466,7 +481,7 @@ function iniciarRetorno() {
                   <th>Elemento</th>
                   <th>Cantidad</th>
                   <th>Fecha préstamo</th>
-                  <th>Acciones</th>
+                  ${puedeDevolver ? '<th>Acciones</th>' : ''}
                 </tr>
               </thead>
               <tbody>
@@ -476,11 +491,13 @@ function iniciarRetorno() {
                     <td>${prestamo.elemento_nombre}</td>
                     <td>${prestamo.cantidad}</td>
                     <td>${prestamo.fecha}</td>
+                    ${puedeDevolver ? `
                     <td>
                       <button class="btn btn-sm btn-success" onclick="registrarDevolucion(${prestamo.id})">
                         Devolver elemento
                       </button>
                     </td>
+                    ` : ''}
                   </tr>
                 `).join('')}
               </tbody>
@@ -491,6 +508,11 @@ function iniciarRetorno() {
             <p>No hay elementos pendientes por devolver.</p>
           </div>
         `}
+        ${!esLaboratorista ? `
+          <div class="alert alert-warning mt-3">
+            <p><strong>Nota:</strong> Para devolver un elemento, debes acudir personalmente al laboratorio donde un laboratorista registrará la devolución.</p>
+          </div>
+        ` : ''}
       </div>
     </div>
   `;

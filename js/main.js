@@ -1279,8 +1279,51 @@ function registrarDevolucion(prestamoId) {
         // Mostrar confirmación
         mostrarNotificacion('Éxito', 'Elemento devuelto correctamente', 'success');
         
-        // Actualizar la vista de préstamos
-        consultarPrestamos();
+        // Actualizar solo la fila correspondiente al préstamo devuelto
+        // Primero verificamos si estamos en la vista de préstamos o retornos
+        const esVistaRetornos = document.getElementById('tabla-retornos') !== null;
+        
+        if (esVistaRetornos) {
+          // Estamos en la sección de retorno, actualizar la tabla de retornos
+          const filaElement = document.querySelector(`button[onclick="registrarDevolucion(${prestamoId})"]`).closest('tr');
+          if (filaElement) {
+            // Eliminar la fila de la tabla de retornos (porque ya no está prestado)
+            filaElement.remove();
+            
+            // Verificar si no quedan más préstamos y mostrar mensaje si es necesario
+            const tbody = document.querySelector('#tabla-retornos tbody');
+            if (tbody && tbody.children.length === 0) {
+              const tabla = document.querySelector('#tabla-retornos').closest('.table-responsive');
+              if (tabla) {
+                tabla.innerHTML = `
+                  <div class="alert alert-info">
+                    <p>No hay elementos pendientes por devolver.</p>
+                  </div>
+                `;
+              }
+            }
+          }
+        } else {
+          // Estamos en la sección de consulta de préstamos, actualizar solo esa fila
+          const filaElement = document.querySelector(`button[onclick="registrarDevolucion(${prestamoId})"]`).closest('tr');
+          if (filaElement) {
+            // Actualizar el estado y el botón
+            const celdaEstado = filaElement.querySelector('td:nth-child(6)');
+            const celdaAcciones = filaElement.querySelector('td:nth-child(7)');
+            
+            if (celdaEstado) {
+              celdaEstado.innerHTML = `
+                <span class="badge bg-success">
+                  devuelto
+                </span>
+              `;
+            }
+            
+            if (celdaAcciones) {
+              celdaAcciones.innerHTML = `<button class="btn btn-sm btn-secondary" disabled>Devuelto</button>`;
+            }
+          }
+        }
       } else {
         mostrarNotificacion('Error', 'No se pudo encontrar el préstamo', 'error');
       }

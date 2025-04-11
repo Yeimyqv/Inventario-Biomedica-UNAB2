@@ -1,0 +1,33 @@
+1. Restricciones por rol en retornos
+•	En las secciones de Estudiante y Docente, los usuarios deben poder consultar los elementos que tienen prestados, pero no deben tener la opción de retornarlos.
+•	El retorno de elementos será una acción exclusiva para los laboratoristas.
+•	Una vez el laboratorista registre el retorno de un elemento, este cambio debe reflejarse automáticamente en la vista del estudiante o docente correspondiente.
+________________________________________
+2. Ingreso con tecla Enter
+•	Al iniciar sesión, el sistema debe permitir que el usuario presione Enter para ingresar, sin necesidad de hacer clic en el botón de acceso.
+________________________________________
+3. Orden de ingreso del laboratorista
+•	En el módulo de Laboratorista, se debe mostrar primero el nombre del laboratorista (al seleccionar o digitar usuario), y luego el campo de ingreso del PIN.
+________________________________________
+4. Gestión de inventario – mejoras (Laboratorista)
+•	Agregar una función de búsqueda por nombre o marca de los elementos.
+•	En esta vista, dejar únicamente el botón global de “Agregar nuevo elemento”. Las opciones de editar o eliminar deben estar disponibles solo dentro del detalle de cada elemento, no de forma general.
+•	El botón “Editar” actualmente no está funcionando: se solicita corregir para que permita modificar correctamente los datos del elemento seleccionado.
+________________________________________
+5. Carga y visualización de imágenes en elementos (Laboratorista)
+•	En el módulo de gestión de inventarios, se solicita que el laboratorista pueda cargar una imagen del elemento.
+•	Esta imagen debe mostrarse en la vista de “Detalles del elemento” cuando se consulta desde cualquier perfil.
+________________________________________
+
+6. Asignación y visualización de categorías
+•	Al momento de registrar o editar un elemento, se debe incluir y almacenar su categoría.
+•	Esta categoría debe utilizarse también en los textos del sistema. Por ejemplo:
+o	Actualmente: ¿Confirma el préstamo de 1 unidad(es) de AD620?
+o	Debe decir: ¿Confirma el préstamo de 1 unidad(es) de Amplificadores AD620? (donde Amplificadores es la categoría del elemento).
+________________________________________
+7. Informe de préstamos
+•	En la sección de Consulta de préstamos, habilitar la opción de generar un informe que incluya:
+o	Estado del préstamo (En préstamo, Devuelto)
+o	Fechas de préstamo y devolución
+o	Información del usuario
+o	Elementos involucrados, entre otros campos relevantes.

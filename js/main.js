@@ -654,11 +654,18 @@ function administrarInventario() {
       <p>Desde esta sección puede agregar, editar o eliminar elementos del inventario.</p>
     </div>
     
-    <!-- Botones de acción -->
-    <div class="mb-4">
-      <button class="btn btn-success me-2" onclick="mostrarFormularioNuevoElemento()">Agregar nuevo elemento</button>
-      <button class="btn btn-danger me-2" onclick="confirmarEliminarElemento()">Eliminar elemento</button>
-      <button class="btn btn-warning" onclick="mostrarFormularioEditarElemento()">Editar elemento existente</button>
+    <!-- Botón de agregar nuevo elemento y búsqueda -->
+    <div class="row mb-4 align-items-end">
+      <div class="col-md-4">
+        <button class="btn btn-success" onclick="mostrarFormularioNuevoElemento()">Agregar nuevo elemento</button>
+      </div>
+      <div class="col-md-8">
+        <div class="input-group">
+          <span class="input-group-text">🔍</span>
+          <input type="text" class="form-control" id="buscar-elemento-inventario" 
+            placeholder="Buscar por nombre o marca de elemento" onkeyup="filtrarInventarioAdmin()">
+        </div>
+      </div>
     </div>
     
     <!-- Listado de inventario -->
@@ -712,53 +719,88 @@ function administrarInventario() {
 }
 
 // Generar acordeón para el inventario
-function generarAcordeonInventario() {
+function generarAcordeonInventario(filtroTexto = '') {
   let html = '';
+  let elementosVisibles = 0;
+  let categoriasVisibles = 0;
+  const filtroLower = filtroTexto.toLowerCase();
   
   INVENTARIO.forEach((categoria, index) => {
-    html += `
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="heading-${index}">
-          <button class="accordion-button ${index === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${index}" aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="collapse-${index}">
-            ${categoria.categoria} (${categoria.elementos.length} elementos)
-          </button>
-        </h2>
-        <div id="collapse-${index}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" aria-labelledby="heading-${index}">
-          <div class="accordion-body">
-            <div class="table-responsive">
-              <table class="table table-sm table-hover">
-                <thead>
-                  <tr>
-                    <th>Código</th>
-                    <th>Nombre</th>
-                    <th>Cantidad</th>
-                    <th>Ubicación</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${categoria.elementos.map(elem => `
+    // Filtrar elementos según búsqueda
+    const elementosFiltrados = filtroTexto ? 
+      categoria.elementos.filter(elem => 
+        elem.nombre.toLowerCase().includes(filtroLower) || 
+        (elem.descripcion && elem.descripcion.toLowerCase().includes(filtroLower))
+      ) : 
+      categoria.elementos;
+    
+    // Solo mostrar categorías con elementos después del filtro
+    if (elementosFiltrados.length > 0) {
+      categoriasVisibles++;
+      elementosVisibles += elementosFiltrados.length;
+      
+      html += `
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="heading-${index}">
+            <button class="accordion-button ${index === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${index}" aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="collapse-${index}">
+              ${categoria.categoria} (${elementosFiltrados.length} elementos)
+            </button>
+          </h2>
+          <div id="collapse-${index}" class="accordion-collapse collapse ${filtroTexto || index === 0 ? 'show' : ''}" aria-labelledby="heading-${index}">
+            <div class="accordion-body">
+              <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                  <thead>
                     <tr>
-                      <td>${elem.id}</td>
-                      <td>${elem.nombre}</td>
-                      <td>${elem.cantidad}</td>
-                      <td>${elem.ubicacion || 'No especificada'}</td>
-                      <td>
-                        <button class="btn btn-sm btn-warning me-1" onclick="editarElemento(${elem.id})">Editar</button>
-                        <button class="btn btn-sm btn-danger" onclick="eliminarElemento(${elem.id})">Eliminar</button>
-                      </td>
+                      <th>Código</th>
+                      <th>Nombre</th>
+                      <th>Cantidad</th>
+                      <th>Ubicación</th>
+                      <th>Acciones</th>
                     </tr>
-                  `).join('')}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    ${elementosFiltrados.map(elem => `
+                      <tr>
+                        <td>${elem.id}</td>
+                        <td>${elem.nombre}</td>
+                        <td>${elem.cantidad}</td>
+                        <td>${elem.ubicacion || 'No especificada'}</td>
+                        <td>
+                          <button class="btn btn-sm btn-warning me-1" onclick="editarElemento(${elem.id})">Editar</button>
+                          <button class="btn btn-sm btn-danger" onclick="eliminarElemento(${elem.id})">Eliminar</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    `;
+      `;
+    }
   });
   
+  // Si no hay resultados, mostrar mensaje
+  if (categoriasVisibles === 0) {
+    html = `
+      <div class="alert alert-info">
+        <p>No se encontraron elementos que coincidan con el término de búsqueda: "${filtroTexto}"</p>
+      </div>
+    `;
+  }
+  
   return html;
+}
+
+// Filtrar inventario en la sección de administración
+function filtrarInventarioAdmin() {
+  const filtroTexto = document.getElementById('buscar-elemento-inventario').value.trim();
+  const acordeonContainer = document.getElementById('accordion-inventario');
+  
+  // Regenerar el acordeón con el filtro aplicado
+  acordeonContainer.innerHTML = generarAcordeonInventario(filtroTexto);
 }
 
 // Mostrar formulario para agregar nuevo elemento

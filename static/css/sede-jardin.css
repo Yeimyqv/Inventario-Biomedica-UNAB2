@@ -34,11 +34,21 @@ body {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 1.5rem;
-  color: white;
+  color: #ffffff !important; /* Forzar color blanco */
 }
 
 .sede-highlight {
-  color: var(--primary-color);
+  color: var(--primary-color) !important; /* Forzar color verde */
+}
+
+/* Asegurar color gris para la descripción */
+.text-secondary {
+  color: #a0a0a0 !important; /* Gris claro */
+}
+
+/* Asegurar texto blanco para el subtítulo */
+#user-selection h2 {
+  color: #ffffff !important;
 }
 
 .user-card {

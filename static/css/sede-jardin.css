@@ -53,7 +53,7 @@ body {
 
 .user-card {
   background-color: rgba(0, 0, 0, 0.7);
-  border: 2px solid var(--primary-color);
+  border: 2px solid #FFFFFF; /* Cambio a borde blanco */
   border-radius: 10px;
   transition: all 0.3s ease;
   height: 100%;
@@ -61,7 +61,7 @@ body {
 
 .user-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(69, 213, 9, 0.3);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.3); /* Sombra blanca */
 }
 
 .user-icon {

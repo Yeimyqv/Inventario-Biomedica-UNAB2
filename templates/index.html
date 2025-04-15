@@ -14,69 +14,14 @@
   <!-- CSS personalizado -->
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/modals.css">
-  
-  <style>
-    :root {
-      --primary-color: #45d509;
-      --primary-dark: #35a507;
-      --secondary-color: #FF6600;
-      --secondary-dark: #CC5200;
-      --text-dark: #333333;
-      --text-light: #FFFFFF;
-    }
-    
-    body {
-      font-family: 'Roboto', sans-serif;
-    }
-
-    .navbar {
-      background-color: #000000 !important;
-    }
-
-    .navbar-brand img {
-      height: 50px;
-    }
-
-    .bg-header-unab {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .text-primary-unab {
-      color: var(--primary-color);
-    }
-    
-    .btn-primary-unab {
-      background-color: var(--primary-color);
-      border-color: var(--primary-color);
-      color: white;
-    }
-    
-    .btn-primary-unab:hover {
-      background-color: var(--primary-dark);
-      border-color: var(--primary-dark);
-      color: white;
-    }
-    
-    .btn-secondary-unab {
-      background-color: var(--secondary-color);
-      border-color: var(--secondary-color);
-      color: white;
-    }
-    
-    .btn-secondary-unab:hover {
-      background-color: var(--secondary-dark);
-      border-color: var(--secondary-dark);
-      color: white;
-    }
-  </style>
+  <link rel="stylesheet" href="/static/css/sede-jardin.css">
 </head>
 <body>
   <!-- Barra de navegación -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
       <a class="navbar-brand" href="/">
-        <img src="/static/images/logo-bioingenieria-sf.png" alt="UNAB Biomedical Engineering" style="height: 40px; max-width: 100%;">
+        <img src="/static/images/logo-bioingenieria-sf.png" alt="UNAB Biomedical Engineering">
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -100,53 +45,60 @@
   <!-- Contenedor principal -->
   <div class="container my-5">
     <!-- Sección de selección de laboratorio -->
-    <section id="lab-selection" class="card shadow-sm mb-5">
-      <div class="card-body text-center py-5">
-        <h2 class="mb-4 text-primary-unab">PRESTAMOS SEDE JARDIN</h2>
-        <p class="lead mb-5">Aquí podrás registrar, consultar y administrar eficientemente los recursos disponibles para tus prácticas y actividades académicas.</p>
-        <button class="btn btn-lg btn-primary-unab" id="lab-select-btn">Continuar</button>
-      </div>
+    <section id="lab-selection" class="mb-5 text-center">
+      <h1 class="sede-title mb-2">PRESTAMOS <span class="sede-highlight">SEDE</span> JARDIN</h1>
+      <p class="lead mb-5">Aquí podrás registrar, consultar y administrar eficientemente los recursos disponibles para tus prácticas y actividades académicas.</p>
+      <button class="btn btn-lg btn-user mb-4" id="lab-select-btn">CONTINUAR</button>
     </section>
     
     <!-- Sección de selección de tipo de usuario (oculta inicialmente) -->
     <section id="user-selection" class="py-4" style="display: none;">
-      <h2 class="text-center mb-5 text-primary-unab">Seleccione su tipo de usuario</h2>
+      <h2 class="text-center mb-5 sede-highlight">Seleccione su tipo de usuario</h2>
       
       <div class="row justify-content-center">
         <div class="col-md-4 mb-4">
-          <div class="card text-center h-100 shadow">
-            <div class="card-body">
-              <img src="/img/student.svg" alt="Estudiante" class="user-icon my-3">
+          <div class="user-card">
+            <div class="card-body text-center p-4">
+              <img src="/static/images/icono-estudiante.png" alt="Estudiante" class="user-icon my-3">
               <h3 class="card-title">Estudiante</h3>
               <p class="card-text">Accede para solicitar préstamos y devoluciones de elementos de laboratorio.</p>
-              <button class="btn btn-primary-unab mt-3" onclick="selectUserType('estudiante')">
-                Entrar como Estudiante
+              <button class="btn btn-user mt-3 w-100" onclick="selectUserType('estudiante')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle btn-icon" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                </svg>
+                ESTUDIANTE
               </button>
             </div>
           </div>
         </div>
         
         <div class="col-md-4 mb-4">
-          <div class="card text-center h-100 shadow">
-            <div class="card-body">
-              <img src="/img/teacher.svg" alt="Docente" class="user-icon my-3">
+          <div class="user-card">
+            <div class="card-body text-center p-4">
+              <img src="/static/images/icono-docente.png" alt="Docente" class="user-icon my-3">
               <h3 class="card-title">Docente</h3>
               <p class="card-text">Accede para gestionar elementos, préstamos y generación de reportes.</p>
-              <button class="btn btn-primary-unab mt-3" onclick="selectUserType('docente')">
-                Entrar como Docente
+              <button class="btn btn-user mt-3 w-100" onclick="selectUserType('docente')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle btn-icon" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                </svg>
+                DOCENTE
               </button>
             </div>
           </div>
         </div>
         
         <div class="col-md-4 mb-4">
-          <div class="card text-center h-100 shadow">
-            <div class="card-body">
-              <img src="/img/lab.svg" alt="Laboratorista" class="user-icon my-3">
+          <div class="user-card">
+            <div class="card-body text-center p-4">
+              <img src="/static/images/icono-laboratorista.png" alt="Laboratorista" class="user-icon my-3">
               <h3 class="card-title">Laboratorista</h3>
               <p class="card-text">Accede para administrar el inventario completo y mantenimiento del sistema.</p>
-              <button class="btn btn-warning mt-3" onclick="selectUserType('laboratorista')">
-                Entrar como Laboratorista
+              <button class="btn btn-user mt-3 w-100" onclick="selectUserType('laboratorista')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle btn-icon" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                </svg>
+                LABORATORISTA
               </button>
             </div>
           </div>
@@ -156,11 +108,9 @@
     
     <!-- Sección de autenticación -->
     <section id="auth-section" class="my-5" style="display: none;">
-      <div class="card shadow">
-        <div class="card-header bg-header-unab text-white">
-          <h3>Ingrese sus datos</h3>
-        </div>
-        <div class="card-body">
+      <div class="user-card">
+        <div class="card-body p-4">
+          <h3 class="mb-4 text-center sede-highlight">Ingrese sus datos</h3>
           <form id="auth-form">
             <div class="mb-3" id="nombre-group">
               <label for="user-name" class="form-label">Nombre completo:</label>
@@ -170,12 +120,12 @@
             <div class="mb-3" id="pin-group" style="display: none;">
               <label for="pin-input" class="form-label">PIN de acceso:</label>
               <input type="password" class="form-control" id="pin-input">
-              <div class="form-text">Su PIN ha sido proporcionado por el administrador del sistema.</div>
+              <div class="form-text text-light">Su PIN ha sido proporcionado por el administrador del sistema.</div>
             </div>
             
-            <div class="d-grid gap-2">
-              <button type="button" class="btn btn-primary-unab" id="auth-button">Ingresar</button>
-              <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload()">Cancelar</button>
+            <div class="d-grid gap-2 mt-4">
+              <button type="button" class="btn btn-user" id="auth-button">INGRESAR</button>
+              <button type="button" class="btn btn-outline-light" onclick="window.location.reload()">CANCELAR</button>
             </div>
           </form>
         </div>
@@ -252,7 +202,7 @@
   </div>
   
   <!-- Footer -->
-  <footer class="bg-dark text-light py-4 mt-5">
+  <footer class="py-3 mt-5">
     <div class="container text-center">
       <p>Sistema de Gestión de Inventario - Laboratorios Ingeniería Biomédica UNAB © 2025</p>
       <p>Desarrollado por: Ing. Y Quintana</p>

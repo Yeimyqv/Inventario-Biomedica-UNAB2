@@ -847,8 +847,8 @@ function generarAcordeonInventario(filtroTexto = '') {
                         <td>${elem.cantidad}</td>
                         <td>${elem.ubicacion || 'No especificada'}</td>
                         <td>
-                          <button class="btn btn-sm btn-warning me-1" onclick="editarElemento(${elem.id})">Editar</button>
-                          <button class="btn btn-sm btn-danger" onclick="eliminarElemento(${elem.id})">Eliminar</button>
+                          <button class="btn btn-sm btn-green me-1" onclick="editarElemento(${elem.id})">Editar</button>
+                          <button class="btn btn-sm btn-outline-light" onclick="eliminarElemento(${elem.id})">Eliminar</button>
                         </td>
                       </tr>
                     `).join('')}
@@ -1006,7 +1006,7 @@ function editarElemento(elementoId) {
         </div>
         <div class="d-flex justify-content-end">
           <button type="button" class="btn btn-secondary me-2" onclick="cancelarEdicion()">Cancelar</button>
-          <button type="button" class="btn btn-success" onclick="guardarEdicionElemento(${elementoId})">Guardar cambios</button>
+          <button type="button" class="btn btn-green" onclick="guardarEdicionElemento(${elementoId})">Guardar cambios</button>
         </div>
       </form>
     </div>
@@ -1286,13 +1286,13 @@ function generarFilasPrestamos(prestamos, filtroEstado = '', filtroUsuario = '')
           <td>${prestamo.usuario_nombre}</td>
           <td>${prestamo.fecha}</td>
           <td>
-            <span class="badge ${prestamo.estado === 'prestado' ? 'bg-warning' : 'bg-success'}">
+            <span class="badge ${prestamo.estado === 'prestado' ? 'bg-warning' : 'bg-green'}">
               ${prestamo.estado}
             </span>
           </td>
           <td>
             ${prestamo.estado === 'prestado' ? 
-              `<button class="btn btn-sm btn-success" onclick="registrarDevolucion(${prestamo.id})">
+              `<button class="btn btn-sm btn-green" onclick="registrarDevolucion(${prestamo.id})">
                 Registrar devolución
               </button>` : 
               `<button class="btn btn-sm btn-secondary" disabled>Devuelto</button>`
@@ -1393,7 +1393,7 @@ function registrarDevolucion(prestamoId) {
             
             if (celdaEstado) {
               celdaEstado.innerHTML = `
-                <span class="badge bg-success">
+                <span class="badge bg-green">
                   devuelto
                 </span>
               `;

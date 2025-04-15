@@ -214,6 +214,12 @@ footer p {
   font-weight: 700;
 }
 
+/* Clase personalizada para badges verdes */
+.bg-green {
+  background-color: #45d509 !important;
+  color: #fff !important;
+}
+
 /* Responsividad */
 @media (max-width: 768px) {
   .panel-title {

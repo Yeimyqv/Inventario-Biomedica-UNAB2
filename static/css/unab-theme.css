@@ -1,0 +1,589 @@
+/* 
+ * UNAB Biomedical Engineering Laboratory - Custom Theme
+ * Based on Canva design
+ */
+
+:root {
+  /* Palette based on the Canva design with the green UNAB logo color */
+  --unab-primary: #45d509; /* Verde brillante del logo UNAB */
+  --unab-primary-light: #61e630;
+  --unab-primary-dark: #35a507;
+  --unab-secondary: #FF6600; /* Naranja del diseño de Canva */
+  --unab-secondary-light: #FF9933;
+  --unab-secondary-dark: #CC5200;
+  --unab-text-gray: #999999; /* Gris para el texto "Ingeniería Biomédica" */
+  --unab-dark: #333333;
+  --unab-light: #FFFFFF;
+  --unab-gray: #F1F2F6;
+  --unab-text: #333333;
+  
+  /* Font sizes */
+  --unab-font-xl: 2.5rem;
+  --unab-font-lg: 1.75rem;
+  --unab-font-md: 1.25rem;
+  --unab-font-sm: 1rem;
+  --unab-font-xs: 0.875rem;
+}
+
+body {
+  font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--unab-text);
+  background-color: var(--unab-gray);
+  margin: 0;
+  padding: 0;
+}
+
+/* Header styles */
+.unab-header {
+  background-color: white;
+  color: var(--unab-dark);
+  padding: 1rem 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.unab-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.unab-logo {
+  height: 60px;
+}
+
+.unab-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.unab-nav a {
+  color: var(--unab-dark);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: color 0.3s, background-color 0.3s;
+}
+
+.unab-nav a:hover, .unab-nav a.active {
+  color: var(--unab-primary);
+  background-color: rgba(69, 213, 9, 0.1);
+}
+
+/* Main title banner */
+.unab-banner {
+  background: linear-gradient(135deg, var(--unab-primary) 0%, var(--unab-primary-dark) 100%);
+  color: white;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.unab-banner h1 {
+  font-size: var(--unab-font-xl);
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.unab-banner p {
+  font-size: var(--unab-font-md);
+  max-width: 800px;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+
+/* User selection cards */
+.unab-card-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin: 3rem 0;
+}
+
+.unab-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 300px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-align: center;
+}
+
+.unab-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.unab-card-header {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--unab-primary);
+}
+
+.unab-card-header img {
+  width: 80px;
+  height: 80px;
+  filter: brightness(0) invert(1); /* Hacer íconos blancos */
+}
+
+.unab-card-body {
+  padding: 1.5rem;
+}
+
+.unab-card-body h3 {
+  color: var(--unab-primary);
+  margin-bottom: 1rem;
+  font-size: var(--unab-font-md);
+}
+
+.unab-card-body p {
+  margin-bottom: 1.5rem;
+  color: var(--unab-text);
+  font-size: var(--unab-font-sm);
+  line-height: 1.6;
+}
+
+.unab-student-card .unab-card-header {
+  background: var(--unab-primary);
+}
+
+.unab-teacher-card .unab-card-header {
+  background: var(--unab-primary-dark);
+}
+
+.unab-lab-card .unab-card-header {
+  background: var(--unab-secondary);
+}
+
+/* Buttons */
+.unab-btn {
+  display: inline-block;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.unab-btn-primary {
+  background: var(--unab-primary);
+  color: white;
+}
+
+.unab-btn-primary:hover {
+  background: var(--unab-primary-light);
+  box-shadow: 0 4px 12px rgba(69, 213, 9, 0.3);
+}
+
+.unab-btn-secondary {
+  background: var(--unab-secondary);
+  color: white;
+}
+
+.unab-btn-secondary:hover {
+  background: var(--unab-secondary-light);
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+}
+
+.unab-btn-dark {
+  background: var(--unab-dark);
+  color: white;
+}
+
+.unab-btn-light {
+  background: white;
+  color: var(--unab-primary);
+  border: 1px solid var(--unab-primary);
+}
+
+.unab-btn-light:hover {
+  background: var(--unab-gray);
+}
+
+/* Footer styles */
+.unab-footer {
+  background: white;
+  color: var(--unab-text-gray);
+  padding: 1.5rem 0;
+  text-align: center;
+  font-size: var(--unab-font-xs);
+  border-top: 1px solid #eee;
+}
+
+.unab-footer p {
+  margin: 0;
+}
+
+/* Auth section */
+.unab-auth-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 500px;
+  margin: 2rem auto;
+}
+
+.unab-auth-header {
+  background: var(--unab-primary);
+  color: white;
+  padding: 1.5rem;
+}
+
+.unab-auth-header h3 {
+  margin: 0;
+  font-size: var(--unab-font-md);
+}
+
+.unab-auth-body {
+  padding: 2rem;
+}
+
+.unab-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.unab-form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.unab-form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--unab-text);
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.unab-form-control:focus {
+  border-color: var(--unab-primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(69, 213, 9, 0.25);
+}
+
+.unab-form-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--unab-text);
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.unab-form-select:focus {
+  border-color: var(--unab-primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(69, 213, 9, 0.25);
+}
+
+/* Interface panel */
+.unab-panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.unab-panel-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.unab-panel-header-student {
+  background: var(--unab-primary);
+  color: white;
+}
+
+.unab-panel-header-teacher {
+  background: var(--unab-primary-dark);
+  color: white;
+}
+
+.unab-panel-header-lab {
+  background: var(--unab-secondary);
+  color: white;
+}
+
+.unab-panel-title {
+  margin: 0;
+}
+
+.unab-panel-subtitle {
+  margin: 0.5rem 0 0 0;
+  opacity: 0.8;
+  font-size: var(--unab-font-sm);
+}
+
+.unab-panel-body {
+  padding: 2rem;
+}
+
+/* Feature cards */
+.unab-feature-cards {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.unab-feature-card {
+  flex: 1;
+  min-width: 250px;
+  background: var(--unab-gray);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.unab-feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.unab-feature-card h4 {
+  color: var(--unab-primary);
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.unab-feature-card p {
+  margin-bottom: 1.25rem;
+  font-size: var(--unab-font-sm);
+}
+
+/* Tables */
+.unab-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.unab-table th,
+.unab-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.unab-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  text-align: left;
+}
+
+.unab-table tbody tr:hover {
+  background-color: rgba(69, 213, 9, 0.05);
+}
+
+/* Badge */
+.unab-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+}
+
+.unab-badge-primary {
+  background-color: var(--unab-primary);
+  color: white;
+}
+
+.unab-badge-secondary {
+  background-color: var(--unab-secondary);
+  color: white;
+}
+
+.unab-badge-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.unab-badge-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+/* Alerts */
+.unab-alert {
+  position: relative;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+.unab-alert-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+
+.unab-alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.unab-alert-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
+
+.unab-alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+/* Custom modal */
+.unab-modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unab-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.unab-modal-overlay.active {
+  opacity: 1;
+}
+
+.unab-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  margin: 1.75rem;
+  position: relative;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+  transform: translateY(30px);
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.unab-modal.active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.unab-modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.unab-modal-header.info {
+  background: var(--unab-primary);
+  color: white;
+  border-bottom: none;
+}
+
+.unab-modal-header.warning {
+  background: var(--unab-secondary);
+  color: white;
+  border-bottom: none;
+}
+
+.unab-modal-header.error {
+  background: #dc3545;
+  color: white;
+  border-bottom: none;
+}
+
+.unab-modal-header.success {
+  background: #28a745;
+  color: white;
+  border-bottom: none;
+}
+
+.unab-modal-body {
+  padding: 1.5rem;
+}
+
+.unab-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .unab-card-container {
+    gap: 1rem;
+  }
+  
+  .unab-card {
+    width: 100%;
+    max-width: 320px;
+  }
+  
+  .unab-banner h1 {
+    font-size: var(--unab-font-lg);
+  }
+  
+  .unab-banner p {
+    font-size: var(--unab-font-sm);
+  }
+  
+  .unab-feature-card {
+    min-width: 100%;
+  }
+  
+  .unab-header .container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .unab-logo {
+    height: 40px;
+  }
+}

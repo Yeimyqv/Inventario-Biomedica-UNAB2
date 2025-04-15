@@ -372,12 +372,12 @@ function cargarInterfazPrincipal() {
   if (currentUser.tipo === 'estudiante') {
     contenido = `
       <div class="card shadow mb-4">
-        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
           <div>
             <h3>Bienvenido, ${currentUser.nombre}</h3>
             <p class="mb-0">Panel de Estudiante - Puedes solicitar préstamos de elementos</p>
           </div>
-          <button class="btn btn-sm btn-light" onclick="volverASeleccionUsuario()">Volver</button>
+          <button class="btn btn-sm btn-outline-light" onclick="volverASeleccionUsuario()">Volver</button>
         </div>
         <div class="card-body">
           <div class="row">
@@ -408,12 +408,12 @@ function cargarInterfazPrincipal() {
   else if (currentUser.tipo === 'docente') {
     contenido = `
       <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
           <div>
             <h3>Bienvenido, ${currentUser.nombre}</h3>
             <p class="mb-0">Panel de Docente - Gestión de elementos y préstamos</p>
           </div>
-          <button class="btn btn-sm btn-light" onclick="volverASeleccionUsuario()">Volver</button>
+          <button class="btn btn-sm btn-outline-light" onclick="volverASeleccionUsuario()">Volver</button>
         </div>
         <div class="card-body">
           <div class="row">
@@ -453,12 +453,12 @@ function cargarInterfazPrincipal() {
   else if (currentUser.tipo === 'laboratorista') {
     contenido = `
       <div class="card shadow mb-4">
-        <div class="card-header bg-warning d-flex justify-content-between align-items-center">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
           <div>
             <h3>Bienvenido, ${currentUser.nombre}</h3>
             <p class="mb-0">Panel de Laboratorista - Administración completa del sistema</p>
           </div>
-          <button class="btn btn-sm btn-light" onclick="volverASeleccionUsuario()">Volver</button>
+          <button class="btn btn-sm btn-outline-light" onclick="volverASeleccionUsuario()">Volver</button>
         </div>
         <div class="card-body">
           <div class="row">
@@ -552,9 +552,9 @@ function iniciarRetorno() {
   
   retornoSection.innerHTML = `
     <div class="card shadow">
-      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
         <h3>${tituloSeccion}</h3>
-        <button class="btn btn-sm btn-light" onclick="confirmarVolverAInterfaz()">Volver</button>
+        <button class="btn btn-sm btn-outline-light" onclick="confirmarVolverAInterfaz()">Volver</button>
       </div>
       <div class="card-body">
         ${prestamos.length > 0 ? `
@@ -629,9 +629,9 @@ function consultarInventario() {
   // Estructura del contenido
   inventarioSection.innerHTML = `
     <div class="card shadow">
-      <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
         <h3>Consulta de Inventario</h3>
-        <button class="btn btn-sm btn-light" onclick="confirmarVolverAInterfaz()">Volver</button>
+        <button class="btn btn-sm btn-outline-light" onclick="confirmarVolverAInterfaz()">Volver</button>
       </div>
       <div class="card-body">
         <!-- Filtros -->

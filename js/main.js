@@ -386,7 +386,7 @@ function cargarInterfazPrincipal() {
                 <div class="card-body text-center">
                   <h4>Préstamo de elementos</h4>
                   <p>Solicita elementos para tus prácticas</p>
-                  <button class="btn btn-primary" onclick="iniciarPrestamo()">Prestar elementos</button>
+                  <button class="btn btn-primary-unab" onclick="iniciarPrestamo()">Prestar elementos</button>
                 </div>
               </div>
             </div>
@@ -395,7 +395,7 @@ function cargarInterfazPrincipal() {
                 <div class="card-body text-center">
                   <h4>Consultar mis préstamos</h4>
                   <p>Ver elementos que tienes prestados</p>
-                  <button class="btn btn-secondary" onclick="iniciarRetorno()">Ver préstamos</button>
+                  <button class="btn btn-secondary-unab" onclick="iniciarRetorno()">Ver préstamos</button>
                 </div>
               </div>
             </div>
@@ -649,7 +649,7 @@ function consultarInventario() {
               <input type="text" class="form-control" id="filtro-nombre" placeholder="Nombre del elemento">
             </div>
             <div class="col-md-4 mb-3 d-flex align-items-end">
-              <button class="btn btn-primary w-100" onclick="filtrarInventario()">Filtrar</button>
+              <button class="btn btn-primary-unab w-100" onclick="filtrarInventario()">Filtrar</button>
             </div>
           </div>
         </div>

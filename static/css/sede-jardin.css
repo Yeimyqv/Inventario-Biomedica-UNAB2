@@ -119,6 +119,54 @@ footer {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Estilos para botones adaptados a la paleta de colores */
+.btn-primary-unab {
+  background-color: var(--primary-color) !important;
+  color: var(--text-light) !important;
+  border: none !important;
+}
+
+.btn-primary-unab:hover {
+  background-color: var(--primary-dark) !important;
+  color: var(--text-light) !important;
+}
+
+.btn-secondary-unab {
+  background-color: #212529 !important;
+  color: var(--text-light) !important;
+  border: 1px solid #6c757d !important;
+}
+
+.btn-secondary-unab:hover {
+  background-color: #2c3136 !important;
+  color: var(--text-light) !important;
+}
+
+.btn-success {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+.btn-success:hover {
+  background-color: var(--primary-dark) !important;
+}
+
+.btn-info, .btn-warning, .btn-danger {
+  background-color: #6c757d !important;
+  color: white !important;
+  border: none !important;
+}
+
+.btn-info:hover, .btn-warning:hover, .btn-danger:hover {
+  background-color: #5a6268 !important;
+  color: white !important;
+}
+
+.bg-header-unab {
+  background-color: #212529 !important;
+  border-bottom: 3px solid var(--primary-color) !important;
+}
+
 @media (max-width: 768px) {
   .sede-title {
     font-size: 2rem;

@@ -1,164 +1,181 @@
-/* Estilos para el panel de usuario (nueva interfaz) */
+/* Estilos para panel de usuario - Diseño minimalista */
 
-:root {
-  --primary-green: #45d509;
-  --primary-green-dark: #35a507;
-  --text-white: #ffffff;
-  --text-gray: #a0a0a0;
-  --bg-dark: #000000;
-  --border-gray: #333333;
+body {
+  background: url('/static/images/bg-biomedica.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
 }
 
-/* Contenedor principal del panel */
+/* Paneles */
 .panel-container {
   background-color: rgba(0, 0, 0, 0.75);
-  border: 1px solid var(--text-white);
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
-  color: var(--text-white);
-  margin-bottom: 2rem;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  margin-bottom: 30px;
 }
 
-/* Encabezado del panel */
 .panel-header {
-  border-bottom: 2px solid var(--primary-green);
-  padding: 1.5rem;
-  position: relative;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 15px 20px;
+  border-bottom: 3px solid #45d509;
 }
 
 .panel-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
   margin: 0;
-  padding: 0;
+  color: white;
+  font-weight: 600;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.user-name {
-  color: var(--primary-green);
-}
-
-.panel-subtitle {
-  font-size: 1rem;
-  margin-top: 0.5rem;
-  color: var(--text-gray);
-}
-
-/* Contenido principal del panel */
 .panel-content {
-  padding: 1.5rem;
+  padding: 25px;
+  color: #fff;
 }
 
-/* Módulos de funcionalidad */
-.panel-module {
-  background-color: rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--border-gray);
-  border-radius: 8px;
-  height: 100%;
-  padding: 1.5rem;
-  text-align: center;
+/* Botones */
+.btn-green {
+  background-color: #45d509;
+  color: #000;
+  font-weight: 600;
+  border: none;
   transition: all 0.3s ease;
 }
 
-.panel-module:hover {
-  border-color: var(--primary-green);
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(69, 213, 9, 0.15);
-}
-
-.module-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-}
-
-.module-desc {
-  color: var(--text-gray);
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
-}
-
-/* Botones estilizados */
-.btn-green {
-  background-color: var(--primary-green);
-  color: var(--text-white);
-  border: none;
-  text-transform: uppercase;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  transition: all 0.2s ease;
-}
-
-.btn-green:hover, .btn-green:focus {
-  background-color: var(--primary-green-dark);
-  color: var(--text-white);
+.btn-green:hover {
+  background-color: #3ab507;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(69, 213, 9, 0.2);
+  box-shadow: 0 5px 15px rgba(69, 213, 9, 0.4);
 }
 
 .btn-outline-light {
-  border: 1px solid var(--text-white);
-  background-color: transparent;
-  color: var(--text-white);
-  text-transform: uppercase;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  transition: all 0.2s ease;
+  border: 1px solid #fff;
+  color: #fff;
+  transition: all 0.3s ease;
 }
 
-.btn-outline-light:hover, .btn-outline-light:focus {
+.btn-outline-light:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text-white);
-  transform: translateY(-2px);
 }
 
-/* Navegación inferior */
-.panel-nav {
-  border-top: 1px solid var(--border-gray);
-  padding: 1rem 1.5rem;
-  text-align: right;
+/* Formularios */
+.form-label {
+  color: #fff;
+  font-weight: 500;
+}
+
+.form-control, .form-select {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #45d509;
+  box-shadow: 0 0 0 0.25rem rgba(69, 213, 9, 0.25);
+  color: #fff;
 }
 
 /* Tablas */
 .table {
-  color: var(--text-white);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-.table thead th {
-  border-color: var(--primary-green);
-  background-color: rgba(0, 0, 0, 0.3);
+.table th {
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
-.table tbody tr:hover {
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-hover > tbody > tr:hover {
   background-color: rgba(69, 213, 9, 0.1);
 }
 
 /* Alertas */
+.alert {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-left: 4px solid #45d509;
+  color: #fff;
+}
+
 .alert-info {
-  background-color: rgba(0, 0, 0, 0.5);
-  color: var(--text-white);
-  border-color: var(--primary-green);
+  border-color: #0dcaf0;
 }
 
 .alert-warning {
-  background-color: rgba(0, 0, 0, 0.5);
-  color: var(--text-gray);
-  border-color: #a0a0a0;
+  border-color: #ffc107;
 }
 
-/* Responsive */
+.alert-danger {
+  border-color: #dc3545;
+}
+
+/* Acordeón */
+.accordion-item {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.accordion-button {
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #fff;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: rgba(69, 213, 9, 0.2);
+  color: #fff;
+}
+
+.accordion-button::after {
+  filter: invert(1);
+}
+
+.accordion-body {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
+
+/* Footer */
+footer {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #a0a0a0;
+  padding: 15px 0;
+  position: relative;
+  margin-top: 3rem;
+}
+
+footer p {
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* Imágenes y detalles */
+.img-fluid {
+  max-height: 250px;
+  border-radius: 8px;
+}
+
+#elemento-detalles {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Responsividad */
 @media (max-width: 768px) {
   .panel-title {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
   
-  .module-title {
-    font-size: 1.1rem;
-  }
-  
-  .panel-module {
-    margin-bottom: 1rem;
+  .panel-content {
+    padding: 15px;
   }
 }

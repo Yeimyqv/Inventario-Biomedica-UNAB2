@@ -728,7 +728,7 @@ function administrarInventario() {
   adminSection.style.display = 'block';
   
   // Generar contenido
-  adminSection.querySelector('.card-body').innerHTML = `
+  adminSection.querySelector('.panel-content').innerHTML = `
     <div class="mb-4">
       <h4>Control de Inventario</h4>
       <p>Desde esta sección puede agregar, editar o eliminar elementos del inventario.</p>
@@ -958,7 +958,7 @@ function editarElemento(elementoId) {
   }
   
   // Crear formulario de edición
-  const adminBody = document.querySelector('#admin-section .card-body');
+  const adminBody = document.querySelector('#admin-section .panel-content');
   
   // Ocultar acordeón de inventario
   const inventarioActual = adminBody.querySelector('.mt-4');
@@ -1034,7 +1034,7 @@ function cancelarEdicion() {
   }
   
   // Mostrar acordeón de inventario
-  const inventarioActual = document.querySelector('#admin-section .card-body .mt-4');
+  const inventarioActual = document.querySelector('#admin-section .panel-content .mt-4');
   if (inventarioActual) {
     inventarioActual.style.display = 'block';
   }
@@ -1190,12 +1190,12 @@ function consultarPrestamos() {
   
   // Estructura del contenido
   prestamosSection.innerHTML = `
-    <div class="card shadow">
-      <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-        <h3>Consulta de Préstamos</h3>
-        <button class="btn btn-sm btn-light" onclick="confirmarVolverAInterfaz()">Volver</button>
+    <div class="panel-container">
+      <div class="panel-header d-flex justify-content-between align-items-center">
+        <h2 class="panel-title">CONSULTA DE PRÉSTAMOS</h2>
+        <button class="btn btn-sm btn-outline-light" onclick="confirmarVolverAInterfaz()">Volver</button>
       </div>
-      <div class="card-body">
+      <div class="panel-content">
         <!-- Filtros -->
         <div class="mb-4">
           <div class="row">

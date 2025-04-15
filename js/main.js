@@ -407,7 +407,7 @@ function cargarInterfazPrincipal() {
     contenido = `
       <div class="panel-container">
         <div class="panel-header">
-          <h2 class="panel-title">BIENVENIDO <span class="user-name">"${currentUser.nombre.toUpperCase()}"</span></h2>
+          <h2 class="panel-title">BIENVENIDO <span class="user-name">${currentUser.nombre.toUpperCase()}</span></h2>
           <p class="panel-subtitle">Panel de Docente - Gestión de elementos y préstamos</p>
         </div>
         
@@ -448,7 +448,7 @@ function cargarInterfazPrincipal() {
     contenido = `
       <div class="panel-container">
         <div class="panel-header">
-          <h2 class="panel-title">BIENVENIDO <span class="user-name">"${currentUser.nombre.toUpperCase()}"</span></h2>
+          <h2 class="panel-title">BIENVENIDO <span class="user-name">${currentUser.nombre.toUpperCase()}</span></h2>
           <p class="panel-subtitle">Panel de Laboratorista - Administración completa del sistema</p>
         </div>
         

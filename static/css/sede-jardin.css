@@ -119,6 +119,18 @@ footer {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Formularios con colores adaptados al tema */
+.form-select, .form-control {
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--text-light);
+}
+
+.form-select option {
+  background-color: #212529;
+  color: var(--text-light);
+}
+
 /* Estilos para botones adaptados a la paleta de colores */
 .btn-primary-unab {
   background-color: var(--primary-color) !important;

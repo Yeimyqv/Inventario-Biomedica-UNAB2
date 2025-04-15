@@ -75,6 +75,33 @@ function initNotifications() {
   // Se usa bootstrap para notificaciones tipo toast
 }
 
+// Funciones para manejar los campos "Otro" en los selectores
+function toggleOtroDocenteInput() {
+  const selectDocente = document.getElementById('estudiante-docente');
+  const otroDocenteDiv = document.getElementById('otro-docente-div');
+  
+  if (selectDocente && otroDocenteDiv) {
+    if (selectDocente.value === 'otro') {
+      otroDocenteDiv.style.display = 'block';
+    } else {
+      otroDocenteDiv.style.display = 'none';
+    }
+  }
+}
+
+function toggleOtraMateriaInput() {
+  const selectMateria = document.getElementById('estudiante-materia');
+  const otraMateriaDiv = document.getElementById('otra-materia-div');
+  
+  if (selectMateria && otraMateriaDiv) {
+    if (selectMateria.value === 'otra') {
+      otraMateriaDiv.style.display = 'block';
+    } else {
+      otraMateriaDiv.style.display = 'none';
+    }
+  }
+}
+
 // Configuración inicial del laboratorio (ahora automática)
 function configureDefaultLaboratory() {
   currentLaboratory = 'biomedica';
@@ -113,18 +140,57 @@ function selectUserType(tipo) {
       estudianteDivGroup.id = 'estudiante-group';
       estudianteDivGroup.innerHTML = `
         <div class="mb-3">
-          <label for="estudiante-id" class="form-label">ID Estudiante:</label>
+          <label for="estudiante-id" class="form-label">ID:</label>
           <input type="text" class="form-control" id="estudiante-id" required>
         </div>
         
         <div class="mb-3">
-          <label for="estudiante-semestre" class="form-label">Semestre:</label>
-          <select class="form-select" id="estudiante-semestre" required>
-            <option value="">Seleccione su semestre</option>
-            ${Array.from({length: 9}, (_, i) => i + 1).map(num => 
-              `<option value="${num}">${num}° Semestre</option>`
-            ).join('')}
+          <label for="estudiante-docente" class="form-label">Docente:</label>
+          <select class="form-select" id="estudiante-docente" required onchange="toggleOtroDocenteInput()">
+            <option value="">Seleccione su docente</option>
+            <option value="Luis Felipe Buitrago Castro">Luis Felipe Buitrago Castro</option>
+            <option value="Carlos Julio Arismendi">Carlos Julio Arismendi</option>
+            <option value="Lusvin Javier Amado Forero">Lusvin Javier Amado Forero</option>
+            <option value="William Salamanca">William Salamanca</option>
+            <option value="Alvaro Alyamani Triana Ramirez">Alvaro Alyamani Triana Ramirez</option>
+            <option value="Nayibe Chio Cho">Nayibe Chio Cho</option>
+            <option value="Yamid Gamboa">Yamid Gamboa</option>
+            <option value="Mateo Escobar Jaramillo">Mateo Escobar Jaramillo</option>
+            <option value="otro">Otro</option>
           </select>
+        </div>
+        
+        <div class="mb-3" id="otro-docente-div" style="display: none;">
+          <label for="otro-docente-input" class="form-label">Nombre del docente:</label>
+          <input type="text" class="form-control" id="otro-docente-input">
+        </div>
+        
+        <div class="mb-3">
+          <label for="estudiante-materia" class="form-label">Materia:</label>
+          <select class="form-select" id="estudiante-materia" required onchange="toggleOtraMateriaInput()">
+            <option value="">Seleccione su materia</option>
+            <option value="Tele-robótica">Tele-robótica</option>
+            <option value="Instrumentación">Instrumentación</option>
+            <option value="Electrónica análoga">Electrónica análoga</option>
+            <option value="Electrónica de potencia">Electrónica de potencia</option>
+            <option value="Sistemas embebidos">Sistemas embebidos</option>
+            <option value="Sistemas digitales">Sistemas digitales</option>
+            <option value="Proyecto Integrador">Proyecto Integrador</option>
+            <option value="Circuitos eléctricos">Circuitos eléctricos</option>
+            <option value="Biomecánica Clinica">Biomecánica Clinica</option>
+            <option value="Procesamiento de señales">Procesamiento de señales</option>
+            <option value="otra">Otra</option>
+          </select>
+        </div>
+        
+        <div class="mb-3" id="otra-materia-div" style="display: none;">
+          <label for="otra-materia-input" class="form-label">Nombre de la materia:</label>
+          <input type="text" class="form-control" id="otra-materia-input">
+        </div>
+        
+        <div class="mb-3">
+          <label for="estudiante-correo" class="form-label">Correo Institucional:</label>
+          <input type="email" class="form-control" id="estudiante-correo" required>
         </div>
       `;
       
@@ -232,21 +298,54 @@ function autenticarUsuario() {
   // Verificar datos adicionales para estudiantes
   else if (currentUser.tipo === 'estudiante') {
     const estudianteId = document.getElementById('estudiante-id').value.trim();
-    const semestre = document.getElementById('estudiante-semestre').value;
+    const estudianteCorreo = document.getElementById('estudiante-correo').value.trim();
     
-    if (!estudianteId) {
-      mostrarNotificacion('Error', 'Por favor ingresa tu ID de estudiante', 'error');
+    // Obtener el docente (manejo de "Otro")
+    let docente = document.getElementById('estudiante-docente').value;
+    if (docente === 'otro') {
+      docente = document.getElementById('otro-docente-input').value.trim();
+      if (!docente) {
+        mostrarNotificacion('Error', 'Por favor ingresa el nombre del docente', 'error');
+        return;
+      }
+    } else if (!docente) {
+      mostrarNotificacion('Error', 'Por favor selecciona un docente', 'error');
       return;
     }
     
-    if (!semestre) {
-      mostrarNotificacion('Error', 'Por favor selecciona tu semestre', 'error');
+    // Obtener la materia (manejo de "Otro")
+    let materia = document.getElementById('estudiante-materia').value;
+    if (materia === 'otra') {
+      materia = document.getElementById('otra-materia-input').value.trim();
+      if (!materia) {
+        mostrarNotificacion('Error', 'Por favor ingresa el nombre de la materia', 'error');
+        return;
+      }
+    } else if (!materia) {
+      mostrarNotificacion('Error', 'Por favor selecciona una materia', 'error');
+      return;
+    }
+    
+    if (!estudianteId) {
+      mostrarNotificacion('Error', 'Por favor ingresa tu ID', 'error');
+      return;
+    }
+    
+    if (!estudianteCorreo) {
+      mostrarNotificacion('Error', 'Por favor ingresa tu correo institucional', 'error');
+      return;
+    }
+    
+    if (!estudianteCorreo.includes('@')) {
+      mostrarNotificacion('Error', 'Por favor ingresa un correo electrónico válido', 'error');
       return;
     }
     
     // Guardar datos adicionales del estudiante
     currentUser.id_estudiante = estudianteId;
-    currentUser.semestre = semestre;
+    currentUser.docente = docente;
+    currentUser.materia = materia;
+    currentUser.correo = estudianteCorreo;
   }
   
   // Asignar un ID temporal al usuario (en un sistema real, vendría de la BD)

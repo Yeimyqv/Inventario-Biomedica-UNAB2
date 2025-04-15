@@ -1,0 +1,164 @@
+/* Estilos para el panel de usuario (nueva interfaz) */
+
+:root {
+  --primary-green: #45d509;
+  --primary-green-dark: #35a507;
+  --text-white: #ffffff;
+  --text-gray: #a0a0a0;
+  --bg-dark: #000000;
+  --border-gray: #333333;
+}
+
+/* Contenedor principal del panel */
+.panel-container {
+  background-color: rgba(0, 0, 0, 0.75);
+  border: 1px solid var(--text-white);
+  border-radius: 10px;
+  overflow: hidden;
+  color: var(--text-white);
+  margin-bottom: 2rem;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Encabezado del panel */
+.panel-header {
+  border-bottom: 2px solid var(--primary-green);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.panel-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 0;
+}
+
+.user-name {
+  color: var(--primary-green);
+}
+
+.panel-subtitle {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: var(--text-gray);
+}
+
+/* Contenido principal del panel */
+.panel-content {
+  padding: 1.5rem;
+}
+
+/* Módulos de funcionalidad */
+.panel-module {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  height: 100%;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.panel-module:hover {
+  border-color: var(--primary-green);
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(69, 213, 9, 0.15);
+}
+
+.module-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.module-desc {
+  color: var(--text-gray);
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+/* Botones estilizados */
+.btn-green {
+  background-color: var(--primary-green);
+  color: var(--text-white);
+  border: none;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-green:hover, .btn-green:focus {
+  background-color: var(--primary-green-dark);
+  color: var(--text-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(69, 213, 9, 0.2);
+}
+
+.btn-outline-light {
+  border: 1px solid var(--text-white);
+  background-color: transparent;
+  color: var(--text-white);
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-light:hover, .btn-outline-light:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-white);
+  transform: translateY(-2px);
+}
+
+/* Navegación inferior */
+.panel-nav {
+  border-top: 1px solid var(--border-gray);
+  padding: 1rem 1.5rem;
+  text-align: right;
+}
+
+/* Tablas */
+.table {
+  color: var(--text-white);
+}
+
+.table thead th {
+  border-color: var(--primary-green);
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(69, 213, 9, 0.1);
+}
+
+/* Alertas */
+.alert-info {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: var(--text-white);
+  border-color: var(--primary-green);
+}
+
+.alert-warning {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: var(--text-gray);
+  border-color: #a0a0a0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .panel-title {
+    font-size: 1.5rem;
+  }
+  
+  .module-title {
+    font-size: 1.1rem;
+  }
+  
+  .panel-module {
+    margin-bottom: 1rem;
+  }
+}

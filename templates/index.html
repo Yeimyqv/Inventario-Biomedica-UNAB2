@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/modals.css">
   <link rel="stylesheet" href="/static/css/sede-jardin.css?v=1">
+  <link rel="stylesheet" href="/static/css/panel-usuario.css?v=1">
 </head>
 <body>
   <!-- Barra de navegación -->
@@ -136,12 +137,12 @@
     
     <!-- Sección de préstamo -->
     <section id="prestamo-section" class="my-5" style="display: none;">
-      <div class="card shadow">
-        <div class="card-header bg-header-unab text-white d-flex justify-content-between align-items-center">
-          <h3 id="prestamo-title">Préstamo de elementos</h3>
+      <div class="panel-container">
+        <div class="panel-header d-flex justify-content-between align-items-center">
+          <h2 class="panel-title" id="prestamo-title">PRÉSTAMO DE ELEMENTOS</h2>
           <button id="back-btn" class="btn btn-sm btn-outline-light">Volver al menú</button>
         </div>
-        <div class="card-body">
+        <div class="panel-content">
           <div class="row">
             <div class="col-md-6">
               <h4 class="mb-4">Seleccione el elemento a prestar</h4>
@@ -167,7 +168,7 @@
                 <input type="number" class="form-control" id="cantidad-input" min="1" value="1" disabled>
               </div>
               
-              <button class="btn btn-primary-unab" id="prestamo-btn" disabled>Realizar préstamo</button>
+              <button class="btn btn-green" id="prestamo-btn" disabled>REALIZAR PRÉSTAMO</button>
             </div>
             
             <div class="col-md-6">
@@ -186,12 +187,12 @@
     
     <!-- Sección de administración (sólo para laboratoristas) -->
     <section id="admin-section" class="my-5" style="display: none;">
-      <div class="card shadow">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
-          <h3>Administración de inventario</h3>
+      <div class="panel-container">
+        <div class="panel-header d-flex justify-content-between align-items-center">
+          <h2 class="panel-title">ADMINISTRACIÓN DE INVENTARIO</h2>
           <button class="btn btn-sm btn-outline-light" onclick="volverAInterfazPrincipal()">Volver al menú</button>
         </div>
-        <div class="card-body">
+        <div class="panel-content">
           <!-- Contenido generado dinámicamente en main.js -->
         </div>
       </div>

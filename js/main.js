@@ -371,35 +371,33 @@ function cargarInterfazPrincipal() {
   // Interfaz para Estudiante
   if (currentUser.tipo === 'estudiante') {
     contenido = `
-      <div class="card shadow mb-4">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
-          <div>
-            <h3>Bienvenido, ${currentUser.nombre}</h3>
-            <p class="mb-0">Panel de Estudiante - Puedes solicitar préstamos de elementos</p>
-          </div>
-          <button class="btn btn-sm btn-outline-light" onclick="volverASeleccionUsuario()">Volver</button>
+      <div class="panel-container">
+        <div class="panel-header">
+          <h2 class="panel-title">BIENVENIDO <span class="user-name">"${currentUser.nombre.toUpperCase()}"</span></h2>
+          <p class="panel-subtitle">Panel de Estudiante - Puedes solicitar préstamos de elementos</p>
         </div>
-        <div class="card-body">
+        
+        <div class="panel-content">
           <div class="row">
             <div class="col-md-6 mb-3">
-              <div class="card h-100">
-                <div class="card-body text-center">
-                  <h4>Préstamo de elementos</h4>
-                  <p>Solicita elementos para tus prácticas</p>
-                  <button class="btn btn-primary-unab" onclick="iniciarPrestamo()">Prestar elementos</button>
-                </div>
+              <div class="panel-module">
+                <h3 class="module-title">PRÉSTAMO DE ELEMENTOS</h3>
+                <p class="module-desc">Solicita elementos para tus prácticas</p>
+                <button class="btn btn-green" onclick="iniciarPrestamo()">PRESTAR ELEMENTOS</button>
               </div>
             </div>
             <div class="col-md-6 mb-3">
-              <div class="card h-100">
-                <div class="card-body text-center">
-                  <h4>Consultar mis préstamos</h4>
-                  <p>Ver elementos que tienes prestados</p>
-                  <button class="btn btn-secondary-unab" onclick="iniciarRetorno()">Ver préstamos</button>
-                </div>
+              <div class="panel-module">
+                <h3 class="module-title">CONSULTA DE PRÉSTAMOS</h3>
+                <p class="module-desc">Ver elementos que tienes prestados</p>
+                <button class="btn btn-outline-light" onclick="iniciarRetorno()">VER PRÉSTAMOS</button>
               </div>
             </div>
           </div>
+        </div>
+        
+        <div class="panel-nav">
+          <button class="btn btn-sm btn-outline-light mt-3" onclick="volverASeleccionUsuario()">Volver a selección</button>
         </div>
       </div>
     `;
@@ -407,44 +405,40 @@ function cargarInterfazPrincipal() {
   // Interfaz para Docente
   else if (currentUser.tipo === 'docente') {
     contenido = `
-      <div class="card shadow mb-4">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
-          <div>
-            <h3>Bienvenido, ${currentUser.nombre}</h3>
-            <p class="mb-0">Panel de Docente - Gestión de elementos y préstamos</p>
-          </div>
-          <button class="btn btn-sm btn-outline-light" onclick="volverASeleccionUsuario()">Volver</button>
+      <div class="panel-container">
+        <div class="panel-header">
+          <h2 class="panel-title">BIENVENIDO <span class="user-name">"${currentUser.nombre.toUpperCase()}"</span></h2>
+          <p class="panel-subtitle">Panel de Docente - Gestión de elementos y préstamos</p>
         </div>
-        <div class="card-body">
+        
+        <div class="panel-content">
           <div class="row">
             <div class="col-md-4 mb-3">
-              <div class="card h-100">
-                <div class="card-body text-center">
-                  <h4>Préstamo de elementos</h4>
-                  <p>Solicita elementos para tus clases</p>
-                  <button class="btn btn-primary" onclick="iniciarPrestamo()">Prestar elementos</button>
-                </div>
+              <div class="panel-module">
+                <h3 class="module-title">PRÉSTAMO DE ELEMENTOS</h3>
+                <p class="module-desc">Solicita elementos para tus clases</p>
+                <button class="btn btn-green" onclick="iniciarPrestamo()">PRESTAR ELEMENTOS</button>
               </div>
             </div>
             <div class="col-md-4 mb-3">
-              <div class="card h-100">
-                <div class="card-body text-center">
-                  <h4>Consultar mis préstamos</h4>
-                  <p>Ver elementos que tienes prestados</p>
-                  <button class="btn btn-secondary" onclick="iniciarRetorno()">Ver préstamos</button>
-                </div>
+              <div class="panel-module">
+                <h3 class="module-title">CONSULTA DE PRÉSTAMOS</h3>
+                <p class="module-desc">Ver elementos que tienes prestados</p>
+                <button class="btn btn-outline-light" onclick="iniciarRetorno()">VER PRÉSTAMOS</button>
               </div>
             </div>
             <div class="col-md-4 mb-3">
-              <div class="card h-100">
-                <div class="card-body text-center">
-                  <h4>Consultar inventario</h4>
-                  <p>Revisar disponibilidad actual</p>
-                  <button class="btn btn-info" onclick="consultarInventario()">Ver inventario</button>
-                </div>
+              <div class="panel-module">
+                <h3 class="module-title">CONSULTA DE INVENTARIO</h3>
+                <p class="module-desc">Revisar disponibilidad actual</p>
+                <button class="btn btn-outline-light" onclick="consultarInventario()">VER INVENTARIO</button>
               </div>
             </div>
           </div>
+        </div>
+        
+        <div class="panel-nav">
+          <button class="btn btn-sm btn-outline-light mt-3" onclick="volverASeleccionUsuario()">Volver a selección</button>
         </div>
       </div>
     `;
@@ -452,53 +446,47 @@ function cargarInterfazPrincipal() {
   // Interfaz para Laboratorista
   else if (currentUser.tipo === 'laboratorista') {
     contenido = `
-      <div class="card shadow mb-4">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
-          <div>
-            <h3>Bienvenido, ${currentUser.nombre}</h3>
-            <p class="mb-0">Panel de Laboratorista - Administración completa del sistema</p>
-          </div>
-          <button class="btn btn-sm btn-outline-light" onclick="volverASeleccionUsuario()">Volver</button>
+      <div class="panel-container">
+        <div class="panel-header">
+          <h2 class="panel-title">BIENVENIDO <span class="user-name">"${currentUser.nombre.toUpperCase()}"</span></h2>
+          <p class="panel-subtitle">Panel de Laboratorista - Administración completa del sistema</p>
         </div>
-        <div class="card-body">
+        
+        <div class="panel-content">
           <div class="row">
             <div class="col-md-3 mb-3">
-              <div class="card h-100">
-                <div class="card-body text-center">
-                  <h4>Préstamo de elementos</h4>
-                  <p>Gestionar nuevos préstamos</p>
-                  <button class="btn btn-primary" onclick="iniciarPrestamo()">Prestar elementos</button>
-                </div>
+              <div class="panel-module">
+                <h3 class="module-title">PRÉSTAMO DE ELEMENTOS</h3>
+                <p class="module-desc">Gestionar nuevos préstamos</p>
+                <button class="btn btn-green" onclick="iniciarPrestamo()">PRESTAR ELEMENTOS</button>
               </div>
             </div>
             <div class="col-md-3 mb-3">
-              <div class="card h-100">
-                <div class="card-body text-center">
-                  <h4>Retorno de elementos</h4>
-                  <p>Registrar devoluciones</p>
-                  <button class="btn btn-secondary" onclick="iniciarRetorno()">Retornar elementos</button>
-                </div>
+              <div class="panel-module">
+                <h3 class="module-title">RETORNO DE ELEMENTOS</h3>
+                <p class="module-desc">Registrar devoluciones</p>
+                <button class="btn btn-outline-light" onclick="iniciarRetorno()">RETORNAR ELEMENTOS</button>
               </div>
             </div>
             <div class="col-md-3 mb-3">
-              <div class="card h-100">
-                <div class="card-body text-center">
-                  <h4>Administrar inventario</h4>
-                  <p>Agregar o eliminar elementos</p>
-                  <button class="btn btn-warning" onclick="administrarInventario()">Administrar</button>
-                </div>
+              <div class="panel-module">
+                <h3 class="module-title">ADMINISTRAR INVENTARIO</h3>
+                <p class="module-desc">Agregar o eliminar elementos</p>
+                <button class="btn btn-outline-light" onclick="administrarInventario()">ADMINISTRAR</button>
               </div>
             </div>
             <div class="col-md-3 mb-3">
-              <div class="card h-100">
-                <div class="card-body text-center">
-                  <h4>Consultar préstamos</h4>
-                  <p>Ver historial y estado actual</p>
-                  <button class="btn btn-info" onclick="consultarPrestamos()">Ver préstamos</button>
-                </div>
+              <div class="panel-module">
+                <h3 class="module-title">CONSULTAR PRÉSTAMOS</h3>
+                <p class="module-desc">Ver historial y estado actual</p>
+                <button class="btn btn-outline-light" onclick="consultarPrestamos()">VER PRÉSTAMOS</button>
               </div>
             </div>
           </div>
+        </div>
+        
+        <div class="panel-nav">
+          <button class="btn btn-sm btn-outline-light mt-3" onclick="volverASeleccionUsuario()">Volver a selección</button>
         </div>
       </div>
     `;
@@ -548,15 +536,15 @@ function iniciarRetorno() {
   const puedeDevolver = esLaboratorista; // Solo el laboratorista puede devolver elementos
   
   // Título para la sección
-  const tituloSeccion = esLaboratorista ? 'Retorno de elementos' : 'Mis préstamos activos';
+  const tituloSeccion = esLaboratorista ? 'RETORNO DE ELEMENTOS' : 'MIS PRÉSTAMOS ACTIVOS';
   
   retornoSection.innerHTML = `
-    <div class="card shadow">
-      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
-        <h3>${tituloSeccion}</h3>
+    <div class="panel-container">
+      <div class="panel-header d-flex justify-content-between align-items-center">
+        <h2 class="panel-title">${tituloSeccion}</h2>
         <button class="btn btn-sm btn-outline-light" onclick="confirmarVolverAInterfaz()">Volver</button>
       </div>
-      <div class="card-body">
+      <div class="panel-content">
         ${prestamos.length > 0 ? `
           <p class="mb-4">${esLaboratorista ? 'Seleccione los elementos que desea devolver:' : 'Estos son tus elementos en préstamo actualmente:'}</p>
           ${esLaboratorista ? `
@@ -628,12 +616,12 @@ function consultarInventario() {
   
   // Estructura del contenido
   inventarioSection.innerHTML = `
-    <div class="card shadow">
-      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" style="border-bottom: 3px solid #45d509;">
-        <h3>Consulta de Inventario</h3>
+    <div class="panel-container">
+      <div class="panel-header d-flex justify-content-between align-items-center">
+        <h2 class="panel-title">CONSULTA DE INVENTARIO</h2>
         <button class="btn btn-sm btn-outline-light" onclick="confirmarVolverAInterfaz()">Volver</button>
       </div>
-      <div class="card-body">
+      <div class="panel-content">
         <!-- Filtros -->
         <div class="mb-4">
           <div class="row">

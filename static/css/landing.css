@@ -49,7 +49,7 @@ body {
 }
 
 .logo-container img {
-  height: 60px;
+  min-width: 120px; /* Aseguramos un tamaño mínimo para el logo */
 }
 
 .nav-links {
@@ -83,14 +83,6 @@ body {
   z-index: 10;
 }
 
-.hero-subtitle {
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  opacity: 0.8;
-}
-
 .hero-title {
   font-size: 3.5rem;
   font-weight: 900;
@@ -98,6 +90,14 @@ body {
   line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.hero-subtitle {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .hero-highlight {

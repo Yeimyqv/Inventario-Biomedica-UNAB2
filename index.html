@@ -2,10 +2,63 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0;url=/" />
-  <title>Redirigiendo...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNAB - Sistema de Gestión de Inventario Bioingeniería</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap">
+  <link rel="stylesheet" href="/static/css/landing.css">
 </head>
 <body>
-  <p>Redirigiendo a la aplicación principal...</p>
+  <div class="landing-container">
+    <div class="overlay"></div>
+    
+    <!-- Header Navigation -->
+    <header class="landing-header">
+      <div class="logo-container">
+        <img src="/static/images/unab-logo.svg" alt="UNAB Ingeniería Biomédica">
+      </div>
+      <div class="nav-links">
+        <a href="#" class="nav-link">Inicio</a>
+        <a href="/sede-jardin" class="nav-link">Sede Jardín</a>
+        <a href="#" class="nav-link" style="opacity: 0.6; cursor: not-allowed;">Sede Bosque</a>
+      </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="landing-hero">
+      <div class="hero-subtitle">
+        LABORATORIOS INGENIERIA BIOMÉDICA
+      </div>
+      <h1 class="hero-title">
+        SISTEMA DE <div class="hero-highlight">GESTIÓN</div> DE INVENTARIO
+      </h1>
+      <p class="hero-description">
+        Bienvenido al sistema de préstamos, devoluciones y gestión de elementos de laboratorio.
+      </p>
+      <div class="cta-buttons">
+        <a href="/sede-jardin" class="cta-button cta-button-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 8 8 12 12 16"></polyline>
+            <line x1="16" y1="12" x2="8" y2="12"></line>
+          </svg>
+          SEDE JARDIN
+        </a>
+        <button class="cta-button cta-button-disabled" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          SEDE BOSQUE
+        </button>
+      </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <p>Sistema de Gestión de Inventario - Laboratorios Ingeniería Biomédica UNAB © 2025</p>
+      <p>Desarrollado por: Ing. Y Quintana</p>
+    </footer>
+  </div>
 </body>
 </html>

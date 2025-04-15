@@ -32,14 +32,24 @@ with app.app_context():
 # Rutas para archivos estáticos
 @app.route('/')
 def index():
-    """Serve the main index page."""
+    """Serve the landing page."""
+    return send_from_directory('.', 'index.html')
+
+@app.route('/sede-jardin')
+def sede_jardin():
+    """Serve the main application interface for Sede Jardin."""
     return render_template('index.html')
+
+@app.route('/static/<path:path>')
+def serve_static_files(path):
+    """Serve files from the static folder."""
+    return send_from_directory('static', path)
 
 @app.route('/<path:path>')
 def serve_static(path):
     """Serve static files."""
     # Primero buscar en carpetas específicas
-    if path.startswith(('css/', 'js/', 'img/', 'static/')):
+    if path.startswith(('css/', 'js/', 'img/')):
         folder = path.split('/')[0]
         file_path = '/'.join(path.split('/')[1:])
         return send_from_directory(folder, file_path)

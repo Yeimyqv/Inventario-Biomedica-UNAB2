@@ -3,99 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Gestión de Laboratorio - Bioinstrumentación UNAB</title>
+  <title>Sistema de Gestión de Inventario - Laboratorios Ingeniería Biomédica</title>
   
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   
   <!-- CSS personalizado -->
-  <link href="/css/styles.css" rel="stylesheet">
-  <link href="/css/modals.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/modals.css">
   
-  <!-- Favicon -->
-  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <style>
+    :root {
+      --primary-color: #45d509;
+      --primary-dark: #35a507;
+      --secondary-color: #FF6600;
+      --secondary-dark: #CC5200;
+      --text-dark: #333333;
+      --text-light: #FFFFFF;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .navbar {
+      background-color: #000000 !important;
+    }
+
+    .navbar-brand img {
+      height: 50px;
+    }
+
+    .bg-header-unab {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .text-primary-unab {
+      color: var(--primary-color);
+    }
+    
+    .btn-primary-unab {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary-unab:hover {
+      background-color: var(--primary-dark);
+      border-color: var(--primary-dark);
+      color: white;
+    }
+    
+    .btn-secondary-unab {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-secondary-unab:hover {
+      background-color: var(--secondary-dark);
+      border-color: var(--secondary-dark);
+      color: white;
+    }
+  </style>
 </head>
 <body>
-  
-  <!-- Cabecera -->
-  <header>
-    <div class="container-fluid py-2">
-      <div class="row align-items-center">
-        <div class="col-md-2 text-center text-md-start">
-          <img src="/static/logo-u-vig.png" alt="Logo UNAB" class="logo">
-        </div>
-        <div class="col-md-10 d-flex justify-content-center align-items-center">
-          <h1 class="text-center mb-0">SISTEMA DE GESTIÓN DE INVENTARIO LABORATORIOS INGENIERIA BIOMÉDICA</h1>
-        </div>
+  <!-- Barra de navegación -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <img src="/static/images/unab-logo.svg" alt="UNAB Biomedical Engineering">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/sede-jardin">Sede Jardín</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Sede Bosque</a>
+          </li>
+        </ul>
       </div>
     </div>
-  </header>
-  
-  <!-- Contenido principal -->
-  <main class="container mt-4">
-    
+  </nav>
+
+  <!-- Contenedor principal -->
+  <div class="container my-5">
     <!-- Sección de selección de laboratorio -->
-    <section id="lab-selection" class="my-5">
-      <div class="text-center mb-4">
-        <h2 class="text-center">SISTEMA DE GESTIÓN DE INVENTARIO LABORATORIOS INGENIERIA BIOMÉDICA</h2>
-      </div>
-      
-      <div class="row justify-content-center mt-5">
-        <div class="col-md-6 mb-4">
-          <div class="card text-center h-100 shadow">
-            <div class="card-body">
-              <h3 class="card-title">LABORATORIOS INGENIERÍA BIOMÉDICA</h3>
-              <p class="card-text">Acceda al sistema de gestión para los laboratorios de Ingeniería Biomédica.</p>
-              <button class="btn btn-success mt-3" onclick="selectLaboratory('principal')">
-                Acceder al Sistema
-              </button>
-            </div>
-          </div>
-        </div>
+    <section id="lab-selection" class="card shadow-sm mb-5">
+      <div class="card-body text-center py-5">
+        <h2 class="mb-4 text-primary-unab">PRESTAMOS SEDE JARDIN</h2>
+        <p class="lead mb-5">Aquí podrás registrar, consultar y administrar eficientemente los recursos disponibles para tus prácticas y actividades académicas.</p>
+        <button class="btn btn-lg btn-primary-unab" id="lab-select-btn">Continuar</button>
       </div>
     </section>
     
-    <!-- Sección de selección de usuario -->
-    <section id="user-selection" class="my-3" style="display: none;">
-      <div class="text-center mb-3">
-        <p class="mb-2"><strong>Bienvenido al sistema de préstamos, devoluciones y gestión de elementos de laboratorio.</strong></p>
-        <p class="mb-2">Aquí podrás registrar, consultar y administrar eficientemente los recursos disponibles para tus prácticas y actividades académicas.</p>
-        <p class="mb-2">Seleccione su tipo de usuario para acceder a las funciones del sistema.</p>
-      </div>
+    <!-- Sección de selección de tipo de usuario (oculta inicialmente) -->
+    <section id="user-selection" class="py-4" style="display: none;">
+      <h2 class="text-center mb-5 text-primary-unab">Seleccione su tipo de usuario</h2>
       
-      <div class="row justify-content-center mt-5">
-        <!-- Estudiante -->
+      <div class="row justify-content-center">
         <div class="col-md-4 mb-4">
           <div class="card text-center h-100 shadow">
             <div class="card-body">
               <img src="/img/student.svg" alt="Estudiante" class="user-icon my-3">
               <h3 class="card-title">Estudiante</h3>
               <p class="card-text">Accede para solicitar préstamos y devoluciones de elementos de laboratorio.</p>
-              <button class="btn btn-success mt-3" onclick="selectUserType('estudiante')">
+              <button class="btn btn-primary-unab mt-3" onclick="selectUserType('estudiante')">
                 Entrar como Estudiante
               </button>
             </div>
           </div>
         </div>
         
-        <!-- Docente -->
         <div class="col-md-4 mb-4">
           <div class="card text-center h-100 shadow">
             <div class="card-body">
               <img src="/img/teacher.svg" alt="Docente" class="user-icon my-3">
               <h3 class="card-title">Docente</h3>
               <p class="card-text">Accede para gestionar elementos, préstamos y generación de reportes.</p>
-              <button class="btn btn-primary mt-3" onclick="selectUserType('docente')">
+              <button class="btn btn-primary-unab mt-3" onclick="selectUserType('docente')">
                 Entrar como Docente
               </button>
             </div>
           </div>
         </div>
         
-        <!-- Laboratorista -->
         <div class="col-md-4 mb-4">
           <div class="card text-center h-100 shadow">
             <div class="card-body">
@@ -114,7 +157,7 @@
     <!-- Sección de autenticación -->
     <section id="auth-section" class="my-5" style="display: none;">
       <div class="card shadow">
-        <div class="card-header bg-secondary text-white">
+        <div class="card-header bg-header-unab text-white">
           <h3>Ingrese sus datos</h3>
         </div>
         <div class="card-body">
@@ -131,7 +174,7 @@
             </div>
             
             <div class="d-grid gap-2">
-              <button type="button" class="btn btn-primary" id="auth-button">Ingresar</button>
+              <button type="button" class="btn btn-primary-unab" id="auth-button">Ingresar</button>
               <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload()">Cancelar</button>
             </div>
           </form>
@@ -147,24 +190,28 @@
     <!-- Sección de préstamo -->
     <section id="prestamo-section" class="my-5" style="display: none;">
       <div class="card shadow">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div class="card-header bg-header-unab text-white d-flex justify-content-between align-items-center">
           <h3 id="prestamo-title">Préstamo de elementos</h3>
-          <button id="back-btn" class="btn btn-sm btn-light">Volver</button>
+          <button id="back-btn" class="btn btn-sm btn-light">Volver al menú</button>
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
+              <h4 class="mb-4">Seleccione el elemento a prestar</h4>
+              
               <div class="mb-3">
                 <label for="categoria-select" class="form-label">Categoría:</label>
-                <select class="form-select" id="categoria-select" disabled>
-                  <option value="">Cargando categorías...</option>
+                <select class="form-select" id="categoria-select">
+                  <option value="">Selecciona una categoría</option>
+                  <!-- Las opciones se cargan dinámicamente -->
                 </select>
               </div>
               
               <div class="mb-3">
                 <label for="elemento-select" class="form-label">Elemento:</label>
                 <select class="form-select" id="elemento-select" disabled>
-                  <option value="">Selecciona una categoría primero</option>
+                  <option value="">Selecciona un elemento</option>
+                  <!-- Las opciones se cargan dinámicamente -->
                 </select>
               </div>
               
@@ -173,24 +220,16 @@
                 <input type="number" class="form-control" id="cantidad-input" min="1" value="1" disabled>
               </div>
               
-              <div class="d-grid gap-2">
-                <button class="btn btn-success" id="prestamo-btn" disabled>Realizar préstamo</button>
-              </div>
+              <button class="btn btn-primary-unab" id="prestamo-btn" disabled>Realizar préstamo</button>
             </div>
             
             <div class="col-md-6">
-              <div class="card">
-                <div class="card-header">
-                  <h5>Detalles del elemento</h5>
-                </div>
-                <div class="card-body">
-                  <div id="elemento-imagen" class="text-center mb-3">
-                    <!-- Imagen del elemento se carga dinámicamente -->
-                  </div>
-                  <div id="elemento-detalles">
-                    <p class="text-muted">Selecciona un elemento para ver sus detalles</p>
-                  </div>
-                </div>
+              <h4 class="mb-4">Detalles del elemento</h4>
+              <div id="elemento-detalles">
+                <p class="text-muted">Selecciona un elemento para ver sus detalles</p>
+              </div>
+              <div id="elemento-imagen" class="mt-3 text-center">
+                <!-- La imagen se carga dinámicamente -->
               </div>
             </div>
           </div>
@@ -198,46 +237,38 @@
       </div>
     </section>
     
-    <!-- Sección de administración (solo para laboratorista) -->
+    <!-- Sección de administración (sólo para laboratoristas) -->
     <section id="admin-section" class="my-5" style="display: none;">
       <div class="card shadow">
         <div class="card-header bg-warning d-flex justify-content-between align-items-center">
-          <h3>Administración del inventario</h3>
-          <button id="back-admin-btn" class="btn btn-sm btn-light" onclick="volverAInterfazPrincipal()">Volver</button>
+          <h3>Administración de inventario</h3>
+          <button class="btn btn-sm btn-light" onclick="volverAInterfazPrincipal()">Volver al menú</button>
         </div>
         <div class="card-body">
-          <!-- El contenido se generará dinámicamente -->
+          <!-- Contenido generado dinámicamente en main.js -->
         </div>
       </div>
     </section>
-    
-  </main>
+  </div>
   
-  <!-- Pie de página -->
-  <footer class="mt-5 py-3 bg-light">
+  <!-- Footer -->
+  <footer class="bg-dark text-light py-4 mt-5">
     <div class="container text-center">
-      <p>Sistema de Gestión de Inventario - Laboratorios Ingeniería Biomédica UNAB &copy; 2025</p>
+      <p>Sistema de Gestión de Inventario - Laboratorios Ingeniería Biomédica UNAB © 2025</p>
+      <p>Desarrollado por: Ing. Y Quintana</p>
     </div>
   </footer>
   
-  <!-- Contenedor para notificaciones tipo toast -->
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <!-- Los toasts se generan dinámicamente -->
-  </div>
-  
-  <!-- Botón Home fijo -->
-  <button id="home-button" class="home-button" style="display: none;" onclick="volverASeleccionUsuario()">
-    <i class="fas fa-home home-button-icon"></i>
-  </button>
-  
   <!-- Contenedor para modales personalizados -->
-  <div id="custom-modal-container">
-    <!-- Los modales se generan dinámicamente -->
-  </div>
+  <div id="custom-modal-container"></div>
   
-  <!-- JavaScript -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Scripts de Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Datos mock para desarrollo -->
   <script src="/js/data.js"></script>
+  
+  <!-- Scripts de la aplicación -->
   <script src="/js/api.js"></script>
   <script src="/js/main.js"></script>
 </body>

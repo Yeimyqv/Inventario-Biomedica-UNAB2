@@ -1,22 +1,40 @@
-<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .primary { fill: #ffc107; }
-    .secondary { fill: #ffffff; }
+    .primary-color { fill: #45d509; }
+    .secondary-color { fill: #333333; }
+    .accent-color { fill: #FFFFFF; }
+    .warning-color { fill: #FFC107; }
   </style>
   
-  <!-- Círculo de fondo -->
-  <circle cx="50" cy="50" r="45" class="primary" />
+  <!-- Fondo circular -->
+  <circle cx="60" cy="60" r="55" class="warning-color" opacity="0.1"/>
+  
+  <!-- Tubo de ensayo -->
+  <path d="M55 30L45 75C45 80 50 85 60 85C70 85 75 80 75 75L65 30H55Z" class="accent-color" stroke="#333333" stroke-width="2"/>
+  <path d="M55 30H65" stroke="#333333" stroke-width="2"/>
+  <path d="M50 60L70 60" stroke="#333333" stroke-width="1" stroke-dasharray="2 2"/>
+  
+  <!-- Líquido en el tubo -->
+  <path d="M45 75C45 80 50 85 60 85C70 85 75 80 75 75L70 60H50L45 75Z" class="warning-color" opacity="0.7"/>
+  
+  <!-- Burbujas en el líquido -->
+  <circle cx="55" cy="70" r="2" class="accent-color" opacity="0.8"/>
+  <circle cx="63" cy="65" r="3" class="accent-color" opacity="0.8"/>
+  <circle cx="58" cy="75" r="1.5" class="accent-color" opacity="0.8"/>
   
   <!-- Matraz -->
-  <path d="M40 25 L40 50 C40 65 60 65 60 50 L60 25 Z" class="secondary" />
-  <rect x="36" y="20" width="28" height="5" rx="2" ry="2" class="secondary" />
+  <path d="M85 50V40C85 38 83 36 80 36H77C74 36 72 38 72 40V50L80 65H77L85 50Z" class="accent-color" stroke="#333333" stroke-width="1.5"/>
   
-  <!-- Burbujas dentro del matraz -->
-  <circle cx="45" cy="40" r="3" class="primary" />
-  <circle cx="55" cy="50" r="4" class="primary" />
-  <circle cx="48" cy="55" r="2" class="primary" />
+  <!-- Gafas de seguridad -->
+  <path d="M32 40C32 38 34 35 37 35H43C46 35 48 38 48 40V43C48 45 46 48 43 48H37C34 48 32 45 32 43V40Z" class="accent-color" stroke="#333333" stroke-width="1.5" fill-opacity="0.5"/>
   
-  <!-- Microscopio base -->
-  <rect x="30" y="70" width="40" height="5" rx="2" ry="2" class="secondary" />
-  <rect x="45" y="60" width="10" height="15" class="secondary" />
+  <!-- Soporte para el tubo -->
+  <rect x="30" y="85" width="60" height="5" rx="1" class="secondary-color"/>
+  <rect x="35" y="82" width="50" height="3" rx="1" class="secondary-color"/>
+  <path d="M45 82V75M75 82V75" stroke="#333333" stroke-width="1.5"/>
+  
+  <!-- Icono de peligro -->
+  <path d="M20 65L25 75H15L20 65Z" class="warning-color" stroke="#333333" stroke-width="1"/>
+  <text x="20" y="73" text-anchor="middle" font-size="8" class="secondary-color">!</text>
 </svg>

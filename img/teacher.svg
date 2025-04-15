@@ -1,24 +1,31 @@
-<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .primary { fill: #007bff; }
-    .secondary { fill: #ffffff; }
+    .primary-color { fill: #45d509; }
+    .secondary-color { fill: #333333; }
+    .accent-color { fill: #FFFFFF; }
   </style>
   
-  <!-- Círculo de fondo -->
-  <circle cx="50" cy="50" r="45" class="primary" />
+  <!-- Fondo circular -->
+  <circle cx="60" cy="60" r="55" class="primary-color" opacity="0.1"/>
   
-  <!-- Tablero/Pizarra -->
-  <rect x="25" y="35" width="50" height="40" rx="2" ry="2" class="secondary" />
+  <!-- Silueta de profesor -->
+  <circle cx="60" cy="35" r="15" class="accent-color" stroke="#45d509" stroke-width="2"/>
+  <path d="M60 50V55" stroke="#45d509" stroke-width="2"/>
+  <path d="M40 85C40 70 50 65 60 65C70 65 80 70 80 85" stroke="#45d509" stroke-width="4" fill="none"/>
   
-  <!-- Soporte del tablero -->
-  <rect x="45" y="75" width="10" height="10" class="secondary" />
-  <rect x="40" y="75" width="20" height="3" class="secondary" />
+  <!-- Pizarra -->
+  <rect x="30" y="75" width="60" height="40" rx="2" class="secondary-color"/>
+  <rect x="32" y="77" width="56" height="36" rx="1" class="accent-color"/>
   
-  <!-- Líneas en la pizarra -->
-  <line x1="30" y1="45" x2="70" y2="45" stroke="#007bff" stroke-width="2" />
-  <line x1="30" y1="55" x2="70" y2="55" stroke="#007bff" stroke-width="2" />
-  <line x1="30" y1="65" x2="70" y2="65" stroke="#007bff" stroke-width="2" />
+  <!-- Líneas de texto en la pizarra -->
+  <path d="M38 85H82M38 90H70M38 95H75M38 100H65" stroke="#333333" stroke-width="1.5"/>
   
-  <!-- Puntero/Regla -->
-  <rect x="30" y="20" width="40" height="5" rx="2" ry="2" class="secondary" />
+  <!-- Gafas -->
+  <circle cx="53" cy="35" r="5" fill="none" stroke="#333333" stroke-width="1.5"/>
+  <circle cx="67" cy="35" r="5" fill="none" stroke="#333333" stroke-width="1.5"/>
+  <path d="M58 35H62" stroke="#333333" stroke-width="1.5"/>
+  
+  <!-- Marcador -->
+  <rect x="80" y="60" width="4" height="15" rx="1" class="primary-color"/>
 </svg>

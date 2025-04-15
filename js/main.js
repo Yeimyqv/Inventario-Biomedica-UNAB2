@@ -22,8 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Inicializar modales personalizados
   initCustomModals();
   
-  // Iniciar directamente en la selección de usuario
-  document.getElementById('lab-selection').style.display = 'none';
+  // Mostrar directamente la selección de usuario (ya no hay sección lab-selection)
   document.getElementById('user-selection').style.display = 'block';
 });
 
@@ -76,18 +75,12 @@ function initNotifications() {
   // Se usa bootstrap para notificaciones tipo toast
 }
 
-// Selección inicial del laboratorio
-function selectLaboratory(laboratorio) {
-  currentLaboratory = laboratorio;
+// Configuración inicial del laboratorio (ahora automática)
+function configureDefaultLaboratory() {
+  currentLaboratory = 'biomedica';
   
-  // Mostrar mensaje de confirmación del laboratorio seleccionado
-  mostrarNotificacion('Laboratorio seleccionado', `Ha seleccionado el laboratorio de Ingeniería Biomédica`, 'info');
-  
-  // Ocultar la selección de laboratorio
-  document.getElementById('lab-selection').style.display = 'none';
-  
-  // Mostrar la selección de usuario
-  document.getElementById('user-selection').style.display = 'block';
+  // Mostrar mensaje de confirmación del laboratorio
+  mostrarNotificacion('Laboratorio seleccionado', `Laboratorio de Ingeniería Biomédica - Sede Jardín`, 'info');
 }
 
 // Selección inicial del tipo de usuario

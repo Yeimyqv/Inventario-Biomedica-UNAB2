@@ -573,7 +573,7 @@ function iniciarRetorno() {
                     <td>${prestamo.fecha}</td>
                     ${puedeDevolver ? `
                     <td>
-                      <button class="btn btn-sm btn-success" onclick="registrarDevolucion(${prestamo.id})">
+                      <button class="btn btn-sm btn-green" onclick="registrarDevolucion(${prestamo.id})">
                         Devolver elemento
                       </button>
                     </td>
@@ -637,7 +637,7 @@ function consultarInventario() {
               <input type="text" class="form-control" id="filtro-nombre" placeholder="Nombre del elemento">
             </div>
             <div class="col-md-4 mb-3 d-flex align-items-end">
-              <button class="btn btn-primary-unab w-100" onclick="filtrarInventario()">Filtrar</button>
+              <button class="btn btn-green w-100" onclick="filtrarInventario()">Filtrar</button>
             </div>
           </div>
         </div>
@@ -737,7 +737,7 @@ function administrarInventario() {
     <!-- Botón de agregar nuevo elemento y búsqueda -->
     <div class="row mb-4 align-items-end">
       <div class="col-md-4">
-        <button class="btn btn-success" onclick="mostrarFormularioNuevoElemento()">Agregar nuevo elemento</button>
+        <button class="btn btn-green" onclick="mostrarFormularioNuevoElemento()">Agregar nuevo elemento</button>
       </div>
       <div class="col-md-8">
         <div class="input-group">
@@ -791,7 +791,7 @@ function administrarInventario() {
         </div>
         <div class="d-flex justify-content-end">
           <button type="button" class="btn btn-secondary me-2" onclick="ocultarFormularioNuevoElemento()">Cancelar</button>
-          <button type="button" class="btn btn-success" onclick="agregarNuevoElemento()">Guardar elemento</button>
+          <button type="button" class="btn btn-green" onclick="agregarNuevoElemento()">Guardar elemento</button>
         </div>
       </form>
     </div>
@@ -1212,7 +1212,7 @@ function consultarPrestamos() {
               <input type="text" class="form-control" id="filtro-usuario" placeholder="Nombre del usuario">
             </div>
             <div class="col-md-4 mb-3 d-flex align-items-end">
-              <button class="btn btn-primary w-100" onclick="filtrarPrestamos()">Filtrar</button>
+              <button class="btn btn-green w-100" onclick="filtrarPrestamos()">Filtrar</button>
             </div>
           </div>
         </div>

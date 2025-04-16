@@ -28,6 +28,22 @@ body {
   background-color: rgba(0, 0, 0, 0.8) !important;
 }
 
+.nav-link {
+  color: rgba(255, 255, 255, 0.8) !important;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #fff !important;
+}
+
+.nav-link.active {
+  color: var(--primary-color) !important;
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary-color);
+}
+
 .sede-title {
   font-weight: 900;
   font-size: 3rem;

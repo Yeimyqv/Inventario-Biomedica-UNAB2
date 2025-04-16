@@ -67,13 +67,15 @@ body {
   border-radius: 4px;
 }
 
-.nav-link:hover, .nav-link.active {
+.nav-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .nav-link.active {
   color: var(--primary-color);
   font-weight: 700;
+  border-bottom: 2px solid var(--primary-color);
 }
 
 .landing-hero {

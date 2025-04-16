@@ -251,10 +251,7 @@ function selectUserType(tipo) {
   formButtons.appendChild(backBtn);
 }
 
-// Función para volver a la página de inicio sin confirmación
-function volverAPaginaInicio() {
-  window.location.reload();
-}
+// Función eliminada - reemplazada por volverASeleccionUsuario()
 
 // Autenticar al usuario según su tipo
 function autenticarUsuario() {

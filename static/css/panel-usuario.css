@@ -129,18 +129,36 @@ body {
   border-color: rgba(255, 255, 255, 0.1);
   padding: 10px;
   vertical-align: middle;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
-.table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
+/* Eliminar fondo alternado para filas */
+.table-striped > tbody > tr:nth-of-type(odd),
 .table-striped > tbody > tr:nth-of-type(even) {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
+/* Hacer que el cambio de color solo ocurra al pasar el cursor */
 .table-hover > tbody > tr:hover {
   background-color: rgba(69, 213, 9, 0.2);
+}
+
+/* Asegurar consistencia en todas las tablas */
+.table thead,
+.accordion-body .table thead,
+#prestamos-section .table thead,
+#inventario-section .table thead {
+  background-color: rgba(0, 0, 0, 0.9);
+  border-bottom: 2px solid #45d509;
+}
+
+.table tbody tr,
+.accordion-body .table tbody tr,
+#prestamos-section .table tbody tr,
+#inventario-section .table tbody tr {
+  background-color: rgba(0, 0, 0, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Alertas */
@@ -189,12 +207,15 @@ body {
 
 /* Footer */
 .footer-custom {
-  background-color: rgba(0, 0, 0, 0.85);
-  padding: 25px 0;
-  position: relative;
-  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 20px 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
   border-top: 3px solid #45d509;
-  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .footer-single-line {
@@ -202,6 +223,11 @@ body {
   font-weight: 500;
   color: white;
   margin-bottom: 0;
+}
+
+/* Espacio para evitar que el contenido quede detrás del footer */
+body {
+  padding-bottom: 70px;
 }
 
 /* Imágenes y detalles */

@@ -544,41 +544,67 @@ function iniciarRetorno() {
       <div class="panel-content">
         ${prestamos.length > 0 ? `
           <p class="mb-4">${esLaboratorista ? 'Seleccione los elementos que desea devolver:' : 'Estos son tus elementos en préstamo actualmente:'}</p>
+          
+          <!-- Barra de búsqueda con estilo similar a Administrar Inventario -->
           ${esLaboratorista ? `
-            <div class="mb-3">
-              <input type="text" class="form-control" id="buscar-prestamo" placeholder="Buscar por nombre de usuario o elemento" 
-                onkeyup="filtrarTablaRetornos()">
+            <div class="row mb-4 align-items-end">
+              <div class="col-md-12">
+                <div class="input-group">
+                  <span class="input-group-text">🔍</span>
+                  <input type="text" class="form-control" id="buscar-prestamo" 
+                    placeholder="Buscar por nombre de usuario o elemento" onkeyup="filtrarTablaRetornos()">
+                </div>
+              </div>
             </div>
           ` : ''}
-          <div class="table-responsive">
-            <table class="table table-striped table-hover" id="tabla-retornos">
-              <thead>
-                <tr>
-                  ${esLaboratorista ? '<th>Usuario</th>' : ''}
-                  <th>Elemento</th>
-                  <th>Cantidad</th>
-                  <th>Fecha préstamo</th>
-                  ${puedeDevolver ? '<th>Acciones</th>' : ''}
-                </tr>
-              </thead>
-              <tbody>
-                ${prestamos.map(prestamo => `
-                  <tr>
-                    ${esLaboratorista ? `<td>${prestamo.usuario_nombre}</td>` : ''}
-                    <td>${prestamo.elemento_nombre}</td>
-                    <td>${prestamo.cantidad}</td>
-                    <td>${prestamo.fecha}</td>
-                    ${puedeDevolver ? `
-                    <td>
-                      <button class="btn btn-sm btn-green" onclick="registrarDevolucion(${prestamo.id})">
-                        Devolver elemento
-                      </button>
-                    </td>
-                    ` : ''}
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
+          
+          <div class="accordion" id="prestamos-accordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="heading-prestamos">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                  data-bs-target="#collapse-prestamos" aria-expanded="true" aria-controls="collapse-prestamos">
+                  Préstamos Activos (${prestamos.length} elementos)
+                </button>
+              </h2>
+              <div id="collapse-prestamos" class="accordion-collapse collapse show" aria-labelledby="heading-prestamos">
+                <div class="accordion-body">
+                  <div class="table-responsive">
+                    <table class="table table-sm table-hover" id="tabla-retornos">
+                      <thead>
+                        <tr>
+                          ${esLaboratorista ? '<th>Usuario</th>' : ''}
+                          <th>Código</th>
+                          <th>Elemento</th>
+                          <th>Categoría</th>
+                          <th>Cantidad</th>
+                          <th>Fecha préstamo</th>
+                          ${puedeDevolver ? '<th>Acciones</th>' : ''}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${prestamos.map(prestamo => `
+                          <tr>
+                            ${esLaboratorista ? `<td>${prestamo.usuario_nombre}</td>` : ''}
+                            <td>${prestamo.elemento_id}</td>
+                            <td>${prestamo.elemento_nombre}</td>
+                            <td>${prestamo.categoria || 'Sin categoría'}</td>
+                            <td>${prestamo.cantidad}</td>
+                            <td>${prestamo.fecha}</td>
+                            ${puedeDevolver ? `
+                            <td>
+                              <button class="btn btn-sm btn-green" onclick="registrarDevolucion(${prestamo.id})">
+                                Devolver elemento
+                              </button>
+                            </td>
+                            ` : ''}
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         ` : `
           <div class="alert alert-info">
@@ -619,42 +645,67 @@ function consultarInventario() {
         <button class="btn btn-sm btn-outline-light" onclick="confirmarVolverAInterfaz()">Volver</button>
       </div>
       <div class="panel-content">
-        <!-- Filtros -->
-        <div class="mb-4">
-          <div class="row">
-            <div class="col-md-4 mb-3">
-              <label for="filtro-categoria" class="form-label">Filtrar por categoría:</label>
-              <select class="form-select" id="filtro-categoria">
-                <option value="">Todas las categorías</option>
-                ${INVENTARIO.map(cat => `<option value="${cat.categoria}">${cat.categoria}</option>`).join('')}
-              </select>
-            </div>
-            <div class="col-md-4 mb-3">
-              <label for="filtro-nombre" class="form-label">Buscar por nombre:</label>
-              <input type="text" class="form-control" id="filtro-nombre" placeholder="Nombre del elemento">
-            </div>
-            <div class="col-md-4 mb-3 d-flex align-items-end">
-              <button class="btn btn-green w-100" onclick="filtrarInventario()">Filtrar</button>
+        <!-- Filtros y búsqueda con estilo similar a Administrar Inventario -->
+        <div class="row mb-4 align-items-end">
+          <div class="col-md-4 mb-3">
+            <label for="filtro-categoria" class="form-label">Filtrar por categoría:</label>
+            <select class="form-select" id="filtro-categoria">
+              <option value="">Todas las categorías</option>
+              ${INVENTARIO.map(cat => `<option value="${cat.categoria}">${cat.categoria}</option>`).join('')}
+            </select>
+          </div>
+          <div class="col-md-8 mb-3">
+            <div class="input-group">
+              <span class="input-group-text">🔍</span>
+              <input type="text" class="form-control" id="filtro-nombre" 
+                placeholder="Buscar por nombre de elemento" onkeyup="filtrarInventario()">
             </div>
           </div>
         </div>
         
-        <!-- Tabla de inventario -->
-        <div class="table-responsive">
-          <table class="table table-striped table-hover">
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Cantidad</th>
-                <th>Ubicación</th>
-              </tr>
-            </thead>
-            <tbody id="inventario-tbody">
-              ${generarFilasInventario()}
-            </tbody>
-          </table>
+        <!-- Inventario con acordeón similar a Administrar Inventario -->
+        <div class="mt-4">
+          <h5>Inventario actual</h5>
+          <div class="accordion" id="inventario-consulta-accordion">
+            ${INVENTARIO.map((categoria, index) => `
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-consulta-${index}">
+                  <button class="accordion-button ${index === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#collapse-consulta-${index}" aria-expanded="${index === 0 ? 'true' : 'false'}" 
+                    aria-controls="collapse-consulta-${index}">
+                    ${categoria.categoria} (${categoria.elementos.length} elementos)
+                  </button>
+                </h2>
+                <div id="collapse-consulta-${index}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" 
+                  aria-labelledby="heading-consulta-${index}">
+                  <div class="accordion-body">
+                    <div class="table-responsive">
+                      <table class="table table-sm table-hover">
+                        <thead>
+                          <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Ubicación</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${categoria.elementos.map(elem => `
+                            <tr class="inventario-fila" data-categoria="${categoria.categoria}" data-nombre="${elem.nombre.toLowerCase()}">
+                              <td>${elem.id}</td>
+                              <td>${elem.nombre}</td>
+                              <td>${elem.cantidad}</td>
+                              <td>${elem.ubicacion || 'No especificada'}</td>
+                            </tr>
+                          `).join('')}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
         </div>
       </div>
     </div>
@@ -710,10 +761,59 @@ function generarFilasInventario(filtroCategoria = '', filtroNombre = '') {
 // Filtrar inventario según los criterios
 function filtrarInventario() {
   const filtroCategoria = document.getElementById('filtro-categoria').value;
-  const filtroNombre = document.getElementById('filtro-nombre').value;
+  const filtroNombre = document.getElementById('filtro-nombre').value.toLowerCase();
   
-  const tbody = document.getElementById('inventario-tbody');
-  tbody.innerHTML = generarFilasInventario(filtroCategoria, filtroNombre);
+  // Nueva implementación para el acordeón
+  if (document.getElementById('inventario-consulta-accordion')) {
+    // Si estamos en la consulta de inventario con acordeón
+    const filas = document.querySelectorAll('.inventario-fila');
+    
+    filas.forEach(fila => {
+      const filaNombre = fila.getAttribute('data-nombre');
+      const filaCategoria = fila.getAttribute('data-categoria');
+      
+      // Verificar si la fila cumple con los filtros
+      const cumpleFiltroNombre = !filtroNombre || filaNombre.includes(filtroNombre);
+      const cumpleFiltroCategoria = !filtroCategoria || filaCategoria === filtroCategoria;
+      
+      // Mostrar u ocultar según los filtros
+      if (cumpleFiltroNombre && cumpleFiltroCategoria) {
+        fila.style.display = '';
+      } else {
+        fila.style.display = 'none';
+      }
+    });
+    
+    // Mostrar u ocultar secciones del acordeón según los resultados
+    const categorias = document.querySelectorAll('#inventario-consulta-accordion .accordion-item');
+    categorias.forEach((categoria, index) => {
+      const contenido = categoria.querySelector('.accordion-collapse');
+      const filas = contenido.querySelectorAll('.inventario-fila');
+      const filasVisibles = Array.from(filas).filter(fila => fila.style.display !== 'none');
+      
+      // Actualizar el contador en el título
+      const boton = categoria.querySelector('.accordion-button');
+      const nombreCategoria = boton.textContent.split('(')[0].trim();
+      boton.textContent = `${nombreCategoria} (${filasVisibles.length} elementos)`;
+      
+      // Mostrar u ocultar la categoría completa
+      if (filasVisibles.length === 0) {
+        categoria.style.display = 'none';
+      } else {
+        categoria.style.display = '';
+        // Si hay un filtro, expandir todas las categorías con resultados
+        if (filtroNombre || filtroCategoria) {
+          contenido.classList.add('show');
+        }
+      }
+    });
+  } else {
+    // Implementación original para tabla simple
+    const tbody = document.getElementById('inventario-tbody');
+    if (tbody) {
+      tbody.innerHTML = generarFilasInventario(filtroCategoria, filtroNombre);
+    }
+  }
 }
 
 // Administrar inventario (solo laboratorista)

@@ -1586,7 +1586,7 @@ function realizarPrestamo() {
   // Confirmar el préstamo
   mostrarConfirmacion(
     'Confirmar préstamo',
-    `¿Confirma el préstamo de ${cantidad} unidad(es) de ${elementoSeleccionado.nombre}?`,
+    `¿Confirma el préstamo de ${cantidad} unidad(es) de ${categoriaSeleccionada.categoria} - ${elementoSeleccionado.nombre}?`,
     () => {
       // Simular préstamo (en un sistema real, se usaría la API)
       // Actualizar cantidad disponible en tiempo real
@@ -1597,6 +1597,7 @@ function realizarPrestamo() {
         id: Date.now(),
         elemento_id: elementoSeleccionado.id,
         elemento_nombre: elementoSeleccionado.nombre,
+        categoria: categoriaSeleccionada.categoria,
         cantidad: cantidad,
         fecha: new Date().toLocaleString(),
         usuario_id: currentUser.id,
@@ -1610,13 +1611,81 @@ function realizarPrestamo() {
       prestamos.push(prestamo);
       localStorage.setItem('prestamos', JSON.stringify(prestamos));
       
-      // Mostrar confirmación con detalles del préstamo
-      mostrarNotificacion('Éxito', `Se ha registrado el préstamo de ${cantidad} unidad(es) de ${elementoSeleccionado.nombre} a nombre de ${currentUser.nombre}`, 'success');
-      
-      // Volver a la interfaz principal con confirmación
-      volverAInterfazPrincipal();
+      // Mostrar opciones post-préstamo
+      mostrarOpcionesPostPrestamo(prestamo);
     }
   );
+}
+
+// Mostrar opciones post-préstamo
+function mostrarOpcionesPostPrestamo(prestamo) {
+  // Crear el modal personalizado
+  const modalOverlay = document.createElement('div');
+  modalOverlay.className = 'custom-modal-overlay';
+  
+  const modal = document.createElement('div');
+  modal.className = 'custom-modal';
+  
+  modal.innerHTML = `
+    <div class="custom-modal-header success">
+      <h3>¡Préstamo exitoso!</h3>
+    </div>
+    <div class="custom-modal-body">
+      <div class="confirmation-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="confirmation-text">
+        <p>Se ha registrado el préstamo de ${prestamo.cantidad} unidad(es) de ${prestamo.categoria} - ${prestamo.elemento_nombre} a nombre de ${prestamo.usuario_nombre}.</p>
+        <p class="mt-3"><strong>¿Qué desea hacer ahora?</strong></p>
+      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button class="custom-btn custom-btn-secondary" id="volver-panel-btn">VOLVER A PÁGINA PRINCIPAL</button>
+      <button class="custom-btn custom-btn-primary" id="nuevo-prestamo-btn">REALIZAR OTRO PRÉSTAMO</button>
+    </div>
+  `;
+  
+  modalOverlay.appendChild(modal);
+  document.getElementById('custom-modal-container').appendChild(modalOverlay);
+  
+  // Animar entrada
+  setTimeout(() => {
+    modalOverlay.classList.add('active');
+    modal.classList.add('active');
+  }, 10);
+  
+  // Manejar opción de nuevo préstamo
+  document.getElementById('nuevo-prestamo-btn').addEventListener('click', () => {
+    modalOverlay.classList.remove('active');
+    modal.classList.remove('active');
+    
+    setTimeout(() => {
+      modalOverlay.remove();
+      
+      // Reiniciar el formulario de préstamo
+      document.getElementById('categoria-select').value = '';
+      document.getElementById('elemento-select').innerHTML = '<option value="">Selecciona un elemento</option>';
+      document.getElementById('elemento-select').disabled = true;
+      document.getElementById('cantidad-input').value = '1';
+      document.getElementById('cantidad-input').disabled = true;
+      document.getElementById('prestamo-btn').disabled = true;
+      document.getElementById('elemento-detalles').style.display = 'none';
+      
+      // Volver a cargar categorías
+      cargarCategorias();
+    }, 300);
+  });
+  
+  // Manejar opción de volver al panel
+  document.getElementById('volver-panel-btn').addEventListener('click', () => {
+    modalOverlay.classList.remove('active');
+    modal.classList.remove('active');
+    
+    setTimeout(() => {
+      modalOverlay.remove();
+      volverAInterfazPrincipal();
+    }, 300);
+  });
 }
 
 // Inicializar modales personalizados

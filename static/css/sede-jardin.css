@@ -59,7 +59,7 @@ body {
 
 /* Asegurar color gris para la descripción */
 .text-secondary {
-  color: #a0a0a0 !important; /* Gris claro */
+  color: #ffffff !important; /* Cambiado a blanco para mejor contraste */
 }
 
 /* Asegurar texto blanco para el subtítulo */

@@ -20,14 +20,16 @@
 }
 
 .custom-modal {
-  background: #fff;
+  background: #000;
   border-radius: 8px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(69, 213, 9, 0.3);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(69, 213, 9, 0.2);
   width: 90%;
   max-width: 400px;
   transform: translateY(-20px);
   transition: transform 0.3s ease;
   overflow: hidden;
+  color: white;
 }
 
 .custom-modal.active {
@@ -36,28 +38,35 @@
 
 .custom-modal-header {
   padding: 15px 20px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(69, 213, 9, 0.3);
   position: relative;
+  background-color: #111;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .custom-modal-header.info {
-  background-color: #17a2b8;
-  color: white;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #45d509;
+  border-bottom: 2px solid #45d509;
 }
 
 .custom-modal-header.success {
-  background-color: #28a745;
-  color: white;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #45d509;
+  border-bottom: 2px solid #45d509;
 }
 
 .custom-modal-header.error {
-  background-color: #dc3545;
-  color: white;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #ff3333;
+  border-bottom: 2px solid #ff3333;
 }
 
 .custom-modal-header.warning {
-  background-color: #ffc107;
-  color: #343a40;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #ffc107;
+  border-bottom: 2px solid #ffc107;
 }
 
 .custom-modal-header h3 {

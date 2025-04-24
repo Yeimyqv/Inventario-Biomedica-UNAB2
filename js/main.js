@@ -141,7 +141,11 @@ function selectUserType(tipo) {
       estudianteDivGroup.innerHTML = `
         <div class="mb-3">
           <label for="estudiante-id" class="form-label">ID:</label>
-          <input type="text" class="form-control" id="estudiante-id" required>
+          <div class="input-group">
+            <input type="text" class="form-control" id="estudiante-id" required placeholder="Ingrese su ID universitario">
+            <button class="btn btn-green" type="button" id="buscar-estudiante-btn">Buscar</button>
+          </div>
+          <small class="form-text text-muted">Al ingresar su ID y presionar Enter o Buscar, se autocompletarán sus datos.</small>
         </div>
         
         <div class="mb-3">
@@ -190,7 +194,8 @@ function selectUserType(tipo) {
         
         <div class="mb-3">
           <label for="estudiante-correo" class="form-label">Correo Institucional:</label>
-          <input type="email" class="form-control" id="estudiante-correo" required>
+          <input type="email" class="form-control" id="estudiante-correo" required readonly>
+          <small class="form-text text-muted">El correo se completa automáticamente al ingresar el ID y no se puede modificar.</small>
         </div>
       `;
       

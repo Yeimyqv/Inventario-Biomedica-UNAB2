@@ -1,5 +1,27 @@
 // API.js - Funciones para interactuar con las APIs del servidor
 
+// Buscar estudiante por ID
+async function buscarEstudiante(identificacion) {
+  try {
+    const response = await fetch(`/api/estudiante/${identificacion}`);
+    
+    if (response.status === 404) {
+      // No se encontró el estudiante, pero no es un error crítico
+      return null;
+    }
+    
+    if (!response.ok) {
+      throw new Error('Error al buscar estudiante');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error:', error);
+    mostrarNotificacion('Error', 'No se pudo obtener información del estudiante', 'error');
+    return null;
+  }
+}
+
 // Obtener todas las categorías
 async function getCategorias() {
   try {

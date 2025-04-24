@@ -222,8 +222,8 @@ function autenticarUsuario() {
     
     // Obtener el docente (manejo de "Otro")
     let docente = document.getElementById('estudiante-docente').value;
-    if (docente === 'otro') {
-      docente = document.getElementById('otro-docente-input').value.trim();
+    if (docente === 'Otro') {
+      docente = document.getElementById('otro-docente').value.trim();
       if (!docente) {
         mostrarNotificacion('Error', 'Por favor ingresa el nombre del docente', 'error');
         return;
@@ -235,8 +235,8 @@ function autenticarUsuario() {
     
     // Obtener la materia (manejo de "Otro")
     let materia = document.getElementById('estudiante-materia').value;
-    if (materia === 'otra') {
-      materia = document.getElementById('otra-materia-input').value.trim();
+    if (materia === 'Otro') {
+      materia = document.getElementById('otra-materia').value.trim();
       if (!materia) {
         mostrarNotificacion('Error', 'Por favor ingresa el nombre de la materia', 'error');
         return;
@@ -252,12 +252,12 @@ function autenticarUsuario() {
     }
     
     if (!estudianteCorreo) {
-      mostrarNotificacion('Error', 'Por favor ingresa tu correo institucional', 'error');
+      mostrarNotificacion('Error', 'Por favor busca tu ID para autocompletar tu correo', 'error');
       return;
     }
     
     if (!estudianteCorreo.includes('@')) {
-      mostrarNotificacion('Error', 'Por favor ingresa un correo electrónico válido', 'error');
+      mostrarNotificacion('Error', 'El correo electrónico debe contener @', 'error');
       return;
     }
     

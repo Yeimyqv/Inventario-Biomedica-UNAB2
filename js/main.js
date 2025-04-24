@@ -1895,6 +1895,9 @@ function mostrarOpcionesPostPrestamo(prestamo) {
       </div>
       <div class="confirmation-text">
         <p>Se ha registrado el préstamo de ${prestamo.cantidad} unidad(es) de ${prestamo.categoria} - ${prestamo.elemento_nombre} a nombre de ${prestamo.usuario_nombre}.</p>
+        ${prestamo.prestado_por ? 
+          `<p class="mt-2"><small>Préstamo registrado por: ${prestamo.prestado_por} (Laboratorista)</small></p>` : 
+          ''}
         <p class="mt-3"><strong>¿Qué desea hacer ahora?</strong></p>
       </div>
     </div>
@@ -1929,6 +1932,31 @@ function mostrarOpcionesPostPrestamo(prestamo) {
       document.getElementById('cantidad-input').disabled = true;
       document.getElementById('prestamo-btn').disabled = true;
       document.getElementById('elemento-detalles').style.display = 'none';
+      
+      // Reiniciar campos específicos para laboratoristas
+      if (currentUser.tipo === 'laboratorista') {
+        // Establecer el primer botón (préstamo propio) como activo
+        document.querySelectorAll('#tipo-prestamo-grupo button').forEach((btn, index) => {
+          btn.classList.toggle('active', index === 0);
+        });
+        
+        // Ocultar contenedores de estudiante y docente
+        document.getElementById('prestamo-estudiante-container').style.display = 'none';
+        document.getElementById('prestamo-docente-container').style.display = 'none';
+        
+        // Reiniciar campos de estudiante
+        if (document.getElementById('prestamo-estudiante-id')) {
+          document.getElementById('prestamo-estudiante-id').value = '';
+          document.getElementById('prestamo-estudiante-nombre').value = '';
+        }
+        
+        // Reiniciar campos de docente
+        if (document.getElementById('prestamo-docente-select')) {
+          document.getElementById('prestamo-docente-select').value = '';
+          document.getElementById('prestamo-otro-docente-container').style.display = 'none';
+          document.getElementById('prestamo-otro-docente').value = '';
+        }
+      }
       
       // Volver a cargar categorías
       cargarCategorias();
@@ -2041,7 +2069,7 @@ function mostrarConfirmacion(titulo, mensaje, onConfirm, onCancel) {
         <i class="fas fa-question-circle"></i>
       </div>
       <div class="confirmation-text">
-        ${mensaje}
+        ${mensaje.replace(/\n/g, '<br>')}
       </div>
     </div>
     <div class="custom-modal-footer">

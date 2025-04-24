@@ -171,6 +171,24 @@ function selectUserType(tipo) {
     }
     nombreGroup.style.display = 'block';
     pinGroup.style.display = 'block';
+    
+    // Configurar lista desplegable para docentes
+    if (tipo === 'docente') {
+      // Mostrar selector de docentes y ocultar campo de texto
+      document.getElementById('docente-select-container').style.display = 'block';
+      document.getElementById('user-name').style.display = 'none';
+      
+      // Configurar evento para opción "Otro"
+      const docenteSelect = document.getElementById('docente-select');
+      docenteSelect.addEventListener('change', function() {
+        const otroDocenteNombreGroup = document.getElementById('otro-docente-nombre-group');
+        otroDocenteNombreGroup.style.display = (this.value === 'Otro') ? 'block' : 'none';
+      });
+    } else {
+      // Para laboratoristas, usar el campo de texto normal
+      document.getElementById('docente-select-container').style.display = 'none';
+      document.getElementById('user-name').style.display = 'block';
+    }
   }
 }
 
@@ -180,17 +198,28 @@ function selectUserType(tipo) {
 function autenticarUsuario() {
   let nombre = '';
   
-  // Para laboratoristas, obtener el nombre solo del selector
+  // Obtener el nombre según el tipo de usuario
   if (currentUser.tipo === 'laboratorista') {
-    const laboratoristaSelect = document.getElementById('laboratorista-select');
-    if (laboratoristaSelect) {
-      nombre = laboratoristaSelect.value;
+    // Para laboratoristas, obtener el nombre del campo de texto
+    nombre = document.getElementById('user-name').value.trim();
+  } else if (currentUser.tipo === 'docente') {
+    // Para docentes, obtener el nombre del selector
+    const docenteSelect = document.getElementById('docente-select');
+    nombre = docenteSelect.value;
+    
+    // Si seleccionó "Otro", obtener el nombre del campo de texto adicional
+    if (nombre === 'Otro') {
+      nombre = document.getElementById('otro-docente-nombre').value.trim();
       if (!nombre) {
-        mostrarNotificacion('Error', 'Por favor seleccione su nombre de la lista', 'error');
+        mostrarNotificacion('Error', 'Por favor ingrese su nombre completo', 'error');
         return;
       }
+    } else if (!nombre) {
+      mostrarNotificacion('Error', 'Por favor seleccione su nombre de la lista', 'error');
+      return;
     }
   } else {
+    // Para estudiantes, obtener el nombre del campo de texto
     nombre = document.getElementById('user-name').value.trim();
   }
   

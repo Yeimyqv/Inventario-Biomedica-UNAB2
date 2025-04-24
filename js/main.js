@@ -9,6 +9,35 @@ let elementoSeleccionado = null;
 let categoriaSeleccionada = null;
 let currentLaboratory = null; // Para almacenar el laboratorio seleccionado
 
+// Función para determinar la clase CSS según el estado de devolución
+function getEstadoObservacionClass(observacion) {
+  // Mapeo de observaciones a clases CSS
+  const observacionesProblematicas = [
+    'No funciona / presenta fallas',
+    'Faltan accesorios / partes incompletas',
+    'Daños visibles (físicos)',
+    'Requiere mantenimiento / calibración',
+    'Contaminado / sucio',
+    'Pendiente por revisión técnica',
+    'Reportado como defectuoso por el usuario'
+  ];
+  
+  const observacionesNeutrales = [
+    'No fue utilizado',
+    'No requiere devolución'
+  ];
+  
+  if (observacion === 'Funciona correctamente') {
+    return 'text-success';
+  } else if (observacionesProblematicas.includes(observacion)) {
+    return 'text-danger';
+  } else if (observacionesNeutrales.includes(observacion)) {
+    return 'text-muted';
+  } else {
+    return 'text-dark';
+  }
+}
+
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Aplicación de Gestión de Laboratorio iniciada');
@@ -1481,6 +1510,13 @@ function generarFilasPrestamos(prestamos, filtroEstado = '', filtroUsuario = '')
       const tipoUsuario = prestamo.usuario_tipo ? 
         `<span class="badge bg-secondary ms-1">${prestamo.usuario_tipo.charAt(0).toUpperCase() + prestamo.usuario_tipo.slice(1)}</span>` : '';
       
+      // Obtener información de devolución si existe
+      const observaciones = prestamo.estado === 'devuelto' && prestamo.observaciones ? 
+        `<div class="mt-1 small">
+          <strong>Observación:</strong> <span class="${getEstadoObservacionClass(prestamo.observaciones)}">${prestamo.observaciones}</span>
+          ${prestamo.fecha_devolucion ? `<span class="small d-block text-muted">Devuelto: ${prestamo.fecha_devolucion}</span>` : ''}
+        </div>` : '';
+      
       html += `
         <tr>
           <td>${prestamo.id}</td>
@@ -1495,6 +1531,7 @@ function generarFilasPrestamos(prestamos, filtroEstado = '', filtroUsuario = '')
             <span class="badge ${prestamo.estado === 'prestado' ? 'bg-warning' : 'bg-green'}">
               ${prestamo.estado}
             </span>
+            ${observaciones}
           </td>
           <td>
             ${prestamo.estado === 'prestado' ? 
@@ -1535,86 +1572,173 @@ function filtrarPrestamos() {
 
 // Registrar devolución de un elemento
 function registrarDevolucion(prestamoId) {
-  mostrarConfirmacion(
-    'Confirmar devolución',
-    '¿Confirma la devolución de este elemento?',
-    () => {
-      // Recuperar préstamos
-      let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
-      const index = prestamos.findIndex(p => p.id === prestamoId);
+  // Obtener información del préstamo para mostrarla en el formulario de devolución
+  let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
+  const index = prestamos.findIndex(p => p.id === prestamoId);
+  
+  if (index === -1) {
+    mostrarNotificacion('Error', 'No se pudo encontrar el préstamo', 'error');
+    return;
+  }
+  
+  const prestamo = prestamos[index];
+  
+  // Crear modal personalizado para devolución con observaciones
+  const modalOverlay = document.createElement('div');
+  modalOverlay.className = 'custom-modal-overlay';
+  
+  const modal = document.createElement('div');
+  modal.className = 'custom-modal';
+  
+  modal.innerHTML = `
+    <div class="custom-modal-header warning">
+      <h3>Confirmar devolución</h3>
+    </div>
+    <div class="custom-modal-body">
+      <div class="mb-3">
+        <p><strong>Préstamo a devolver:</strong> ${prestamo.elemento_nombre}</p>
+        <p><strong>Cantidad:</strong> ${prestamo.cantidad} unidad(es)</p>
+        <p><strong>Usuario:</strong> ${prestamo.usuario_nombre}</p>
+      </div>
+      <div class="mb-3">
+        <label for="devolucion-observacion" class="form-label">Observaciones sobre el estado:</label>
+        <select class="form-select" id="devolucion-observacion">
+          <option value="Funciona correctamente">Funciona correctamente</option>
+          <option value="No funciona / presenta fallas">No funciona / presenta fallas</option>
+          <option value="Faltan accesorios / partes incompletas">Faltan accesorios / partes incompletas</option>
+          <option value="Daños visibles (físicos)">Daños visibles (físicos)</option>
+          <option value="Requiere mantenimiento / calibración">Requiere mantenimiento / calibración</option>
+          <option value="No fue utilizado">No fue utilizado</option>
+          <option value="Contaminado / sucio">Contaminado / sucio</option>
+          <option value="Pendiente por revisión técnica">Pendiente por revisión técnica</option>
+          <option value="Reportado como defectuoso por el usuario">Reportado como defectuoso por el usuario</option>
+          <option value="No requiere devolución">No requiere devolución</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="mb-3" id="otra-observacion-container" style="display: none;">
+        <label for="otra-observacion" class="form-label">Especifique:</label>
+        <input type="text" class="form-control" id="otra-observacion" placeholder="Ingrese la observación">
+      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button class="custom-btn custom-btn-secondary" id="cancelar-devolucion-btn">Cancelar</button>
+      <button class="custom-btn custom-btn-primary" id="confirmar-devolucion-btn">Confirmar devolución</button>
+    </div>
+  `;
+  
+  modalOverlay.appendChild(modal);
+  document.getElementById('custom-modal-container').appendChild(modalOverlay);
+  
+  // Animar entrada
+  setTimeout(() => {
+    modalOverlay.classList.add('active');
+    modal.classList.add('active');
+  }, 10);
+  
+  // Configurar evento para mostrar/ocultar campo de otra observación
+  document.getElementById('devolucion-observacion').addEventListener('change', function() {
+    document.getElementById('otra-observacion-container').style.display = 
+      this.value === 'Otro' ? 'block' : 'none';
+  });
+  
+  // Manejar cancelación
+  document.getElementById('cancelar-devolucion-btn').addEventListener('click', () => {
+    modalOverlay.classList.remove('active');
+    modal.classList.remove('active');
+    setTimeout(() => modalOverlay.remove(), 300);
+  });
+  
+  // Manejar confirmación
+  document.getElementById('confirmar-devolucion-btn').addEventListener('click', () => {
+    // Obtener la observación seleccionada
+    const observacionSelect = document.getElementById('devolucion-observacion');
+    let observacion = observacionSelect.value;
+    
+    // Si se seleccionó "Otro", obtener el texto especificado
+    if (observacion === 'Otro') {
+      const otraObservacion = document.getElementById('otra-observacion').value.trim();
+      if (!otraObservacion) {
+        mostrarNotificacion('Error', 'Por favor especifique la observación', 'error');
+        return;
+      }
+      observacion = otraObservacion;
+    }
+    
+    // Cerrar el modal
+    modalOverlay.classList.remove('active');
+    modal.classList.remove('active');
+    
+    setTimeout(() => {
+      modalOverlay.remove();
       
-      if (index !== -1) {
-        const prestamo = prestamos[index];
-        
-        // Actualizar estado del préstamo
-        prestamo.estado = 'devuelto';
-        prestamo.fecha_devolucion = new Date().toLocaleString();
-        prestamos[index] = prestamo;
-        
-        // Actualizar inventario: devolver la cantidad al stock disponible
-        INVENTARIO.forEach(categoria => {
-          const elemento = categoria.elementos.find(e => e.id === prestamo.elemento_id);
-          if (elemento) {
-            elemento.cantidad += prestamo.cantidad;
-          }
-        });
-        
-        // Guardar cambios
-        localStorage.setItem('prestamos', JSON.stringify(prestamos));
-        
-        // Mostrar confirmación
-        mostrarNotificacion('Éxito', 'Elemento devuelto correctamente', 'success');
-        
-        // Actualizar solo la fila correspondiente al préstamo devuelto
-        // Primero verificamos si estamos en la vista de préstamos o retornos
-        const esVistaRetornos = document.getElementById('tabla-retornos') !== null;
-        
-        if (esVistaRetornos) {
-          // Estamos en la sección de retorno, actualizar la tabla de retornos
-          const filaElement = document.querySelector(`button[onclick="registrarDevolucion(${prestamoId})"]`).closest('tr');
-          if (filaElement) {
-            // Eliminar la fila de la tabla de retornos (porque ya no está prestado)
-            filaElement.remove();
-            
-            // Verificar si no quedan más préstamos y mostrar mensaje si es necesario
-            const tbody = document.querySelector('#tabla-retornos tbody');
-            if (tbody && tbody.children.length === 0) {
-              const tabla = document.querySelector('#tabla-retornos').closest('.table-responsive');
-              if (tabla) {
-                tabla.innerHTML = `
-                  <div class="alert alert-info">
-                    <p>No hay elementos pendientes por devolver.</p>
-                  </div>
-                `;
-              }
-            }
-          }
-        } else {
-          // Estamos en la sección de consulta de préstamos, actualizar solo esa fila
-          const filaElement = document.querySelector(`button[onclick="registrarDevolucion(${prestamoId})"]`).closest('tr');
-          if (filaElement) {
-            // Actualizar el estado y el botón
-            const celdaEstado = filaElement.querySelector('td:nth-child(6)');
-            const celdaAcciones = filaElement.querySelector('td:nth-child(7)');
-            
-            if (celdaEstado) {
-              celdaEstado.innerHTML = `
-                <span class="badge bg-green">
-                  devuelto
-                </span>
+      // Actualizar estado del préstamo
+      prestamo.estado = 'devuelto';
+      prestamo.fecha_devolucion = new Date().toLocaleString();
+      prestamo.observaciones = observacion;
+      prestamos[index] = prestamo;
+      
+      // Actualizar inventario: devolver la cantidad al stock disponible
+      INVENTARIO.forEach(categoria => {
+        const elemento = categoria.elementos.find(e => e.id === prestamo.elemento_id);
+        if (elemento) {
+          elemento.cantidad += prestamo.cantidad;
+        }
+      });
+      
+      // Guardar cambios
+      localStorage.setItem('prestamos', JSON.stringify(prestamos));
+      
+      // Mostrar confirmación
+      mostrarNotificacion('Éxito', 'Elemento devuelto correctamente', 'success');
+      
+      // Actualizar solo la fila correspondiente al préstamo devuelto
+      // Primero verificamos si estamos en la vista de préstamos o retornos
+      const esVistaRetornos = document.getElementById('tabla-retornos') !== null;
+      
+      if (esVistaRetornos) {
+        // Estamos en la sección de retorno, actualizar la tabla de retornos
+        const filaElement = document.querySelector(`button[onclick="registrarDevolucion(${prestamoId})"]`).closest('tr');
+        if (filaElement) {
+          // Eliminar la fila de la tabla de retornos (porque ya no está prestado)
+          filaElement.remove();
+          
+          // Verificar si no quedan más préstamos y mostrar mensaje si es necesario
+          const tbody = document.querySelector('#tabla-retornos tbody');
+          if (tbody && tbody.children.length === 0) {
+            const tabla = document.querySelector('#tabla-retornos').closest('.table-responsive');
+            if (tabla) {
+              tabla.innerHTML = `
+                <div class="alert alert-info">
+                  <p>No hay elementos pendientes por devolver.</p>
+                </div>
               `;
-            }
-            
-            if (celdaAcciones) {
-              celdaAcciones.innerHTML = `<button class="btn btn-sm btn-secondary" disabled>Devuelto</button>`;
             }
           }
         }
       } else {
-        mostrarNotificacion('Error', 'No se pudo encontrar el préstamo', 'error');
+        // Estamos en la sección de consulta de préstamos, actualizar solo esa fila
+        const filaElement = document.querySelector(`button[onclick="registrarDevolucion(${prestamoId})"]`).closest('tr');
+        if (filaElement) {
+          // Actualizar el estado y el botón
+          const celdaEstado = filaElement.querySelector('td:nth-child(6)');
+          const celdaAcciones = filaElement.querySelector('td:nth-child(7)');
+          
+          if (celdaEstado) {
+            celdaEstado.innerHTML = `
+              <span class="badge bg-green">
+                devuelto
+              </span>
+            `;
+          }
+          
+          if (celdaAcciones) {
+            celdaAcciones.innerHTML = `<button class="btn btn-sm btn-secondary" disabled>Devuelto</button>`;
+          }
+        }
       }
-    }
-  );
+    });
+  });
 }
 
 // Filtrar la tabla de retornos (para laboratoristas)

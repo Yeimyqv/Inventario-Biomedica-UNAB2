@@ -123,142 +123,55 @@ function selectUserType(tipo) {
   
   // Configurar según tipo de usuario
   const pinGroup = document.getElementById('pin-group');
-  const estudianteGroup = document.getElementById('estudiante-group');
-  const laboratoristaGroup = document.getElementById('laboratorista-group');
+  const estudianteFields = document.getElementById('estudiante-fields');
+  const nombreGroup = document.getElementById('nombre-group');
   
-  // Si es estudiante, configurar eventos de autocompletado después de un breve tiempo
-  if (tipo === 'estudiante') {
-    setTimeout(configurarEventosAutocompletado, 500);
+  // Título dinámico de autenticación según el tipo de usuario
+  const authTitle = document.querySelector('#auth-section h3');
+  if (authTitle) {
+    if (tipo === 'estudiante') {
+      authTitle.textContent = 'Datos del Estudiante';
+    } else if (tipo === 'docente') {
+      authTitle.textContent = 'Acceso para Docentes';
+    } else if (tipo === 'laboratorista') {
+      authTitle.textContent = 'Acceso para Laboratoristas';
+    }
   }
   
-  // Ocultar todos los grupos específicos primero
-  if (estudianteGroup) estudianteGroup.style.display = 'none';
-  if (laboratoristaGroup) laboratoristaGroup.style.display = 'none';
-  pinGroup.style.display = 'none';
-  
+  // Configurar campos según el tipo de usuario
   if (tipo === 'estudiante') {
-    if (estudianteGroup) {
-      estudianteGroup.style.display = 'block';
-    } else {
-      // Crear los campos adicionales para estudiantes
-      const estudianteDivGroup = document.createElement('div');
-      estudianteDivGroup.id = 'estudiante-group';
-      estudianteDivGroup.innerHTML = `
-        <div class="mb-3">
-          <label for="estudiante-id" class="form-label">ID:</label>
-          <div class="input-group">
-            <input type="text" class="form-control" id="estudiante-id" required placeholder="Ingrese su ID universitario">
-            <button class="btn btn-green" type="button" id="buscar-estudiante-btn">Buscar</button>
-          </div>
-          <small class="form-text text-muted">Al ingresar su ID y presionar Enter o Buscar, se autocompletarán sus datos.</small>
-        </div>
-        
-        <div class="mb-3">
-          <label for="estudiante-docente" class="form-label">Docente:</label>
-          <select class="form-select" id="estudiante-docente" required onchange="toggleOtroDocenteInput()">
-            <option value="">Seleccione su docente</option>
-            <option value="Luis Felipe Buitrago Castro">Luis Felipe Buitrago Castro</option>
-            <option value="Carlos Julio Arismendi">Carlos Julio Arismendi</option>
-            <option value="Lusvin Javier Amado Forero">Lusvin Javier Amado Forero</option>
-            <option value="William Salamanca">William Salamanca</option>
-            <option value="Alvaro Alyamani Triana Ramirez">Alvaro Alyamani Triana Ramirez</option>
-            <option value="Nayibe Chio Cho">Nayibe Chio Cho</option>
-            <option value="Yamid Gamboa">Yamid Gamboa</option>
-            <option value="Mateo Escobar Jaramillo">Mateo Escobar Jaramillo</option>
-            <option value="otro">Otro</option>
-          </select>
-        </div>
-        
-        <div class="mb-3" id="otro-docente-div" style="display: none;">
-          <label for="otro-docente-input" class="form-label">Nombre del docente:</label>
-          <input type="text" class="form-control" id="otro-docente-input">
-        </div>
-        
-        <div class="mb-3">
-          <label for="estudiante-materia" class="form-label">Materia:</label>
-          <select class="form-select" id="estudiante-materia" required onchange="toggleOtraMateriaInput()">
-            <option value="">Seleccione su materia</option>
-            <option value="Tele-robótica">Tele-robótica</option>
-            <option value="Instrumentación">Instrumentación</option>
-            <option value="Electrónica análoga">Electrónica análoga</option>
-            <option value="Electrónica de potencia">Electrónica de potencia</option>
-            <option value="Sistemas embebidos">Sistemas embebidos</option>
-            <option value="Sistemas digitales">Sistemas digitales</option>
-            <option value="Proyecto Integrador">Proyecto Integrador</option>
-            <option value="Circuitos eléctricos">Circuitos eléctricos</option>
-            <option value="Biomecánica Clinica">Biomecánica Clinica</option>
-            <option value="Procesamiento de señales">Procesamiento de señales</option>
-            <option value="otra">Otra</option>
-          </select>
-        </div>
-        
-        <div class="mb-3" id="otra-materia-div" style="display: none;">
-          <label for="otra-materia-input" class="form-label">Nombre de la materia:</label>
-          <input type="text" class="form-control" id="otra-materia-input">
-        </div>
-        
-        <div class="mb-3">
-          <label for="estudiante-correo" class="form-label">Correo Institucional:</label>
-          <input type="email" class="form-control" id="estudiante-correo" required readonly>
-          <small class="form-text text-muted">El correo se completa automáticamente al ingresar el ID y no se puede modificar.</small>
-        </div>
-      `;
-      
-      // Insertar después del campo de nombre
-      const usernameField = document.getElementById('user-name').parentNode;
-      usernameField.insertAdjacentElement('afterend', estudianteDivGroup);
-    }
-  } else if (tipo === 'laboratorista') {
-    // Ocultar el campo de nombre completo
-    const nombreGroup = document.getElementById('nombre-group');
-    nombreGroup.style.display = 'none';
+    // Mostrar campos específicos de estudiante
+    estudianteFields.style.display = 'block';
+    nombreGroup.style.display = 'block';
+    pinGroup.style.display = 'none';
     
-    // Verificar si ya existe el grupo de laboratorista
-    if (laboratoristaGroup) {
-      laboratoristaGroup.style.display = 'block';
-    } else {
-      // Crear el grupo para seleccionar laboratoristas específicos
-      const laboratoristaDivGroup = document.createElement('div');
-      laboratoristaDivGroup.id = 'laboratorista-group';
-      laboratoristaDivGroup.innerHTML = `
-        <div class="mb-3">
-          <label for="laboratorista-select" class="form-label">Seleccione su nombre:</label>
-          <select class="form-select" id="laboratorista-select" required>
-            <option value="">Seleccione su nombre</option>
-            <option value="Lina Alexandra Quiros Obando">Lina Alexandra Quiros Obando</option>
-            <option value="Luis Alexander Vargas Vargas">Luis Alexander Vargas Vargas</option>
-            <option value="Juan Camilo Sierra Martinez">Juan Camilo Sierra Martinez</option>
-          </select>
-        </div>
-      `;
-      
-      // Insertar en la parte superior del formulario (antes de todos los campos)
-      const authForm = document.getElementById('auth-form');
-      authForm.insertAdjacentElement('afterbegin', laboratoristaDivGroup);
+    // Configurar eventos para los selectores de "Otro"
+    const docenteSelect = document.getElementById('estudiante-docente');
+    if (docenteSelect) {
+      docenteSelect.addEventListener('change', function() {
+        const otroDocenteGroup = document.getElementById('otro-docente-group');
+        otroDocenteGroup.style.display = (this.value === 'Otro') ? 'block' : 'none';
+      });
     }
     
-    // Mostrar el PIN después del nombre
-    pinGroup.style.display = 'block';
+    const materiaSelect = document.getElementById('estudiante-materia');
+    if (materiaSelect) {
+      materiaSelect.addEventListener('change', function() {
+        const otraMateriaGroup = document.getElementById('otra-materia-group');
+        otraMateriaGroup.style.display = (this.value === 'Otro') ? 'block' : 'none';
+      });
+    }
+    
+    // Configurar eventos de autocompletado después de un breve tiempo
+    setTimeout(configurarEventosAutocompletado, 100);
   } else {
-    // Para docentes, mostrar el PIN y el campo de nombre
+    // Para docentes y laboratoristas
+    if (estudianteFields) {
+      estudianteFields.style.display = 'none';
+    }
+    nombreGroup.style.display = 'block';
     pinGroup.style.display = 'block';
-    document.getElementById('nombre-group').style.display = 'block';
   }
-  
-  // Añadir botón de regreso a la página principal
-  const formButtons = document.querySelector('#auth-form .d-grid');
-  // Limpiar botones existentes que no sean el principal
-  const existingBackBtn = formButtons.querySelector('.btn-outline-secondary');
-  if (existingBackBtn) {
-    existingBackBtn.remove();
-  }
-  
-  const backBtn = document.createElement('button');
-  backBtn.className = 'btn btn-outline-secondary mt-3';
-  backBtn.textContent = 'Volver a página de inicio';
-  backBtn.onclick = volverAPaginaInicio;
-  
-  formButtons.appendChild(backBtn);
 }
 
 // Función eliminada - reemplazada por volverASeleccionUsuario()

@@ -67,6 +67,9 @@ class Usuario(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     identificacion = db.Column(db.String(20), nullable=False, unique=True)
     pin = db.Column(db.String(20), nullable=True)  # Solo para docentes y laboratoristas
+    correo = db.Column(db.String(100), nullable=True)  # Correo institucional
+    docente = db.Column(db.String(100), nullable=True)  # Docente asociado (solo para estudiantes)
+    materia = db.Column(db.String(100), nullable=True)  # Materia o curso (solo para estudiantes)
     prestamos = db.relationship('Prestamo', backref='usuario', lazy=True)
     
     def __repr__(self):
@@ -74,12 +77,22 @@ class Usuario(db.Model):
     
     def to_dict(self):
         """Convertir objeto a diccionario."""
-        return {
+        data = {
             'id': self.id,
             'tipo': self.tipo,
             'nombre': self.nombre,
-            'identificacion': self.identificacion
+            'identificacion': self.identificacion,
+            'correo': self.correo
         }
+        
+        # Agregar campos adicionales solo si son relevantes para el tipo de usuario
+        if self.tipo == 'estudiante':
+            data.update({
+                'docente': self.docente,
+                'materia': self.materia
+            })
+            
+        return data
 
 class Prestamo(db.Model):
     """Modelo para préstamos de elementos."""

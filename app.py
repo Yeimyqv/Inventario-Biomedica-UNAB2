@@ -223,6 +223,20 @@ def eliminar_elemento(elemento_id):
         'mensaje': f'Elemento {elemento.nombre} eliminado correctamente'
     })
 
+# Nueva ruta para buscar información de estudiante por ID
+@app.route('/api/estudiante/<identificacion>', methods=['GET'])
+def buscar_estudiante(identificacion):
+    """Buscar estudiante por ID."""
+    estudiante = Usuario.query.filter_by(
+        identificacion=identificacion,
+        tipo='estudiante'
+    ).first()
+    
+    if not estudiante:
+        return jsonify({'error': 'Estudiante no encontrado'}), 404
+    
+    return jsonify(estudiante.to_dict())
+
 # Punto de entrada
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

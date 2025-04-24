@@ -158,7 +158,7 @@ function selectUserType(tipo) {
     if (materiaSelect) {
       materiaSelect.addEventListener('change', function() {
         const otraMateriaGroup = document.getElementById('otra-materia-group');
-        otraMateriaGroup.style.display = (this.value === 'Otro') ? 'block' : 'none';
+        otraMateriaGroup.style.display = (this.value === 'Otra') ? 'block' : 'none';
       });
     }
     
@@ -233,9 +233,9 @@ function autenticarUsuario() {
       return;
     }
     
-    // Obtener la materia (manejo de "Otro")
+    // Obtener la materia (manejo de "Otra")
     let materia = document.getElementById('estudiante-materia').value;
-    if (materia === 'Otro') {
+    if (materia === 'Otra') {
       materia = document.getElementById('otra-materia').value.trim();
       if (!materia) {
         mostrarNotificacion('Error', 'Por favor ingresa el nombre de la materia', 'error');

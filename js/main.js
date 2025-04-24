@@ -1456,20 +1456,40 @@ function generarFilasPrestamos(prestamos, filtroEstado = '', filtroUsuario = '')
   // Aplicar filtros
   prestamosFiltered = prestamos.filter(prestamo => {
     const matchEstado = !filtroEstado || prestamo.estado === filtroEstado;
-    const matchUsuario = !filtroUsuario || 
-      prestamo.usuario_nombre.toLowerCase().includes(filtroUsuario.toLowerCase());
+    
+    // Filtro por usuario (busca tanto en nombre de usuario como en quien realizó el préstamo)
+    let matchUsuario = true;
+    if (filtroUsuario) {
+      const busqueda = filtroUsuario.toLowerCase();
+      const nombreUsuario = prestamo.usuario_nombre.toLowerCase();
+      const prestadoPor = prestamo.prestado_por ? prestamo.prestado_por.toLowerCase() : '';
+      
+      matchUsuario = nombreUsuario.includes(busqueda) || prestadoPor.includes(busqueda);
+    }
+    
     return matchEstado && matchUsuario;
   });
   
   // Generar filas
   if (prestamosFiltered.length > 0) {
     prestamosFiltered.forEach(prestamo => {
+      // Indicador para préstamos realizados por laboratorista en nombre de otro usuario
+      const prestadoPorLab = prestamo.prestado_por ? 
+        `<span class="small text-muted d-block">Registrado por: ${prestamo.prestado_por}</span>` : '';
+      
+      // Indicador del tipo de usuario
+      const tipoUsuario = prestamo.usuario_tipo ? 
+        `<span class="badge bg-secondary ms-1">${prestamo.usuario_tipo.charAt(0).toUpperCase() + prestamo.usuario_tipo.slice(1)}</span>` : '';
+      
       html += `
         <tr>
           <td>${prestamo.id}</td>
           <td>${prestamo.elemento_nombre}</td>
           <td>${prestamo.cantidad}</td>
-          <td>${prestamo.usuario_nombre}</td>
+          <td>
+            ${prestamo.usuario_nombre} ${tipoUsuario}
+            ${prestadoPorLab}
+          </td>
           <td>${prestamo.fecha}</td>
           <td>
             <span class="badge ${prestamo.estado === 'prestado' ? 'bg-warning' : 'bg-green'}">

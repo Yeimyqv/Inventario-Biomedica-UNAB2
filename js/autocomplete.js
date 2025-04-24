@@ -21,48 +21,65 @@ function configurarEventosAutocompletado() {
   });
   
   // Evento al hacer clic en el botón buscar
-  buscarBtn.addEventListener('click', buscarEstudiantePorId);
+  buscarBtn.addEventListener('click', function() {
+    console.log('Botón buscar estudiante clickeado');
+    buscarEstudiantePorId();
+  });
   
   console.log('Eventos de autocompletado configurados correctamente');
 }
 
 // Función para buscar información del estudiante por ID
 async function buscarEstudiantePorId() {
-  console.log('Buscando estudiante por ID');
+  console.log('Ejecutando búsqueda de estudiante por ID');
   
   const idInput = document.getElementById('estudiante-id');
   const nombreInput = document.getElementById('user-name');
   const correoInput = document.getElementById('estudiante-correo');
   
   if (!idInput || !nombreInput || !correoInput) {
-    console.error('Faltan elementos del formulario');
+    console.error('Faltan elementos del formulario:', {
+      idInput: !!idInput,
+      nombreInput: !!nombreInput,
+      correoInput: !!correoInput
+    });
+    alert('Error: Faltan elementos del formulario');
     return;
   }
   
   const estudianteId = idInput.value.trim();
   if (!estudianteId) {
-    mostrarNotificacion('Error', 'Por favor ingrese su ID', 'error');
+    console.log('ID de estudiante vacío');
+    alert('Por favor ingrese su ID');
     return;
   }
   
-  // Mostrar notificación de búsqueda
-  mostrarNotificacion('Buscando', 'Buscando información del estudiante...', 'info');
+  // Mostrar mensaje de búsqueda
+  console.log('Buscando estudiante con ID:', estudianteId);
+  alert('Buscando información del estudiante...');
   
   try {
     // Llamar a la API para buscar el estudiante
     const estudiante = await buscarEstudiante(estudianteId);
+    console.log('Respuesta de la API:', estudiante);
     
     if (estudiante) {
       // Autocompletar campos si se encontró el estudiante
       nombreInput.value = estudiante.nombre || '';
       correoInput.value = estudiante.correo || '';
       
-      mostrarNotificacion('Éxito', 'Información del estudiante cargada correctamente', 'success');
+      console.log('Información cargada:', {
+        nombre: estudiante.nombre,
+        correo: estudiante.correo
+      });
+      
+      alert('Información del estudiante cargada correctamente');
     } else {
-      mostrarNotificacion('No encontrado', 'No se encontró un estudiante con ese ID. Ingrese sus datos manualmente.', 'warning');
+      console.log('Estudiante no encontrado');
+      alert('No se encontró un estudiante con ese ID. Ingrese sus datos manualmente.');
     }
   } catch (error) {
     console.error('Error al buscar estudiante:', error);
-    mostrarNotificacion('Error', 'Ocurrió un error al buscar la información del estudiante', 'error');
+    alert('Ocurrió un error al buscar la información del estudiante');
   }
 }

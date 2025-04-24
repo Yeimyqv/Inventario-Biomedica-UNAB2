@@ -3,21 +3,27 @@
 // Buscar estudiante por ID
 async function buscarEstudiante(identificacion) {
   try {
+    console.log('API: Buscando estudiante con ID:', identificacion);
     const response = await fetch(`/api/estudiante/${identificacion}`);
+    
+    console.log('API: Respuesta del servidor:', response.status);
     
     if (response.status === 404) {
       // No se encontró el estudiante, pero no es un error crítico
+      console.log('API: Estudiante no encontrado (404)');
       return null;
     }
     
     if (!response.ok) {
-      throw new Error('Error al buscar estudiante');
+      console.error('API: Error de respuesta', response.status);
+      throw new Error(`Error al buscar estudiante: ${response.status}`);
     }
     
-    return await response.json();
+    const data = await response.json();
+    console.log('API: Datos recibidos:', data);
+    return data;
   } catch (error) {
-    console.error('Error:', error);
-    mostrarNotificacion('Error', 'No se pudo obtener información del estudiante', 'error');
+    console.error('API: Error en buscarEstudiante:', error);
     return null;
   }
 }

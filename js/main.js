@@ -126,6 +126,11 @@ function selectUserType(tipo) {
   const estudianteGroup = document.getElementById('estudiante-group');
   const laboratoristaGroup = document.getElementById('laboratorista-group');
   
+  // Si es estudiante, configurar eventos de autocompletado después de un breve tiempo
+  if (tipo === 'estudiante') {
+    setTimeout(configurarEventosAutocompletado, 500);
+  }
+  
   // Ocultar todos los grupos específicos primero
   if (estudianteGroup) estudianteGroup.style.display = 'none';
   if (laboratoristaGroup) laboratoristaGroup.style.display = 'none';

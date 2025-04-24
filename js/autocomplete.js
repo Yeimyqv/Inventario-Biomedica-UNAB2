@@ -38,25 +38,22 @@ async function buscarEstudiantePorId() {
   const correoInput = document.getElementById('estudiante-correo');
   
   if (!idInput || !nombreInput || !correoInput) {
-    console.error('Faltan elementos del formulario:', {
-      idInput: !!idInput,
-      nombreInput: !!nombreInput,
-      correoInput: !!correoInput
-    });
-    alert('Error: Faltan elementos del formulario');
+    console.error('Faltan elementos del formulario');
     return;
   }
   
-  const estudianteId = idInput.value.trim();
+  const estudianteId = idInput.value.trim().toUpperCase(); // Convertir a mayúsculas para uniformidad
   if (!estudianteId) {
     console.log('ID de estudiante vacío');
-    alert('Por favor ingrese su ID');
     return;
   }
   
-  // Mostrar mensaje de búsqueda
-  console.log('Buscando estudiante con ID:', estudianteId);
-  alert('Buscando información del estudiante...');
+  // Mostrar un spinner o indicador de carga en lugar de alerta
+  const buscarBtn = document.getElementById('buscar-estudiante-btn');
+  if (buscarBtn) {
+    buscarBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Buscando...';
+    buscarBtn.disabled = true;
+  }
   
   try {
     // Llamar a la API para buscar el estudiante
@@ -73,13 +70,36 @@ async function buscarEstudiantePorId() {
         correo: estudiante.correo
       });
       
-      alert('Información del estudiante cargada correctamente');
+      // No mostrar alerta de éxito, solo actualizar los campos silenciosamente
     } else {
       console.log('Estudiante no encontrado');
-      alert('No se encontró un estudiante con ese ID. Ingrese sus datos manualmente.');
+      // Usar una notificación con estilo personalizado en lugar de alert
+      const notificacion = document.createElement('div');
+      notificacion.className = 'alert alert-warning alert-dismissible fade show mt-2';
+      notificacion.role = 'alert';
+      notificacion.innerHTML = `
+        <strong>Estudiante no encontrado.</strong> Por favor ingrese sus datos manualmente.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      
+      // Insertar la notificación después del campo de ID
+      const parentElement = idInput.parentElement.parentElement;
+      parentElement.appendChild(notificacion);
+      
+      // Configurar auto-cierre después de 5 segundos
+      setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(notificacion);
+        bsAlert.close();
+      }, 5000);
     }
   } catch (error) {
     console.error('Error al buscar estudiante:', error);
-    alert('Ocurrió un error al buscar la información del estudiante');
+    // No mostrar alerta para errores técnicos, solo registrar en consola
+  } finally {
+    // Restaurar el botón de búsqueda
+    if (buscarBtn) {
+      buscarBtn.innerHTML = 'Buscar';
+      buscarBtn.disabled = false;
+    }
   }
 }

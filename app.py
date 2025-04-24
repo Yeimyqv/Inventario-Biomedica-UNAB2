@@ -227,14 +227,31 @@ def eliminar_elemento(elemento_id):
 @app.route('/api/estudiante/<identificacion>', methods=['GET'])
 def buscar_estudiante(identificacion):
     """Buscar estudiante por ID."""
+    # Convertir a mayúsculas para mejorar la compatibilidad
+    identificacion_upper = identificacion.strip().upper()
+    
+    # Log para depuración
+    print(f"Buscando estudiante con ID: {identificacion_upper}")
+    
+    # Buscar primero con coincidencia exacta
     estudiante = Usuario.query.filter_by(
-        identificacion=identificacion,
+        identificacion=identificacion_upper,
         tipo='estudiante'
     ).first()
     
     if not estudiante:
+        # Si no se encuentra, intentar búsqueda parcial (para IDs que podrían estar truncados)
+        estudiante = Usuario.query.filter(
+            Usuario.identificacion.like(f"{identificacion_upper}%"),
+            Usuario.tipo == 'estudiante'
+        ).first()
+    
+    if not estudiante:
+        print(f"Estudiante no encontrado: {identificacion_upper}")
         return jsonify({'error': 'Estudiante no encontrado'}), 404
     
+    # Log del estudiante encontrado
+    print(f"Estudiante encontrado: {estudiante.nombre}, ID: {estudiante.identificacion}")
     return jsonify(estudiante.to_dict())
 
 # Punto de entrada

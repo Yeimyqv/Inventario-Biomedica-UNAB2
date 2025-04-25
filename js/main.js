@@ -12,6 +12,12 @@ let currentLaboratory = null; // Para almacenar el laboratorio seleccionado
 // Reemplazar variable INVENTARIO estática con datos de la API
 let INVENTARIO = []; // Será llenado dinámicamente desde la base de datos
 
+// Objeto para almacenar los PINes de docentes y laboratoristas
+const PINES = {
+  'docente': 'DOC1234',
+  'laboratorista': 'LAB5678'
+};
+
 // Función para determinar la clase CSS según el estado de devolución
 function getEstadoObservacionClass(observacion) {
   // Mapeo de observaciones a clases CSS

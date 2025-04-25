@@ -3,8 +3,9 @@ Aplicación principal para el Sistema de Gestión de Laboratorio de Bioinstrumen
 """
 
 import os
+import json
 from datetime import datetime, timedelta
-from flask import Flask, jsonify, request, render_template, send_from_directory, abort
+from flask import Flask, jsonify, request, render_template, send_from_directory, abort, Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 
@@ -254,6 +255,31 @@ def buscar_estudiante(identificacion):
     # Log del estudiante encontrado
     print(f"Estudiante encontrado: {estudiante.nombre}, ID: {estudiante.identificacion}")
     return jsonify(estudiante.to_dict())
+
+# API para importar inventario desde CSV (solo admin)
+@app.route('/api/importar-inventario', methods=['POST'])
+def importar_inventario():
+    """Importar inventario desde un archivo CSV (ruta en attached_assets)."""
+    # Esta API solo debe ser llamada por administradores
+    try:
+        from import_inventory import import_inventory_from_csv
+        
+        # Ruta al archivo CSV
+        csv_file = "attached_assets/MATERIALES_PISO_4_PROCESADO.csv"
+        
+        if not os.path.exists(csv_file):
+            return jsonify({'error': f'El archivo {csv_file} no existe'}), 404
+            
+        # Importar inventario
+        success, message = import_inventory_from_csv(csv_file)
+        
+        if success:
+            return jsonify({'success': True, 'message': message})
+        else:
+            return jsonify({'error': message}), 500
+            
+    except Exception as e:
+        return jsonify({'error': f'Error al importar inventario: {str(e)}'}), 500
 
 # Punto de entrada
 if __name__ == '__main__':

@@ -213,9 +213,15 @@ function selectUserType(tipo) {
         const otroDocenteNombreGroup = document.getElementById('otro-docente-nombre-group');
         otroDocenteNombreGroup.style.display = (this.value === 'Otro') ? 'block' : 'none';
       });
-    } else {
-      // Para laboratoristas, usar el campo de texto normal
+    } else if (tipo === 'laboratorista') {
+      // Para laboratoristas, usar el selector específico
       document.getElementById('docente-select-container').style.display = 'none';
+      document.getElementById('laboratorista-select-container').style.display = 'block';
+      document.getElementById('user-name').style.display = 'none';
+    } else {
+      // Para otros tipos de usuario
+      document.getElementById('docente-select-container').style.display = 'none';
+      document.getElementById('laboratorista-select-container').style.display = 'none';
       document.getElementById('user-name').style.display = 'block';
     }
   }
@@ -955,10 +961,13 @@ function administrarInventario() {
       <p>Desde esta sección puede agregar, editar o eliminar elementos del inventario.</p>
     </div>
     
-    <!-- Botón de agregar nuevo elemento y búsqueda -->
+    <!-- Botones de acciones y búsqueda -->
     <div class="row mb-4 align-items-end">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <button class="btn btn-green" onclick="mostrarFormularioNuevoElemento()">Agregar nuevo elemento</button>
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-outline-light" onclick="importarInventario()">Importar inventario CSV</button>
       </div>
       <div class="col-md-8">
         <div class="input-group">

@@ -180,6 +180,8 @@
             
             <div class="mb-3" id="nombre-group">
               <label for="user-name" class="form-label">Nombre completo:</label>
+              
+              <!-- Selector de docentes -->
               <div id="docente-select-container" style="display: none;">
                 <select class="form-select" id="docente-select">
                   <option value="" selected>Seleccione su nombre</option>
@@ -198,6 +200,18 @@
                   <input type="text" class="form-control" id="otro-docente-nombre" placeholder="Ingrese su nombre completo">
                 </div>
               </div>
+              
+              <!-- Selector de laboratoristas -->
+              <div id="laboratorista-select-container" style="display: none;">
+                <select class="form-select" id="laboratorista-select">
+                  <option value="" selected>Seleccione su nombre</option>
+                  <option value="Lina Alexandra Quiroz Obando">Lina Alexandra Quiroz Obando</option>
+                  <option value="Luis Alexandres Vargas Vargas">Luis Alexandres Vargas Vargas</option>
+                  <option value="Juan Camilo Sierra Martinez">Juan Camilo Sierra Martinez</option>
+                </select>
+              </div>
+              
+              <!-- Campo de texto para nombre (estudiantes) -->
               <input type="text" class="form-control" id="user-name" required>
             </div>
             

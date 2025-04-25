@@ -51,16 +51,6 @@ function getEstadoObservacionClass(observacion) {
 document.addEventListener('DOMContentLoaded', async function() {
   console.log('Aplicación de Gestión de Laboratorio iniciada');
   
-  // Cargar el inventario desde la base de datos antes de inicializar la interfaz
-  try {
-    mostrarNotificacion('Cargando', 'Cargando datos del sistema...', 'info');
-    INVENTARIO = await cargarInventarioDesdeDB();
-    console.log(`Inventario cargado: ${INVENTARIO.length} categorías`);
-  } catch (error) {
-    console.error('Error al cargar el inventario:', error);
-    mostrarNotificacion('Error', 'Hubo un problema al cargar el inventario. Algunas funciones podrían no estar disponibles.', 'error', 5000);
-  }
-  
   // Inicializar elementos interactivos
   initEventListeners();
   
@@ -72,6 +62,21 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   // Mostrar directamente la selección de usuario (ya no hay sección lab-selection)
   document.getElementById('user-selection').style.display = 'block';
+  
+  // Cargar el inventario desde la base de datos en segundo plano
+  try {
+    const loadingMsg = mostrarNotificacion('Cargando', 'Cargando datos del sistema...', 'info', 3000);
+    INVENTARIO = await cargarInventarioDesdeDB();
+    console.log(`Inventario cargado: ${INVENTARIO.length} categorías`);
+    
+    // Cerrar la notificación inmediatamente después de cargar
+    if (loadingMsg && loadingMsg.close) {
+      loadingMsg.close();
+    }
+  } catch (error) {
+    console.error('Error al cargar el inventario:', error);
+    mostrarNotificacion('Error', 'Hubo un problema al cargar el inventario. Algunas funciones podrían no estar disponibles.', 'error', 5000);
+  }
 });
 
 // Inicializar listeners de eventos
@@ -2191,7 +2196,7 @@ function volverASeleccionUsuario() {
 }
 
 // Mostrar notificación al usuario
-function mostrarNotificacion(titulo, mensaje, tipo = 'info') {
+function mostrarNotificacion(titulo, mensaje, tipo = 'info', autoCloseMs = 0) {
   // Crear el modal personalizado
   const modalOverlay = document.createElement('div');
   modalOverlay.className = 'custom-modal-overlay';
@@ -2220,15 +2225,26 @@ function mostrarNotificacion(titulo, mensaje, tipo = 'info') {
     modal.classList.add('active');
   }, 10);
   
-  // Manejar cierre
-  document.getElementById('modal-ok-btn').addEventListener('click', () => {
+  // Función para cerrar el modal
+  const cerrarModal = () => {
     modalOverlay.classList.remove('active');
     modal.classList.remove('active');
     
     setTimeout(() => {
       modalOverlay.remove();
     }, 300);
-  });
+  };
+  
+  // Manejar cierre con botón
+  document.getElementById('modal-ok-btn').addEventListener('click', cerrarModal);
+  
+  // Auto-cierre si se especifica un tiempo
+  if (autoCloseMs > 0) {
+    setTimeout(cerrarModal, autoCloseMs);
+  }
+  
+  // Devolver el objeto modal para operaciones adicionales
+  return { overlay: modalOverlay, modal, close: cerrarModal };
 }
 
 // Mostrar confirmación al usuario

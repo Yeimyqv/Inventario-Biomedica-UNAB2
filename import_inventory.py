@@ -21,14 +21,13 @@ def import_inventory_from_csv(csv_file):
         with open(csv_file, 'r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             
-            # Limitamos a 100 elementos para evitar sobrecargar la BD en producción
-            max_elementos = 100
+            # Procesamos todos los elementos del archivo CSV
             contador_filas = 0
             
             for row in reader:
                 contador_filas += 1
-                if contador_filas > max_elementos:
-                    break
+                if contador_filas % 20 == 0:
+                    print(f"Procesados {contador_filas} elementos...")
                 
                 # Manejar categoría
                 categoria_nombre = row.get('CATEGORIA', '').strip()

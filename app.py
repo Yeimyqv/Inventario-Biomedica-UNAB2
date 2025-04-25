@@ -30,6 +30,118 @@ db.init_app(app)
 with app.app_context():
     from models import Categoria, Elemento, Usuario, Prestamo
     db.create_all()
+    
+    # Inicializar inventario automáticamente
+    def cargar_inventario_inicial():
+        """Cargar inventario inicial desde CSV si la base de datos está vacía."""
+        try:
+            # Verificar si ya hay elementos en la base de datos
+            elementos_count = Elemento.query.count()
+            categorias_count = Categoria.query.count()
+            
+            if elementos_count == 0 or categorias_count == 0:
+                print("Base de datos vacía. Cargando inventario inicial...")
+                from import_inventory import import_inventory_from_csv
+                
+                # Ruta al archivo CSV
+                csv_file = "attached_assets/MATERIALES_PISO_4_PROCESADO.csv"
+                
+                if os.path.exists(csv_file):
+                    success, message = import_inventory_from_csv(csv_file)
+                    print(f"Resultado de la carga de inventario: {message}")
+                else:
+                    print(f"ADVERTENCIA: Archivo de inventario {csv_file} no encontrado")
+            else:
+                print(f"Ya existen {categorias_count} categorías y {elementos_count} elementos en la base de datos")
+        except Exception as e:
+            print(f"Error cargando inventario inicial: {str(e)}")
+    
+    # Inicializar datos de estudiantes automáticamente
+    def cargar_estudiantes_iniciales():
+        """Cargar datos de estudiantes desde CSV si no hay estudiantes en la base de datos."""
+        try:
+            # Verificar si ya hay estudiantes en la base de datos
+            estudiantes_count = Usuario.query.filter_by(tipo='estudiante').count()
+            
+            if estudiantes_count == 0:
+                print("No hay estudiantes en la base de datos. Cargando datos iniciales...")
+                from import_students import import_students_from_csv
+                
+                # Ruta al archivo CSV
+                csv_file = "attached_assets/Estudiantes_Biomedica_PostgreSQL.csv"
+                
+                if os.path.exists(csv_file):
+                    import_students_from_csv(csv_file)
+                else:
+                    print(f"ADVERTENCIA: Archivo de estudiantes {csv_file} no encontrado")
+            else:
+                print(f"Ya existen {estudiantes_count} estudiantes en la base de datos")
+        except Exception as e:
+            print(f"Error cargando datos de estudiantes: {str(e)}")
+    
+    # Inicializar usuarios del sistema (docentes y laboratoristas)
+    def inicializar_usuarios_sistema():
+        """Crear usuarios de sistema (docentes y laboratoristas) si no existen."""
+        try:
+            # Verificar si ya hay laboratoristas y docentes en la base de datos
+            lab_count = Usuario.query.filter_by(tipo='laboratorista').count()
+            doc_count = Usuario.query.filter_by(tipo='docente').count()
+            
+            if lab_count == 0:
+                print("Creando usuarios laboratoristas predeterminados...")
+                # Crear laboratoristas predeterminados
+                laboratoristas = [
+                    {
+                        'nombre': 'Lina Alexandra Quiroz Obando',
+                        'identificacion': 'LAB001',
+                        'pin': 'LAB5678'
+                    },
+                    {
+                        'nombre': 'Luis Alexandres Vargas Vargas',
+                        'identificacion': 'LAB002',
+                        'pin': 'LAB5678'
+                    },
+                    {
+                        'nombre': 'Juan Camilo Sierra Martinez',
+                        'identificacion': 'LAB003',
+                        'pin': 'LAB5678'
+                    }
+                ]
+                
+                for lab_data in laboratoristas:
+                    nuevo_lab = Usuario(
+                        tipo='laboratorista',
+                        nombre=lab_data['nombre'],
+                        identificacion=lab_data['identificacion'],
+                        pin=lab_data['pin']
+                    )
+                    db.session.add(nuevo_lab)
+                    print(f"Laboratorista creado: {lab_data['nombre']}")
+                
+                db.session.commit()
+            
+            if doc_count == 0:
+                print("Creando usuario docente predeterminado...")
+                # Crear docente predeterminado
+                nuevo_docente = Usuario(
+                    tipo='docente',
+                    nombre='Docente de Bioinstrumentación',
+                    identificacion='DOC001',
+                    pin='DOC1234'
+                )
+                db.session.add(nuevo_docente)
+                db.session.commit()
+                print("Docente creado: Docente de Bioinstrumentación")
+            
+            print(f"Usuarios del sistema: {lab_count} laboratoristas y {doc_count} docentes")
+        
+        except Exception as e:
+            print(f"Error creando usuarios del sistema: {str(e)}")
+    
+    # Cargar datos iniciales
+    cargar_inventario_inicial()
+    cargar_estudiantes_iniciales()
+    inicializar_usuarios_sistema()
 
 # Rutas para archivos estáticos
 @app.route('/')

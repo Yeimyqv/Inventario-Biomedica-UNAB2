@@ -963,13 +963,10 @@ function administrarInventario() {
     
     <!-- Botones de acciones y búsqueda -->
     <div class="row mb-4 align-items-end">
-      <div class="col-md-3">
+      <div class="col-md-4">
         <button class="btn btn-green" onclick="mostrarFormularioNuevoElemento()">Agregar nuevo elemento</button>
       </div>
-      <div class="col-md-3">
-        <button class="btn btn-outline-light" onclick="importarInventario()">Importar inventario CSV</button>
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-8">
         <div class="input-group">
           <span class="input-group-text">🔍</span>
           <input type="text" class="form-control" id="buscar-elemento-inventario" 

@@ -15,6 +15,9 @@ def import_inventory_from_csv(csv_file):
     elementos_creados = 0
     
     try:
+        # No borraremos nada, solo agregaremos elementos nuevos
+        print("Verificando elementos y categorías existentes...")
+        
         with open(csv_file, 'r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             
@@ -26,64 +29,89 @@ def import_inventory_from_csv(csv_file):
                 contador_filas += 1
                 if contador_filas > max_elementos:
                     break
-                if not row['CATEGORIA'] or row['CATEGORIA'].lower() == 'nan':
-                    continue  # Saltamos filas sin categoría definida
                 
                 # Manejar categoría
-                categoria_nombre = row['CATEGORIA'].strip()
+                categoria_nombre = row.get('CATEGORIA', '').strip()
+                if not categoria_nombre or categoria_nombre.lower() == 'nan':
+                    print(f"Omitiendo fila {contador_filas}: Sin categoría")
+                    continue  # Saltamos filas sin categoría definida
+                
+                # Crear o recuperar categoría
                 if categoria_nombre not in categorias_creadas:
-                    # Verificar si la categoría ya existe en la base de datos
+                    # Buscar si ya existe la categoría
                     categoria = Categoria.query.filter_by(nombre=categoria_nombre).first()
+                    
                     if not categoria:
+                        # Crear nueva categoría si no existe
                         categoria = Categoria(nombre=categoria_nombre)
                         db.session.add(categoria)
-                        db.session.commit()
+                        db.session.flush()  # Para obtener el ID generado
+                        print(f"Creada categoría: {categoria_nombre} (ID: {categoria.id})")
+                    else:
+                        print(f"Usando categoría existente: {categoria_nombre} (ID: {categoria.id})")
                     
                     categorias_creadas[categoria_nombre] = categoria.id
                 
                 # Manejar elemento
-                elemento_nombre = row['ELEMENTO'].strip()
+                elemento_nombre = row.get('ELEMENTO', '').strip()
                 if not elemento_nombre or elemento_nombre.lower() == 'nan':
+                    print(f"Omitiendo fila {contador_filas}: Sin nombre de elemento")
                     continue  # Saltamos elementos sin nombre definido
                 
-                # Verificar si el elemento ya existe
-                codigo = f"{categoria_nombre[:3]}-{elementos_creados + 1:04d}"
-                elemento = Elemento.query.filter_by(nombre=elemento_nombre, categoria_id=categorias_creadas[categoria_nombre]).first()
+                # Verificar si el elemento ya existe en esta categoría
+                elemento_existente = Elemento.query.filter_by(
+                    nombre=elemento_nombre,
+                    categoria_id=categorias_creadas[categoria_nombre]
+                ).first()
                 
-                if not elemento:
-                    # Obtener cantidad, ubicación y descripción
-                    try:
-                        cantidad = int(row['CANTIDAD']) if row['CANTIDAD'] and row['CANTIDAD'].lower() != 'nan' else 0
-                    except ValueError:
-                        cantidad = 0
-                    
-                    ubicacion = row['UBICACION'] if row['UBICACION'] and row['UBICACION'].lower() != 'nan' else None
-                    
-                    # Combinar enlace y observaciones para la descripción
-                    descripcion = ""
-                    if row.get('LINK_REFERENCIA') and row['LINK_REFERENCIA'].lower() != 'sin enlace de referencia' and row['LINK_REFERENCIA'].lower() != 'nan':
-                        descripcion += f"Referencia: {row['LINK_REFERENCIA']}\n"
-                    
-                    if row.get('OBSERVACIONES') and row['OBSERVACIONES'].lower() != 'nan':
-                        descripcion += row['OBSERVACIONES']
-                    
-                    # Crear nuevo elemento
-                    nuevo_elemento = Elemento(
-                        codigo=codigo,
-                        nombre=elemento_nombre,
-                        descripcion=descripcion,
-                        cantidad=cantidad,
-                        ubicacion=ubicacion,
-                        categoria_id=categorias_creadas[categoria_nombre]
-                    )
-                    
-                    db.session.add(nuevo_elemento)
-                    elementos_creados += 1
-                    
-                    # Commit cada 50 elementos para no sobrecargar la DB
-                    if elementos_creados % 50 == 0:
-                        db.session.commit()
-                        print(f"Procesados {elementos_creados} elementos...")
+                if elemento_existente:
+                    print(f"Elemento ya existe: {elemento_nombre} (Categoría: {categoria_nombre})")
+                    continue
+                
+                # Generar código único
+                codigo = f"{categoria_nombre[:3]}-{elementos_creados + 1:04d}"
+                
+                # Obtener cantidad, ubicación y descripción
+                try:
+                    cantidad_str = row.get('CANTIDAD', '0').strip()
+                    cantidad = int(cantidad_str) if cantidad_str and cantidad_str.lower() != 'nan' else 0
+                except ValueError:
+                    print(f"Error al convertir cantidad '{row.get('CANTIDAD')}' para {elemento_nombre}. Usando 0.")
+                    cantidad = 0
+                
+                ubicacion = row.get('UBICACION', '') 
+                if not ubicacion or ubicacion.lower() == 'nan':
+                    ubicacion = "No especificada"
+                
+                # Combinar enlace y observaciones para la descripción
+                descripcion = ""
+                link_ref = row.get('LINK_REFERENCIA', '')
+                if link_ref and link_ref.lower() != 'sin enlace de referencia' and link_ref.lower() != 'nan':
+                    descripcion += f"Referencia: {link_ref}\n"
+                
+                obs = row.get('OBSERVACIONES', '')
+                if obs and obs.lower() != 'nan':
+                    descripcion += obs
+                
+                # Crear nuevo elemento
+                nuevo_elemento = Elemento(
+                    codigo=codigo,
+                    nombre=elemento_nombre,
+                    descripcion=descripcion,
+                    cantidad=cantidad,
+                    ubicacion=ubicacion,
+                    categoria_id=categorias_creadas[categoria_nombre]
+                )
+                
+                db.session.add(nuevo_elemento)
+                elementos_creados += 1
+                
+                print(f"Elemento {elementos_creados} creado: {elemento_nombre} (Categoría: {categoria_nombre})")
+                
+                # Commit cada 20 elementos para no sobrecargar la DB
+                if elementos_creados % 20 == 0:
+                    db.session.commit()
+                    print(f"Procesados {elementos_creados} elementos...")
         
         # Commit final
         db.session.commit()

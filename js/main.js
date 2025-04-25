@@ -9,6 +9,9 @@ let elementoSeleccionado = null;
 let categoriaSeleccionada = null;
 let currentLaboratory = null; // Para almacenar el laboratorio seleccionado
 
+// Reemplazar variable INVENTARIO estática con datos de la API
+let INVENTARIO = []; // Será llenado dinámicamente desde la base de datos
+
 // Función para determinar la clase CSS según el estado de devolución
 function getEstadoObservacionClass(observacion) {
   // Mapeo de observaciones a clases CSS
@@ -39,8 +42,18 @@ function getEstadoObservacionClass(observacion) {
 }
 
 // Inicialización cuando el DOM está listo
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   console.log('Aplicación de Gestión de Laboratorio iniciada');
+  
+  // Cargar el inventario desde la base de datos antes de inicializar la interfaz
+  try {
+    mostrarNotificacion('Cargando', 'Cargando datos del sistema...', 'info');
+    INVENTARIO = await cargarInventarioDesdeDB();
+    console.log(`Inventario cargado: ${INVENTARIO.length} categorías`);
+  } catch (error) {
+    console.error('Error al cargar el inventario:', error);
+    mostrarNotificacion('Error', 'Hubo un problema al cargar el inventario. Algunas funciones podrían no estar disponibles.', 'error', 5000);
+  }
   
   // Inicializar elementos interactivos
   initEventListeners();

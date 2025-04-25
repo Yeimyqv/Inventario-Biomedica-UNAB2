@@ -1,5 +1,51 @@
 // API.js - Funciones para interactuar con las APIs del servidor
 
+// Función para cargar y preparar el inventario desde la base de datos
+async function cargarInventarioDesdeDB() {
+  try {
+    console.log("Cargando inventario desde la base de datos...");
+    
+    // Obtener todas las categorías
+    const categoriasResponse = await fetch('/api/categorias');
+    const categorias = await categoriasResponse.json();
+    
+    if (!categoriasResponse.ok) {
+      throw new Error('Error al cargar las categorías del inventario');
+    }
+    
+    // Crear un array con formato compatible con la estructura anterior de INVENTARIO
+    const inventarioFormateado = [];
+    
+    // Procesar cada categoría y cargar sus elementos
+    for (const categoria of categorias) {
+      // Obtener elementos para esta categoría
+      const elementosResponse = await fetch(`/api/elementos/categoria/${categoria.id}`);
+      const elementos = await elementosResponse.json();
+      
+      if (!elementosResponse.ok) {
+        console.error(`Error al cargar los elementos de la categoría: ${categoria.nombre}`);
+        continue;
+      }
+      
+      // Añadir esta categoría con sus elementos al inventario formateado
+      inventarioFormateado.push({
+        categoria: categoria.nombre,
+        categoria_id: categoria.id,
+        elementos: elementos
+      });
+    }
+    
+    console.log(`Inventario cargado: ${inventarioFormateado.length} categorías`);
+    
+    // Devolver el inventario formateado
+    return inventarioFormateado;
+  } catch (error) {
+    console.error('Error cargando inventario:', error);
+    mostrarNotificacion('Error', 'No se pudo cargar el inventario. Por favor, intente de nuevo más tarde.', 'error');
+    return [];
+  }
+}
+
 // Buscar estudiante por ID
 async function buscarEstudiante(identificacion) {
   try {

@@ -35,24 +35,36 @@ with app.app_context():
     def cargar_inventario_inicial():
         """Cargar inventario inicial desde CSV si la base de datos está vacía."""
         try:
-            # Verificar si ya hay elementos en la base de datos
+            # Limpiar datos existentes de elementos y categorías
+            print("Actualizando base de datos con nuevo inventario...")
+            Prestamo.query.delete()  # Primero eliminamos préstamos (dependencia de FK)
+            Elemento.query.delete()  # Luego elementos
+            Categoria.query.delete() # Finalmente categorías
+            db.session.commit()
+            print("Base de datos limpiada. Cargando inventario actualizado...")
+            
+            from import_inventory import import_inventory_from_csv
+            
+            # Ruta al archivo CSV actualizado
+            csv_file = "attached_assets/MATERIALES_PISO_4_PROCESADO (1).csv"
+            
+            if os.path.exists(csv_file):
+                success, message = import_inventory_from_csv(csv_file)
+                print(f"Resultado de la carga de inventario: {message}")
+            else:
+                print(f"ADVERTENCIA: Archivo de inventario {csv_file} no encontrado")
+                
+                # Intentar con el archivo anterior como respaldo
+                csv_file_backup = "attached_assets/MATERIALES_PISO_4_PROCESADO.csv"
+                if os.path.exists(csv_file_backup):
+                    print(f"Intentando con archivo de respaldo: {csv_file_backup}")
+                    success, message = import_inventory_from_csv(csv_file_backup)
+                    print(f"Resultado de la carga de inventario de respaldo: {message}")
+            
+            # Contar elementos después de la carga
             elementos_count = Elemento.query.count()
             categorias_count = Categoria.query.count()
-            
-            if elementos_count == 0 or categorias_count == 0:
-                print("Base de datos vacía. Cargando inventario inicial...")
-                from import_inventory import import_inventory_from_csv
-                
-                # Ruta al archivo CSV
-                csv_file = "attached_assets/MATERIALES_PISO_4_PROCESADO.csv"
-                
-                if os.path.exists(csv_file):
-                    success, message = import_inventory_from_csv(csv_file)
-                    print(f"Resultado de la carga de inventario: {message}")
-                else:
-                    print(f"ADVERTENCIA: Archivo de inventario {csv_file} no encontrado")
-            else:
-                print(f"Ya existen {categorias_count} categorías y {elementos_count} elementos en la base de datos")
+            print(f"Base de datos actualizada con {categorias_count} categorías y {elementos_count} elementos")
         except Exception as e:
             print(f"Error cargando inventario inicial: {str(e)}")
     

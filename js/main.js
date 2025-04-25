@@ -229,8 +229,14 @@ function autenticarUsuario() {
   
   // Obtener el nombre según el tipo de usuario
   if (currentUser.tipo === 'laboratorista') {
-    // Para laboratoristas, obtener el nombre del campo de texto
-    nombre = document.getElementById('user-name').value.trim();
+    // Para laboratoristas, obtener el nombre del selector
+    const laboratoristaSelect = document.getElementById('laboratorista-select');
+    if (laboratoristaSelect) {
+      nombre = laboratoristaSelect.value;
+    } else {
+      // Fallback al campo de texto si no existe el selector
+      nombre = document.getElementById('user-name').value.trim();
+    }
   } else if (currentUser.tipo === 'docente') {
     // Para docentes, obtener el nombre del selector
     const docenteSelect = document.getElementById('docente-select');

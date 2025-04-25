@@ -18,7 +18,14 @@ def import_inventory_from_csv(csv_file):
         with open(csv_file, 'r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             
+            # Limitamos a 100 elementos para evitar sobrecargar la BD en producción
+            max_elementos = 100
+            contador_filas = 0
+            
             for row in reader:
+                contador_filas += 1
+                if contador_filas > max_elementos:
+                    break
                 if not row['CATEGORIA'] or row['CATEGORIA'].lower() == 'nan':
                     continue  # Saltamos filas sin categoría definida
                 

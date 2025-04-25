@@ -174,3 +174,30 @@ async function eliminarElemento(elementoId) {
     return null;
   }
 }
+
+// Importar inventario desde CSV (solo laboratorista)
+async function importarInventarioCSV() {
+  try {
+    mostrarNotificacion('Procesando', 'Importando inventario desde archivo CSV...', 'info', 10000);
+    
+    const response = await fetch('/api/importar-inventario', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Error al importar el inventario');
+    }
+    
+    mostrarNotificacion('Éxito', data.message || 'Inventario importado correctamente', 'success');
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    mostrarNotificacion('Error', error.message, 'error');
+    return null;
+  }
+}

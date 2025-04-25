@@ -969,7 +969,7 @@ function administrarInventario() {
       <div class="col-md-3">
         <button class="btn btn-outline-light" onclick="importarInventario()">Importar inventario CSV</button>
       </div>
-      <div class="col-md-8">
+      <div class="col-md-6">
         <div class="input-group">
           <span class="input-group-text">🔍</span>
           <input type="text" class="form-control" id="buscar-elemento-inventario" 
@@ -1111,6 +1111,31 @@ function filtrarInventarioAdmin() {
   
   // Regenerar el acordeón con el filtro aplicado
   acordeonContainer.innerHTML = generarAcordeonInventario(filtroTexto);
+}
+
+// Importar inventario desde archivo CSV
+async function importarInventario() {
+  // Mostrar diálogo de confirmación
+  mostrarConfirmacion(
+    'Importar Inventario', 
+    'Se importarán los elementos desde el archivo CSV proporcionado. Este proceso puede tardar unos momentos. ¿Desea continuar?',
+    async () => {
+      try {
+        // Llamar a la API para importar
+        const resultado = await importarInventarioCSV();
+        
+        if (resultado && resultado.success) {
+          // Recargar la página después de 2 segundos para mostrar los cambios
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Error importando inventario:', error);
+        mostrarNotificacion('Error', 'No se pudo importar el inventario', 'error');
+      }
+    }
+  );
 }
 
 // Mostrar formulario para agregar nuevo elemento

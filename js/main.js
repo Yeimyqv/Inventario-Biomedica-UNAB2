@@ -497,6 +497,15 @@ function cargarInterfazPrincipal() {
               </div>
             </div>
           </div>
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <div class="panel-module">
+                <h3 class="module-title">REPORTES Y ESTADÍSTICAS</h3>
+                <p class="module-desc">Generar reportes detallados del laboratorio</p>
+                <button class="btn btn-success" onclick="mostrarModuloReportes()">GENERAR REPORTES</button>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div class="panel-nav">
@@ -2304,4 +2313,570 @@ function mostrarConfirmacion(titulo, mensaje, onConfirm, onCancel) {
       if (typeof onCancel === 'function') onCancel();
     }, 300);
   });
+}
+
+
+// ======= MÓDULO DE REPORTES PARA LABORATORISTA =======
+
+/**
+ * Mostrar el módulo completo de reportes
+ */
+function mostrarModuloReportes() {
+  // Ocultar la interfaz principal
+  document.getElementById("interface").style.display = "none";
+  
+  // Crear o mostrar la sección de reportes
+  let reportesSection = document.getElementById("reportes-section");
+  
+  if (!reportesSection) {
+    reportesSection = document.createElement("div");
+    reportesSection.id = "reportes-section";
+    reportesSection.className = "container-fluid p-4";
+    reportesSection.style.display = "none";
+    
+    // Configurar fechas por defecto (último mes)
+    const hoy = new Date();
+    const haceUnMes = new Date();
+    haceUnMes.setMonth(haceUnMes.getMonth() - 1);
+    
+    const fechaInicio = haceUnMes.toISOString().split("T")[0];
+    const fechaFin = hoy.toISOString().split("T")[0];
+    
+    reportesSection.innerHTML = `
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="text-light">MÓDULO DE REPORTES Y ESTADÍSTICAS</h2>
+            <button class="btn btn-outline-light" onclick="volverAInterfazPrincipal()">
+              Volver al panel principal
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panel de filtros -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card bg-dark border-secondary">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Filtros de Consulta</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-3 mb-3">
+                  <label for="fecha-inicio-reporte" class="form-label">Fecha Inicio:</label>
+                  <input type="date" class="form-control" id="fecha-inicio-reporte" value="${fechaInicio}">
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="fecha-fin-reporte" class="form-label">Fecha Fin:</label>
+                  <input type="date" class="form-control" id="fecha-fin-reporte" value="${fechaFin}">
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="tipo-usuario-filtro" class="form-label">Tipo de Usuario:</label>
+                  <select class="form-select" id="tipo-usuario-filtro">
+                    <option value="">Todos</option>
+                    <option value="estudiante">Estudiantes</option>
+                    <option value="docente">Docentes</option>
+                  </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="materia-filtro" class="form-label">Materia:</label>
+                  <input type="text" class="form-control" id="materia-filtro" placeholder="Filtrar por materia">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Botones de tipos de reporte -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="btn-group w-100" role="group">
+            <button type="button" class="btn btn-primary active" onclick="generarReportePrestamos()">
+              Préstamos Realizados
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="generarReporteEstudiantes()">
+              Ranking Estudiantes
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="generarReporteDocentes()">
+              Ranking Docentes
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="generarReporteMaterias()">
+              Ranking Materias
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="generarReporteProductos()">
+              Productos Más Solicitados
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Contenido del reporte -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card bg-dark border-secondary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0" id="titulo-reporte">Reporte de Préstamos Realizados</h5>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-outline-success" onclick="exportarReportePDF()">
+                  PDF
+                </button>
+                <button class="btn btn-sm btn-outline-success" onclick="exportarReporteExcel()">
+                  Excel
+                </button>
+              </div>
+            </div>
+            <div class="card-body" id="contenido-reporte">
+              <div class="text-center p-4">
+                <p class="text-muted">Seleccione un tipo de reporte para comenzar</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(reportesSection);
+  }
+  
+  // Mostrar la sección
+  reportesSection.style.display = "block";
+  
+  // Cargar reporte de préstamos por defecto
+  setTimeout(() => generarReportePrestamos(), 100);
+}
+
+async function generarReportePrestamos() {
+  try {
+    mostrarCargandoReporte();
+    actualizarTituloReporte("Reporte de Préstamos Realizados");
+    activarBotonReporte(0);
+    
+    const filtros = obtenerFiltrosReporte();
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/prestamos?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReportePrestamos(data);
+    
+  } catch (error) {
+    console.error("Error generando reporte de préstamos:", error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+async function generarReporteEstudiantes() {
+  try {
+    mostrarCargandoReporte();
+    actualizarTituloReporte("Ranking de Estudiantes por Número de Préstamos");
+    activarBotonReporte(1);
+    
+    const filtros = obtenerFiltrosReporte();
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/estudiantes?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReporteEstudiantes(data);
+    
+  } catch (error) {
+    console.error("Error generando reporte de estudiantes:", error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+async function generarReporteDocentes() {
+  try {
+    mostrarCargandoReporte();
+    actualizarTituloReporte("Ranking de Docentes por Uso de Insumos");
+    activarBotonReporte(2);
+    
+    const filtros = obtenerFiltrosReporte();
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/docentes?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReporteDocentes(data);
+    
+  } catch (error) {
+    console.error("Error generando reporte de docentes:", error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+async function generarReporteMaterias() {
+  try {
+    mostrarCargandoReporte();
+    actualizarTituloReporte("Ranking de Materias por Uso de Insumos");
+    activarBotonReporte(3);
+    
+    const filtros = obtenerFiltrosReporte();
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/materias?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReporteMaterias(data);
+    
+  } catch (error) {
+    console.error("Error generando reporte de materias:", error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+async function generarReporteProductos() {
+  try {
+    mostrarCargandoReporte();
+    actualizarTituloReporte("Productos Más Solicitados del Laboratorio");
+    activarBotonReporte(4);
+    
+    const filtros = obtenerFiltrosReporte();
+    const limite = document.getElementById("limite-productos")?.value || 10;
+    filtros.limite = limite;
+    
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/productos?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReporteProductos(data);
+    
+  } catch (error) {
+    console.error("Error generando reporte de productos:", error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+function obtenerFiltrosReporte() {
+  const filtros = {};
+  
+  const fechaInicio = document.getElementById("fecha-inicio-reporte")?.value;
+  const fechaFin = document.getElementById("fecha-fin-reporte")?.value;
+  const tipoUsuario = document.getElementById("tipo-usuario-filtro")?.value;
+  const materia = document.getElementById("materia-filtro")?.value;
+  
+  if (fechaInicio) filtros.fecha_inicio = fechaInicio;
+  if (fechaFin) filtros.fecha_fin = fechaFin;
+  if (tipoUsuario) filtros.tipo_usuario = tipoUsuario;
+  if (materia) filtros.materia = materia;
+  
+  return filtros;
+}
+
+function mostrarReportePrestamos(data) {
+  const contenido = `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="alert alert-info">
+          <strong>Total de préstamos encontrados:</strong> ${data.total_prestamos}
+        </div>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Tipo</th>
+            <th>Elemento</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.prestamos.length > 0 ? data.prestamos.map(prestamo => `
+            <tr>
+              <td>${formatearFechaReporte(prestamo.fecha_prestamo)}</td>
+              <td>${prestamo.usuario_nombre || "N/A"}</td>
+              <td>
+                <span class="badge ${prestamo.usuario_tipo === "estudiante" ? "bg-primary" : "bg-success"}">
+                  ${prestamo.usuario_tipo}
+                </span>
+              </td>
+              <td>${prestamo.elemento_nombre || "N/A"}</td>
+              <td><span class="badge bg-info">${prestamo.cantidad}</span></td>
+              <td>
+                <span class="badge ${obtenerClaseEstadoReporte(prestamo.estado)}">
+                  ${prestamo.estado}
+                </span>
+              </td>
+            </tr>
+          `).join("") : "<tr><td colspan=\"6\" class=\"text-center\">No se encontraron préstamos</td></tr>"}
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  document.getElementById("contenido-reporte").innerHTML = contenido;
+}
+
+function mostrarReporteEstudiantes(data) {
+  const contenido = `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="alert alert-info">
+          <strong>Total de estudiantes con préstamos:</strong> ${data.total_estudiantes}
+        </div>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th>Ranking</th>
+            <th>Identificación</th>
+            <th>Nombre</th>
+            <th>Materia</th>
+            <th>Total Préstamos</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.estudiantes.length > 0 ? data.estudiantes.map((estudiante, index) => `
+            <tr ${index < 3 ? "class=\"table-warning\"" : ""}>
+              <td>
+                <strong>#${index + 1}</strong>
+                ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
+              </td>
+              <td>${estudiante.identificacion}</td>
+              <td>${estudiante.nombre}</td>
+              <td>${estudiante.materia || "N/A"}</td>
+              <td>
+                <span class="badge bg-primary fs-6">${estudiante.total_prestamos}</span>
+              </td>
+            </tr>
+          `).join("") : "<tr><td colspan=\"5\" class=\"text-center\">No se encontraron estudiantes</td></tr>"}
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  document.getElementById("contenido-reporte").innerHTML = contenido;
+}
+
+function mostrarReporteDocentes(data) {
+  const contenido = `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="alert alert-info">
+          <strong>Total de docentes:</strong> ${data.total_docentes}
+        </div>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th>Ranking</th>
+            <th>Docente</th>
+            <th>Número de Préstamos</th>
+            <th>Total Productos</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.docentes.length > 0 ? data.docentes.map((docente, index) => `
+            <tr ${index < 3 ? "class=\"table-warning\"" : ""}>
+              <td>
+                <strong>#${index + 1}</strong>
+                ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
+              </td>
+              <td>${docente.nombre}</td>
+              <td>
+                <span class="badge bg-info">${docente.numero_prestamos}</span>
+              </td>
+              <td>
+                <span class="badge bg-primary fs-6">${docente.total_productos}</span>
+              </td>
+            </tr>
+          `).join("") : "<tr><td colspan=\"4\" class=\"text-center\">No se encontraron docentes</td></tr>"}
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  document.getElementById("contenido-reporte").innerHTML = contenido;
+}
+
+function mostrarReporteMaterias(data) {
+  const contenido = `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="alert alert-info">
+          <strong>Total de materias:</strong> ${data.total_materias}
+        </div>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th>Ranking</th>
+            <th>Materia</th>
+            <th>Docente</th>
+            <th>Número de Préstamos</th>
+            <th>Total Productos</th>
+            <th>Estudiantes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.materias.length > 0 ? data.materias.map((materia, index) => `
+            <tr ${index < 3 ? "class=\"table-warning\"" : ""}>
+              <td>
+                <strong>#${index + 1}</strong>
+                ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
+              </td>
+              <td>${materia.materia}</td>
+              <td>${materia.docente || "N/A"}</td>
+              <td>
+                <span class="badge bg-info">${materia.numero_prestamos}</span>
+              </td>
+              <td>
+                <span class="badge bg-primary fs-6">${materia.total_productos}</span>
+              </td>
+              <td>
+                <span class="badge bg-success">${materia.numero_estudiantes}</span>
+              </td>
+            </tr>
+          `).join("") : "<tr><td colspan=\"6\" class=\"text-center\">No se encontraron materias</td></tr>"}
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  document.getElementById("contenido-reporte").innerHTML = contenido;
+}
+
+function mostrarReporteProductos(data) {
+  const contenido = `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="alert alert-info">
+          <strong>Top ${data.limite_aplicado} productos más solicitados</strong> 
+          (Total encontrados: ${data.total_productos})
+        </div>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th>Ranking</th>
+            <th>Código</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Total Solicitado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.productos.length > 0 ? data.productos.map((producto, index) => `
+            <tr ${index < 3 ? "class=\"table-warning\"" : ""}>
+              <td>
+                <strong>#${index + 1}</strong>
+                ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
+              </td>
+              <td><code>${producto.codigo}</code></td>
+              <td>${producto.nombre}</td>
+              <td><span class="badge bg-secondary">${producto.categoria}</span></td>
+              <td>
+                <span class="badge bg-primary fs-6">${producto.total_solicitado}</span>
+              </td>
+            </tr>
+          `).join("") : "<tr><td colspan=\"5\" class=\"text-center\">No se encontraron productos</td></tr>"}
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  document.getElementById("contenido-reporte").innerHTML = contenido;
+}
+
+function mostrarCargandoReporte() {
+  document.getElementById("contenido-reporte").innerHTML = `
+    <div class="text-center p-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Generando reporte...</span>
+      </div>
+      <p class="mt-3">Generando reporte...</p>
+    </div>
+  `;
+}
+
+function mostrarErrorReporte(mensaje) {
+  document.getElementById("contenido-reporte").innerHTML = `
+    <div class="alert alert-danger">
+      <strong>Error:</strong> ${mensaje}
+    </div>
+  `;
+}
+
+function actualizarTituloReporte(titulo) {
+  document.getElementById("titulo-reporte").textContent = titulo;
+}
+
+function activarBotonReporte(indice) {
+  const botones = document.querySelectorAll("#reportes-section .btn-group .btn");
+  botones.forEach((btn, i) => {
+    if (i === indice) {
+      btn.classList.remove("btn-outline-primary");
+      btn.classList.add("btn-primary", "active");
+    } else {
+      btn.classList.remove("btn-primary", "active");
+      btn.classList.add("btn-outline-primary");
+    }
+  });
+}
+
+function formatearFechaReporte(fecha) {
+  return new Date(fecha).toLocaleDateString("es-CO", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function obtenerClaseEstadoReporte(estado) {
+  switch (estado) {
+    case "prestado": return "bg-warning";
+    case "devuelto": return "bg-success";
+    case "vencido": return "bg-danger";
+    default: return "bg-secondary";
+  }
+}
+
+function exportarReportePDF() {
+  mostrarNotificacion("Exportación a PDF", "Funcionalidad en desarrollo", "info");
+}
+
+function exportarReporteExcel() {
+  mostrarNotificacion("Exportación a Excel", "Funcionalidad en desarrollo", "info");
 }

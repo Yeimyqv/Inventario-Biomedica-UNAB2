@@ -405,6 +405,295 @@ def importar_inventario():
     except Exception as e:
         return jsonify({'error': f'Error al importar inventario: {str(e)}'}), 500
 
+# ======= APIs DE REPORTES PARA LABORATORISTA =======
+
+@app.route('/api/reportes/prestamos', methods=['GET'])
+def reporte_prestamos():
+    """Reporte de préstamos realizados con filtros."""
+    try:
+        # Obtener parámetros de filtro
+        fecha_inicio = request.args.get('fecha_inicio')
+        fecha_fin = request.args.get('fecha_fin')
+        tipo_usuario = request.args.get('tipo_usuario')
+        materia = request.args.get('materia')
+        elemento_id = request.args.get('elemento_id')
+        
+        # Construir consulta base
+        query = db.session.query(Prestamo).join(Usuario).join(Elemento)
+        
+        # Aplicar filtros de fecha
+        if fecha_inicio:
+            query = query.filter(Prestamo.fecha_prestamo >= datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        if fecha_fin:
+            query = query.filter(Prestamo.fecha_prestamo <= datetime.strptime(fecha_fin, '%Y-%m-%d'))
+        
+        # Aplicar filtros adicionales
+        if tipo_usuario:
+            query = query.filter(Usuario.tipo == tipo_usuario)
+        if materia:
+            query = query.filter(Usuario.materia.ilike(f'%{materia}%'))
+        if elemento_id:
+            query = query.filter(Prestamo.elemento_id == elemento_id)
+        
+        prestamos = query.all()
+        
+        # Preparar respuesta
+        resultado = {
+            'total_prestamos': len(prestamos),
+            'prestamos': [prestamo.to_dict() for prestamo in prestamos],
+            'filtros_aplicados': {
+                'fecha_inicio': fecha_inicio,
+                'fecha_fin': fecha_fin,
+                'tipo_usuario': tipo_usuario,
+                'materia': materia,
+                'elemento_id': elemento_id
+            }
+        }
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({'error': f'Error generando reporte de préstamos: {str(e)}'}), 500
+
+@app.route('/api/reportes/estudiantes', methods=['GET'])
+def reporte_estudiantes():
+    """Reporte de número de préstamos por estudiante."""
+    try:
+        fecha_inicio = request.args.get('fecha_inicio')
+        fecha_fin = request.args.get('fecha_fin')
+        buscar_estudiante = request.args.get('buscar_estudiante')
+        
+        # Consulta para contar préstamos por estudiante
+        query = db.session.query(
+            Usuario.id,
+            Usuario.nombre,
+            Usuario.identificacion,
+            Usuario.materia,
+            Usuario.docente,
+            db.func.count(Prestamo.id).label('total_prestamos')
+        ).join(Prestamo).filter(Usuario.tipo == 'estudiante')
+        
+        # Aplicar filtros de fecha
+        if fecha_inicio:
+            query = query.filter(Prestamo.fecha_prestamo >= datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        if fecha_fin:
+            query = query.filter(Prestamo.fecha_prestamo <= datetime.strptime(fecha_fin, '%Y-%m-%d'))
+        
+        # Filtro de búsqueda de estudiante
+        if buscar_estudiante:
+            query = query.filter(
+                db.or_(
+                    Usuario.nombre.ilike(f'%{buscar_estudiante}%'),
+                    Usuario.identificacion.ilike(f'%{buscar_estudiante}%')
+                )
+            )
+        
+        estudiantes = query.group_by(Usuario.id).order_by(db.desc('total_prestamos')).all()
+        
+        resultado = {
+            'total_estudiantes': len(estudiantes),
+            'estudiantes': [
+                {
+                    'id': est.id,
+                    'nombre': est.nombre,
+                    'identificacion': est.identificacion,
+                    'materia': est.materia,
+                    'docente': est.docente,
+                    'total_prestamos': est.total_prestamos
+                }
+                for est in estudiantes
+            ]
+        }
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({'error': f'Error generando reporte de estudiantes: {str(e)}'}), 500
+
+@app.route('/api/reportes/docentes', methods=['GET'])
+def reporte_docentes():
+    """Reporte de docentes que más utilizaron insumos."""
+    try:
+        fecha_inicio = request.args.get('fecha_inicio')
+        fecha_fin = request.args.get('fecha_fin')
+        
+        # Consulta para docentes con préstamos directos
+        query_docentes = db.session.query(
+            Usuario.id,
+            Usuario.nombre,
+            Usuario.identificacion,
+            db.func.count(Prestamo.id).label('numero_prestamos'),
+            db.func.sum(Prestamo.cantidad).label('total_productos')
+        ).join(Prestamo).filter(Usuario.tipo == 'docente')
+        
+        # Consulta para docentes a través de estudiantes
+        query_estudiantes = db.session.query(
+            Usuario.docente.label('nombre_docente'),
+            db.func.count(Prestamo.id).label('numero_prestamos'),
+            db.func.sum(Prestamo.cantidad).label('total_productos')
+        ).join(Prestamo).filter(
+            Usuario.tipo == 'estudiante',
+            Usuario.docente.isnot(None)
+        )
+        
+        # Aplicar filtros de fecha a ambas consultas
+        if fecha_inicio:
+            fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+            query_docentes = query_docentes.filter(Prestamo.fecha_prestamo >= fecha_inicio_dt)
+            query_estudiantes = query_estudiantes.filter(Prestamo.fecha_prestamo >= fecha_inicio_dt)
+        if fecha_fin:
+            fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
+            query_docentes = query_docentes.filter(Prestamo.fecha_prestamo <= fecha_fin_dt)
+            query_estudiantes = query_estudiantes.filter(Prestamo.fecha_prestamo <= fecha_fin_dt)
+        
+        docentes_directos = query_docentes.group_by(Usuario.id).all()
+        docentes_estudiantes = query_estudiantes.group_by(Usuario.docente).all()
+        
+        # Combinar resultados
+        ranking_docentes = {}
+        
+        # Agregar préstamos directos de docentes
+        for doc in docentes_directos:
+            ranking_docentes[doc.nombre] = {
+                'nombre': doc.nombre,
+                'identificacion': doc.identificacion,
+                'numero_prestamos': doc.numero_prestamos,
+                'total_productos': doc.total_productos,
+                'tipo': 'directo'
+            }
+        
+        # Agregar préstamos a través de estudiantes
+        for doc in docentes_estudiantes:
+            if doc.nombre_docente in ranking_docentes:
+                ranking_docentes[doc.nombre_docente]['numero_prestamos'] += doc.numero_prestamos
+                ranking_docentes[doc.nombre_docente]['total_productos'] += doc.total_productos
+                ranking_docentes[doc.nombre_docente]['tipo'] = 'mixto'
+            else:
+                ranking_docentes[doc.nombre_docente] = {
+                    'nombre': doc.nombre_docente,
+                    'identificacion': 'N/A',
+                    'numero_prestamos': doc.numero_prestamos,
+                    'total_productos': doc.total_productos,
+                    'tipo': 'estudiantes'
+                }
+        
+        # Ordenar por total de productos
+        docentes_ordenados = sorted(
+            ranking_docentes.values(),
+            key=lambda x: x['total_productos'],
+            reverse=True
+        )
+        
+        resultado = {
+            'total_docentes': len(docentes_ordenados),
+            'docentes': docentes_ordenados
+        }
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({'error': f'Error generando reporte de docentes: {str(e)}'}), 500
+
+@app.route('/api/reportes/materias', methods=['GET'])
+def reporte_materias():
+    """Reporte de materias con mayor uso de insumos."""
+    try:
+        fecha_inicio = request.args.get('fecha_inicio')
+        fecha_fin = request.args.get('fecha_fin')
+        docente_filtro = request.args.get('docente')
+        
+        query = db.session.query(
+            Usuario.materia,
+            Usuario.docente,
+            db.func.count(Prestamo.id).label('numero_prestamos'),
+            db.func.sum(Prestamo.cantidad).label('total_productos'),
+            db.func.count(db.distinct(Usuario.id)).label('numero_estudiantes')
+        ).join(Prestamo).filter(
+            Usuario.tipo == 'estudiante',
+            Usuario.materia.isnot(None)
+        )
+        
+        # Aplicar filtros
+        if fecha_inicio:
+            query = query.filter(Prestamo.fecha_prestamo >= datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        if fecha_fin:
+            query = query.filter(Prestamo.fecha_prestamo <= datetime.strptime(fecha_fin, '%Y-%m-%d'))
+        if docente_filtro:
+            query = query.filter(Usuario.docente.ilike(f'%{docente_filtro}%'))
+        
+        materias = query.group_by(Usuario.materia, Usuario.docente).order_by(db.desc('total_productos')).all()
+        
+        resultado = {
+            'total_materias': len(materias),
+            'materias': [
+                {
+                    'materia': mat.materia,
+                    'docente': mat.docente,
+                    'numero_prestamos': mat.numero_prestamos,
+                    'total_productos': mat.total_productos,
+                    'numero_estudiantes': mat.numero_estudiantes
+                }
+                for mat in materias
+            ]
+        }
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({'error': f'Error generando reporte de materias: {str(e)}'}), 500
+
+@app.route('/api/reportes/productos', methods=['GET'])
+def reporte_productos():
+    """Reporte de productos más solicitados."""
+    try:
+        fecha_inicio = request.args.get('fecha_inicio')
+        fecha_fin = request.args.get('fecha_fin')
+        materia_filtro = request.args.get('materia')
+        tipo_usuario = request.args.get('tipo_usuario')
+        limite = int(request.args.get('limite', 10))
+        
+        query = db.session.query(
+            Elemento.id,
+            Elemento.nombre,
+            Elemento.codigo,
+            Categoria.nombre.label('categoria'),
+            db.func.count(Prestamo.id).label('numero_prestamos'),
+            db.func.sum(Prestamo.cantidad).label('total_solicitado')
+        ).join(Prestamo).join(Usuario).join(Categoria)
+        
+        # Aplicar filtros
+        if fecha_inicio:
+            query = query.filter(Prestamo.fecha_prestamo >= datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        if fecha_fin:
+            query = query.filter(Prestamo.fecha_prestamo <= datetime.strptime(fecha_fin, '%Y-%m-%d'))
+        if materia_filtro:
+            query = query.filter(Usuario.materia.ilike(f'%{materia_filtro}%'))
+        if tipo_usuario:
+            query = query.filter(Usuario.tipo == tipo_usuario)
+        
+        productos = query.group_by(Elemento.id, Categoria.nombre).order_by(db.desc('total_solicitado')).limit(limite).all()
+        
+        resultado = {
+            'total_productos': len(productos),
+            'limite_aplicado': limite,
+            'productos': [
+                {
+                    'id': prod.id,
+                    'nombre': prod.nombre,
+                    'codigo': prod.codigo,
+                    'categoria': prod.categoria,
+                    'numero_prestamos': prod.numero_prestamos,
+                    'total_solicitado': prod.total_solicitado
+                }
+                for prod in productos
+            ]
+        }
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({'error': f'Error generando reporte de productos: {str(e)}'}), 500
+
 # Punto de entrada
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

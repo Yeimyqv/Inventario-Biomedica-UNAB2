@@ -2393,19 +2393,19 @@ function mostrarModuloReportes() {
       <div class="row mb-4">
         <div class="col-12">
           <div class="btn-group w-100" role="group">
-            <button type="button" class="btn btn-primary active" onclick="generarReportePrestamos()">
+            <button type="button" class="btn btn-success active" onclick="generarReportePrestamos()">
               Préstamos Realizados
             </button>
-            <button type="button" class="btn btn-outline-primary" onclick="generarReporteEstudiantes()">
+            <button type="button" class="btn btn-outline-success" onclick="generarReporteEstudiantes()">
               Ranking Estudiantes
             </button>
-            <button type="button" class="btn btn-outline-primary" onclick="generarReporteDocentes()">
+            <button type="button" class="btn btn-outline-success" onclick="generarReporteDocentes()">
               Ranking Docentes
             </button>
-            <button type="button" class="btn btn-outline-primary" onclick="generarReporteMaterias()">
+            <button type="button" class="btn btn-outline-success" onclick="generarReporteMaterias()">
               Ranking Materias
             </button>
-            <button type="button" class="btn btn-outline-primary" onclick="generarReporteProductos()">
+            <button type="button" class="btn btn-outline-success" onclick="generarReporteProductos()">
               Productos Más Solicitados
             </button>
           </div>
@@ -2821,7 +2821,7 @@ function mostrarReporteProductos(data) {
 function mostrarCargandoReporte() {
   document.getElementById("contenido-reporte").innerHTML = `
     <div class="text-center p-5">
-      <div class="spinner-border text-primary" role="status">
+      <div class="spinner-border text-success" role="status">
         <span class="visually-hidden">Generando reporte...</span>
       </div>
       <p class="mt-3">Generando reporte...</p>
@@ -2845,11 +2845,11 @@ function activarBotonReporte(indice) {
   const botones = document.querySelectorAll("#reportes-section .btn-group .btn");
   botones.forEach((btn, i) => {
     if (i === indice) {
-      btn.classList.remove("btn-outline-primary");
-      btn.classList.add("btn-primary", "active");
+      btn.classList.remove("btn-outline-success");
+      btn.classList.add("btn-success", "active");
     } else {
-      btn.classList.remove("btn-primary", "active");
-      btn.classList.add("btn-outline-primary");
+      btn.classList.remove("btn-success", "active");
+      btn.classList.add("btn-outline-success");
     }
   });
 }

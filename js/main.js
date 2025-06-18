@@ -2383,11 +2383,17 @@ function mostrarModuloReportes() {
                   <label for="materia-filtro" class="form-label">Materia:</label>
                   <select class="form-select" id="materia-filtro">
                     <option value="">Todas las materias</option>
-                    <option value="Bioinstrumentación I">Bioinstrumentación I</option>
-                    <option value="Bioinstrumentación II">Bioinstrumentación II</option>
-                    <option value="Diseño de Dispositivos Médicos">Diseño de Dispositivos Médicos</option>
-                    <option value="Procesamiento de Señales">Procesamiento de Señales</option>
-                    <option value="Sistemas Embebidos">Sistemas Embebidos</option>
+                    <option value="Tele-Robótica">Tele-Robótica</option>
+                    <option value="Instrumentación">Instrumentación</option>
+                    <option value="Electrónica análoga">Electrónica análoga</option>
+                    <option value="Electrónica de potencia">Electrónica de potencia</option>
+                    <option value="Sistemas embebidos">Sistemas embebidos</option>
+                    <option value="Sistemas digitales">Sistemas digitales</option>
+                    <option value="Proyecto Integrador">Proyecto Integrador</option>
+                    <option value="Proyecto de grado">Proyecto de grado</option>
+                    <option value="Circuitos eléctricos">Circuitos eléctricos</option>
+                    <option value="Biomecánica clínica">Biomecánica clínica</option>
+                    <option value="Procesamiento de señales">Procesamiento de señales</option>
                   </select>
                 </div>
               </div>
@@ -2482,8 +2488,37 @@ function mostrarModuloReportes() {
   // Mostrar la sección
   reportesSection.style.display = "block";
   
-  // Cargar reporte de préstamos por defecto
-  setTimeout(() => generarReportePrestamos(), 100);
+  // Configurar aplicación automática de filtros
+  setTimeout(() => {
+    // Agregar eventos para aplicar filtros automáticamente
+    const filtros = ['fecha-inicio-reporte', 'fecha-fin-reporte', 'tipo-usuario-filtro', 'materia-filtro', 'docente-filtro', 'limite-productos'];
+    filtros.forEach(filtroId => {
+      const elemento = document.getElementById(filtroId);
+      if (elemento) {
+        elemento.addEventListener('change', () => {
+          // Aplicar filtros automáticamente cuando cambie cualquier valor
+          setTimeout(() => {
+            const botones = document.querySelectorAll('#reportes-section .btn-group .btn');
+            botones.forEach((btn, index) => {
+              if (btn.classList.contains('active')) {
+                // Regenerar el reporte activo
+                switch(index) {
+                  case 0: generarReportePrestamos(); break;
+                  case 1: generarReporteEstudiantes(); break;
+                  case 2: generarReporteDocentes(); break;
+                  case 3: generarReporteMaterias(); break;
+                  case 4: generarReporteProductos(); break;
+                }
+              }
+            });
+          }, 100);
+        });
+      }
+    });
+    
+    // Cargar reporte de préstamos por defecto
+    generarReportePrestamos();
+  }, 200);
 }
 
 async function generarReportePrestamos() {

@@ -2334,12 +2334,12 @@ function mostrarModuloReportes() {
     reportesSection.className = "container-fluid p-4";
     reportesSection.style.display = "none";
     
-    // Configurar fechas por defecto (último mes)
+    // Configurar fechas por defecto (últimos 30 días)
     const hoy = new Date();
-    const haceUnMes = new Date();
-    haceUnMes.setMonth(haceUnMes.getMonth() - 1);
+    const hace30Dias = new Date();
+    hace30Dias.setDate(hace30Dias.getDate() - 30);
     
-    const fechaInicio = haceUnMes.toISOString().split("T")[0];
+    const fechaInicio = hace30Dias.toISOString().split("T")[0];
     const fechaFin = hoy.toISOString().split("T")[0];
     
     reportesSection.innerHTML = `

@@ -2381,7 +2381,46 @@ function mostrarModuloReportes() {
                 </div>
                 <div class="col-md-3 mb-3">
                   <label for="materia-filtro" class="form-label">Materia:</label>
-                  <input type="text" class="form-control" id="materia-filtro" placeholder="Filtrar por materia">
+                  <select class="form-select" id="materia-filtro">
+                    <option value="">Todas las materias</option>
+                    <option value="Bioinstrumentación I">Bioinstrumentación I</option>
+                    <option value="Bioinstrumentación II">Bioinstrumentación II</option>
+                    <option value="Diseño de Dispositivos Médicos">Diseño de Dispositivos Médicos</option>
+                    <option value="Procesamiento de Señales">Procesamiento de Señales</option>
+                    <option value="Sistemas Embebidos">Sistemas Embebidos</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="buscar-estudiante" class="form-label">Buscar Estudiante:</label>
+                  <input type="text" class="form-control" id="buscar-estudiante" placeholder="Nombre o identificación">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="docente-filtro" class="form-label">Filtrar por Docente:</label>
+                  <select class="form-select" id="docente-filtro">
+                    <option value="">Todos los docentes</option>
+                    <option value="Alejandro Arboleda Carvajal">Alejandro Arboleda Carvajal</option>
+                    <option value="Carlos Julio Arizmendi Pereira">Carlos Julio Arizmendi Pereira</option>
+                    <option value="Leidy Rocío Pico Martínez">Leidy Rocío Pico Martínez</option>
+                    <option value="Luis Felipe Buitrago Castro">Luis Felipe Buitrago Castro</option>
+                    <option value="Lusvin Javier Amado Forero">Lusvin Javier Amado Forero</option>
+                    <option value="Mario Fernando Morales Cordero">Mario Fernando Morales Cordero</option>
+                    <option value="Mateo Escobar Jaramillo">Mateo Escobar Jaramillo</option>
+                    <option value="Nayibe Chio Cho">Nayibe Chio Cho</option>
+                    <option value="Víctor Alfonso Solarte David">Víctor Alfonso Solarte David</option>
+                    <option value="William Alexander Salamanca Becerra">William Alexander Salamanca Becerra</option>
+                    <option value="Yeimy Liseth Quintana Villamizar">Yeimy Liseth Quintana Villamizar</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="limite-productos" class="form-label">Límite de Productos:</label>
+                  <select class="form-select" id="limite-productos">
+                    <option value="5">Top 5</option>
+                    <option value="10" selected>Top 10</option>
+                    <option value="20">Top 20</option>
+                    <option value="50">Top 50</option>
+                  </select>
                 </div>
               </div>
             </div>

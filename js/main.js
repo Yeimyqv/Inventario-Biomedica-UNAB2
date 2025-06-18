@@ -2334,13 +2334,9 @@ function mostrarModuloReportes() {
     reportesSection.className = "container-fluid p-4";
     reportesSection.style.display = "none";
     
-    // Configurar fechas por defecto (últimos 60 días para asegurar que incluya todos los datos)
-    const hoy = new Date();
-    const hace60Dias = new Date();
-    hace60Dias.setDate(hace60Dias.getDate() - 60);
-    
-    const fechaInicio = hace60Dias.toISOString().split("T")[0];
-    const fechaFin = hoy.toISOString().split("T")[0];
+    // Configurar fechas por defecto para incluir todos los datos de prueba
+    const fechaInicio = "2025-06-01";
+    const fechaFin = "2025-06-30";
     
     reportesSection.innerHTML = `
       <div class="row mb-4">

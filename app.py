@@ -150,10 +150,108 @@ with app.app_context():
         except Exception as e:
             print(f"Error creando usuarios del sistema: {str(e)}")
     
+    def crear_prestamos_de_prueba():
+        """Crear préstamos de prueba si no existen en la base de datos."""
+        try:
+            from models import Prestamo
+            
+            # Verificar si ya hay préstamos en la base de datos
+            prestamos_count = Prestamo.query.count()
+            
+            if prestamos_count == 0:
+                print("Creando préstamos de prueba...")
+                
+                # Obtener usuarios de estudiantes reales que existen
+                estudiantes_reales = [
+                    'U00054496', 'U00062931', 'U00092674', 'U00097909', 'U00098538',
+                    'U00101887', 'U00101916', 'U00111973', 'U00115436', 'U00117595',
+                    'U00118399', 'U00120120', 'U00122102', 'U00122174', 'U00123283',
+                    'U00139049', 'U00156628', 'U00160276'
+                ]
+                
+                estudiantes_ids = []
+                for ident in estudiantes_reales:
+                    usuario = Usuario.query.filter_by(identificacion=ident).first()
+                    if usuario:
+                        estudiantes_ids.append(usuario.id)
+                
+                # Obtener docentes
+                docentes_ids = [u.id for u in Usuario.query.filter_by(tipo='docente').all()[:5]]
+                
+                # Obtener elementos disponibles
+                elementos_disponibles = [e.id for e in Elemento.query.filter(Elemento.cantidad > 0).limit(15).all()]
+                
+                if len(estudiantes_ids) >= 10 and len(docentes_ids) >= 3 and len(elementos_disponibles) >= 10:
+                    from datetime import datetime
+                    
+                    # Crear 30 préstamos con datos realistas
+                    prestamos_data = [
+                        # Préstamos recientes - junio 2025
+                        (elementos_disponibles[0], estudiantes_ids[0], 1, datetime(2025, 6, 18), None, 'prestado', 'Laboratorio Instrumentación - Amplificadores'),
+                        (elementos_disponibles[1], estudiantes_ids[1], 1, datetime(2025, 6, 17), None, 'prestado', 'Proyecto de grado - Dispositivo ECG'),
+                        (elementos_disponibles[2], estudiantes_ids[2], 2, datetime(2025, 6, 16), datetime(2025, 6, 18), 'devuelto', 'Laboratorio Instrumentación - Filtros'),
+                        (elementos_disponibles[3], estudiantes_ids[3], 1, datetime(2025, 6, 15), None, 'prestado', 'Sistemas embebidos - Sensor temperatura'),
+                        (elementos_disponibles[4], estudiantes_ids[4], 1, datetime(2025, 6, 14), None, 'prestado', 'Procesamiento señales - Amplificador'),
+                        (elementos_disponibles[5], estudiantes_ids[5], 1, datetime(2025, 6, 13), datetime(2025, 6, 17), 'devuelto', 'Electrónica análoga - PWM'),
+                        (elementos_disponibles[6], estudiantes_ids[6], 2, datetime(2025, 6, 12), None, 'prestado', 'Proyecto de grado - Amplificador'),
+                        (elementos_disponibles[7], estudiantes_ids[7], 1, datetime(2025, 6, 11), None, 'prestado', 'Sistemas embebidos - Display LCD'),
+                        (elementos_disponibles[8], estudiantes_ids[8], 1, datetime(2025, 6, 10), datetime(2025, 6, 15), 'devuelto', 'Instrumentación - Amplificador operacional'),
+                        (elementos_disponibles[9], estudiantes_ids[9], 1, datetime(2025, 6, 9), None, 'prestado', 'Procesamiento señales - ADC'),
+                        
+                        # Préstamos de docentes
+                        (elementos_disponibles[10], docentes_ids[0], 3, datetime(2025, 6, 8), datetime(2025, 6, 16), 'devuelto', 'Preparación clase Instrumentación'),
+                        (elementos_disponibles[11], docentes_ids[1], 2, datetime(2025, 6, 7), None, 'prestado', 'Investigación dispositivos biomédicos'),
+                        (elementos_disponibles[12], docentes_ids[2], 1, datetime(2025, 6, 6), datetime(2025, 6, 14), 'devuelto', 'Demo amplificadores clase'),
+                        (elementos_disponibles[13], docentes_ids[3] if len(docentes_ids) > 3 else docentes_ids[0], 2, datetime(2025, 6, 5), None, 'prestado', 'Proyecto investigación colaborativa'),
+                        (elementos_disponibles[14], docentes_ids[4] if len(docentes_ids) > 4 else docentes_ids[1], 1, datetime(2025, 6, 4), None, 'prestado', 'Tesis dirigida maestría'),
+                        
+                        # Más préstamos de estudiantes - junio
+                        (elementos_disponibles[0], estudiantes_ids[10], 1, datetime(2025, 6, 3), datetime(2025, 6, 12), 'devuelto', 'Electrónica de potencia - Rectificador'),
+                        (elementos_disponibles[1], estudiantes_ids[11], 1, datetime(2025, 6, 2), None, 'prestado', 'Sistemas digitales - Contador'),
+                        (elementos_disponibles[2], estudiantes_ids[12], 2, datetime(2025, 6, 1), datetime(2025, 6, 10), 'devuelto', 'Proyecto Integrador - Biosensor'),
+                        (elementos_disponibles[3], estudiantes_ids[13], 1, datetime(2025, 5, 31), None, 'prestado', 'Tele-Robótica - Control remoto'),
+                        (elementos_disponibles[4], estudiantes_ids[14], 1, datetime(2025, 5, 30), datetime(2025, 6, 8), 'devuelto', 'Circuitos eléctricos - Análisis AC'),
+                        
+                        # Préstamos de mayo 2025
+                        (elementos_disponibles[5], estudiantes_ids[15], 1, datetime(2025, 5, 29), None, 'prestado', 'Biomecánica clínica - Acelerómetro'),
+                        (elementos_disponibles[6], estudiantes_ids[16], 1, datetime(2025, 5, 28), None, 'prestado', 'Electrónica análoga - Buffer'),
+                        (elementos_disponibles[7], estudiantes_ids[17], 1, datetime(2025, 5, 27), datetime(2025, 6, 5), 'devuelto', 'Sistemas digitales - Interfaz serie'),
+                        (elementos_disponibles[8], estudiantes_ids[0], 1, datetime(2025, 5, 26), datetime(2025, 6, 3), 'devuelto', 'Segunda práctica Instrumentación'),
+                        (elementos_disponibles[9], estudiantes_ids[1], 1, datetime(2025, 5, 25), None, 'prestado', 'Continuación proyecto de grado'),
+                        (elementos_disponibles[10], estudiantes_ids[2], 1, datetime(2025, 5, 24), datetime(2025, 5, 30), 'devuelto', 'Práctica inicial Instrumentación'),
+                        (elementos_disponibles[11], estudiantes_ids[3], 2, datetime(2025, 5, 23), datetime(2025, 5, 31), 'devuelto', 'Primer proyecto sistemas embebidos'),
+                        (elementos_disponibles[12], estudiantes_ids[4], 1, datetime(2025, 5, 22), datetime(2025, 6, 1), 'devuelto', 'Análisis señales básico'),
+                        (elementos_disponibles[13], estudiantes_ids[5], 1, datetime(2025, 5, 21), datetime(2025, 6, 2), 'devuelto', 'Introducción electrónica análoga'),
+                        (elementos_disponibles[14], estudiantes_ids[6], 1, datetime(2025, 5, 20), datetime(2025, 6, 3), 'devuelto', 'Primer acercamiento proyecto grado')
+                    ]
+                    
+                    for elemento_id, usuario_id, cantidad, fecha_prestamo, fecha_devolucion, estado, observaciones in prestamos_data:
+                        prestamo = Prestamo(
+                            elemento_id=elemento_id,
+                            usuario_id=usuario_id,
+                            cantidad=cantidad,
+                            fecha_prestamo=fecha_prestamo,
+                            fecha_devolucion_real=fecha_devolucion,
+                            estado=estado,
+                            observaciones=observaciones
+                        )
+                        db.session.add(prestamo)
+                    
+                    db.session.commit()
+                    print(f"Creados {len(prestamos_data)} préstamos de prueba")
+                else:
+                    print(f"Datos insuficientes: {len(estudiantes_ids)} estudiantes, {len(docentes_ids)} docentes, {len(elementos_disponibles)} elementos")
+            else:
+                print(f"Ya existen {prestamos_count} préstamos en la base de datos")
+        
+        except Exception as e:
+            print(f"Error creando préstamos de prueba: {e}")
+    
     # Cargar datos iniciales
     cargar_inventario_inicial()
     cargar_estudiantes_iniciales()
     inicializar_usuarios_sistema()
+    crear_prestamos_de_prueba()
 
 # Rutas para archivos estáticos
 @app.route('/')

@@ -2975,8 +2975,7 @@ function mostrarReporteProductos(data) {
   generarGraficoProductos(data);
 }
 
-// Variable global para almacenar la instancia del gráfico actual
-let currentChart = null;
+// Variable global para gráficos (declarada más abajo)
 
 // Función para cambiar entre vistas de reporte
 function cambiarVistaReporte(vista) {

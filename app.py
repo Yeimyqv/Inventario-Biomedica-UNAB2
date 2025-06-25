@@ -782,7 +782,6 @@ def reporte_productos():
         query = db.session.query(
             Elemento.id,
             Elemento.nombre,
-            Elemento.codigo,
             Categoria.nombre.label('categoria'),
             db.func.count(Prestamo.id).label('numero_prestamos'),
             db.func.sum(Prestamo.cantidad).label('total_solicitado')
@@ -807,7 +806,6 @@ def reporte_productos():
                 {
                     'id': prod.id,
                     'nombre': prod.nombre,
-                    'codigo': prod.codigo,
                     'categoria': prod.categoria,
                     'numero_prestamos': prod.numero_prestamos,
                     'total_solicitado': prod.total_solicitado

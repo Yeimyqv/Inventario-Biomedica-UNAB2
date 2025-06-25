@@ -2904,9 +2904,8 @@ function mostrarReporteProductos(data) {
         <thead>
           <tr>
             <th>Ranking</th>
-            <th>Código</th>
-            <th>Producto</th>
             <th>Categoría</th>
+            <th>Elemento</th>
             <th>Total Solicitado</th>
           </tr>
         </thead>
@@ -2917,14 +2916,13 @@ function mostrarReporteProductos(data) {
                 <strong>#${index + 1}</strong>
                 ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
               </td>
-              <td><code>${producto.codigo}</code></td>
-              <td>${producto.nombre}</td>
               <td><span class="badge bg-secondary">${producto.categoria}</span></td>
+              <td>${producto.nombre}</td>
               <td>
                 <span class="badge bg-primary fs-6">${producto.total_solicitado}</span>
               </td>
             </tr>
-          `).join("") : "<tr><td colspan=\"5\" class=\"text-center\">No se encontraron productos</td></tr>"}
+          `).join("") : "<tr><td colspan=\"4\" class=\"text-center\">No se encontraron productos</td></tr>"}
         </tbody>
       </table>
     </div>

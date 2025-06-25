@@ -2808,8 +2808,9 @@ function mostrarReporteDocentes(data) {
           <tr>
             <th>Ranking</th>
             <th>Docente</th>
+            <th>Correo</th>
             <th>Número de Préstamos</th>
-            <th>Total Productos</th>
+            <th>Número de Productos</th>
           </tr>
         </thead>
         <tbody>
@@ -2820,6 +2821,7 @@ function mostrarReporteDocentes(data) {
                 ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
               </td>
               <td>${docente.nombre}</td>
+              <td>${docente.correo || '-'}</td>
               <td>
                 <span class="badge bg-info">${docente.numero_prestamos}</span>
               </td>
@@ -2827,7 +2829,7 @@ function mostrarReporteDocentes(data) {
                 <span class="badge bg-primary fs-6">${docente.total_productos}</span>
               </td>
             </tr>
-          `).join("") : "<tr><td colspan=\"4\" class=\"text-center\">No se encontraron docentes</td></tr>"}
+          `).join("") : "<tr><td colspan=\"5\" class=\"text-center\">No se encontraron docentes</td></tr>"}
         </tbody>
       </table>
     </div>

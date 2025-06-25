@@ -647,6 +647,7 @@ def reporte_docentes():
             Usuario.id,
             Usuario.nombre,
             Usuario.identificacion,
+            Usuario.correo,
             db.func.count(Prestamo.id).label('numero_prestamos'),
             db.func.sum(Prestamo.cantidad).label('total_productos')
         ).join(Prestamo).filter(Usuario.tipo == 'docente')
@@ -682,6 +683,7 @@ def reporte_docentes():
             ranking_docentes[doc.nombre] = {
                 'nombre': doc.nombre,
                 'identificacion': doc.identificacion,
+                'correo': doc.correo,
                 'numero_prestamos': doc.numero_prestamos,
                 'total_productos': doc.total_productos,
                 'tipo': 'directo'

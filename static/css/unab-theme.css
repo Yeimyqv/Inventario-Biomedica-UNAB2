@@ -213,45 +213,103 @@ body {
   background: var(--unab-gray);
 }
 
-/* Reportes Module Button Overrides - Manteniendo consistencia con el esquema verde UNAB */
+/* Reportes Module Button Overrides - Forzando consistencia con el esquema verde UNAB */
+/* Usar selectores más específicos para garantizar que tomen precedencia */
+
+/* Botones outline success - estado normal */
+#reportes-section .btn-outline-success,
 .btn-outline-success {
-  border-color: var(--unab-primary) !important;
-  color: var(--unab-primary) !important;
+  border-color: #45d509 !important;
+  color: #45d509 !important;
   background-color: transparent !important;
 }
 
+/* Botones outline success - estados hover/focus/active */
+#reportes-section .btn-outline-success:hover,
+#reportes-section .btn-outline-success:focus,
+#reportes-section .btn-outline-success:active,
 .btn-outline-success:hover,
 .btn-outline-success:focus,
 .btn-outline-success:active {
-  background-color: var(--unab-primary) !important;
-  border-color: var(--unab-primary) !important;
+  background-color: #45d509 !important;
+  border-color: #45d509 !important;
   color: white !important;
+  box-shadow: none !important;
 }
 
+/* Botones success - estado normal */
+#reportes-section .btn-success,
 .btn-success {
-  background-color: var(--unab-primary) !important;
-  border-color: var(--unab-primary) !important;
+  background-color: #45d509 !important;
+  border-color: #45d509 !important;
   color: white !important;
 }
 
+/* Botones success - estados hover/focus/active */
+#reportes-section .btn-success:hover,
+#reportes-section .btn-success:focus,
+#reportes-section .btn-success:active,
 .btn-success:hover,
 .btn-success:focus,
 .btn-success:active {
-  background-color: var(--unab-primary-dark) !important;
-  border-color: var(--unab-primary-dark) !important;
+  background-color: #35a507 !important;
+  border-color: #35a507 !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+
+/* Reglas específicas para el grupo de botones en reportes */
+#reportes-section .btn-group .btn {
+  border-color: #45d509 !important;
+}
+
+#reportes-section .btn-group .btn:not(.active) {
+  background-color: transparent !important;
+  color: #45d509 !important;
+}
+
+#reportes-section .btn-group .btn:not(.active):hover {
+  background-color: #45d509 !important;
   color: white !important;
 }
 
-/* Asegurar que los botones en grupo mantengan consistencia */
-.btn-group .btn-outline-success:not(.active) {
-  background-color: transparent !important;
-  border-color: var(--unab-primary) !important;
-  color: var(--unab-primary) !important;
+#reportes-section .btn-group .btn.active {
+  background-color: #45d509 !important;
+  color: white !important;
 }
 
-.btn-group .btn-outline-success:not(.active):hover {
-  background-color: var(--unab-primary) !important;
-  border-color: var(--unab-primary) !important;
+/* Forzar estilos específicos para cada botón del módulo de reportes */
+button[onclick="generarReportePrestamos()"],
+button[onclick="generarReporteEstudiantes()"],
+button[onclick="generarReporteDocentes()"],
+button[onclick="generarReporteMaterias()"],
+button[onclick="generarReporteProductos()"],
+button[onclick="exportarReportePDF()"],
+button[onclick="exportarReporteExcel()"] {
+  border-color: #45d509 !important;
+  background-color: transparent !important;
+  color: #45d509 !important;
+}
+
+button[onclick="generarReportePrestamos()"].active,
+button[onclick="generarReporteEstudiantes()"].active,
+button[onclick="generarReporteDocentes()"].active,
+button[onclick="generarReporteMaterias()"].active,
+button[onclick="generarReporteProductos()"].active {
+  background-color: #45d509 !important;
+  border-color: #45d509 !important;
+  color: white !important;
+}
+
+button[onclick="generarReportePrestamos()"]:hover,
+button[onclick="generarReporteEstudiantes()"]:hover,
+button[onclick="generarReporteDocentes()"]:hover,
+button[onclick="generarReporteMaterias()"]:hover,
+button[onclick="generarReporteProductos()"]:hover,
+button[onclick="exportarReportePDF()"]:hover,
+button[onclick="exportarReporteExcel()"]:hover {
+  background-color: #45d509 !important;
+  border-color: #45d509 !important;
   color: white !important;
 }
 

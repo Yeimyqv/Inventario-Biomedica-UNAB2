@@ -217,9 +217,12 @@ body {
 .btn-outline-success {
   border-color: var(--unab-primary) !important;
   color: var(--unab-primary) !important;
+  background-color: transparent !important;
 }
 
-.btn-outline-success:hover {
+.btn-outline-success:hover,
+.btn-outline-success:focus,
+.btn-outline-success:active {
   background-color: var(--unab-primary) !important;
   border-color: var(--unab-primary) !important;
   color: white !important;
@@ -228,11 +231,28 @@ body {
 .btn-success {
   background-color: var(--unab-primary) !important;
   border-color: var(--unab-primary) !important;
+  color: white !important;
 }
 
-.btn-success:hover {
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active {
   background-color: var(--unab-primary-dark) !important;
   border-color: var(--unab-primary-dark) !important;
+  color: white !important;
+}
+
+/* Asegurar que los botones en grupo mantengan consistencia */
+.btn-group .btn-outline-success:not(.active) {
+  background-color: transparent !important;
+  border-color: var(--unab-primary) !important;
+  color: var(--unab-primary) !important;
+}
+
+.btn-group .btn-outline-success:not(.active):hover {
+  background-color: var(--unab-primary) !important;
+  border-color: var(--unab-primary) !important;
+  color: white !important;
 }
 
 /* Footer styles */

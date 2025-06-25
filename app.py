@@ -375,6 +375,10 @@ def retornar_elemento():
     prestamo.estado = 'devuelto'
     prestamo.fecha_devolucion_real = datetime.utcnow()
     
+    # Guardar observaciones de devolución si se proporcionan
+    if 'observaciones' in data and data['observaciones']:
+        prestamo.observaciones = data['observaciones']
+    
     db.session.commit()
     
     return jsonify({

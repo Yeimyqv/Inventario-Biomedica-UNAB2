@@ -1742,22 +1742,18 @@ function registrarDevolucion(prestamoId) {
     setTimeout(() => {
       modalOverlay.remove();
       
-      // Actualizar estado del préstamo
-      prestamo.estado = 'devuelto';
-      prestamo.fecha_devolucion = new Date().toLocaleString();
-      prestamo.observaciones = observacion;
-      prestamos[index] = prestamo;
-      
-      // Actualizar inventario: devolver la cantidad al stock disponible
-      INVENTARIO.forEach(categoria => {
-        const elemento = categoria.elementos.find(e => e.id === prestamo.elemento_id);
-        if (elemento) {
-          elemento.cantidad += prestamo.cantidad;
+      // Realizar retorno usando la API
+      retornarElemento(prestamoId, observacion).then(response => {
+        if (response && response.success) {
+          // Actualizar inventario local si es necesario
+          INVENTARIO.forEach(categoria => {
+            const elemento = categoria.elementos.find(e => e.id === prestamo.elemento_id);
+            if (elemento) {
+              elemento.cantidad += prestamo.cantidad;
+            }
+          });
         }
       });
-      
-      // Guardar cambios
-      localStorage.setItem('prestamos', JSON.stringify(prestamos));
       
       // Mostrar confirmación
       mostrarNotificacion('Éxito', 'Elemento devuelto correctamente', 'success');

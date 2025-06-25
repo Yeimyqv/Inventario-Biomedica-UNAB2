@@ -149,16 +149,22 @@ async function prestarElemento(elementoId, usuarioId, cantidad) {
 }
 
 // Retornar elemento prestado
-async function retornarElemento(prestamoId) {
+async function retornarElemento(prestamoId, observaciones = null) {
   try {
+    const payload = {
+      prestamo_id: prestamoId
+    };
+    
+    if (observaciones) {
+      payload.observaciones = observaciones;
+    }
+    
     const response = await fetch('/api/retornar', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        prestamo_id: prestamoId
-      })
+      body: JSON.stringify(payload)
     });
     
     const data = await response.json();

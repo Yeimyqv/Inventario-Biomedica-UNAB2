@@ -2759,9 +2759,11 @@ function mostrarReporteEstudiantes(data) {
         <thead>
           <tr>
             <th>Ranking</th>
-            <th>Identificación</th>
+            <th>ID</th>
             <th>Nombre</th>
+            <th>Correo</th>
             <th>Materia</th>
+            <th>Docente</th>
             <th>Total Préstamos</th>
           </tr>
         </thead>
@@ -2774,12 +2776,14 @@ function mostrarReporteEstudiantes(data) {
               </td>
               <td>${estudiante.identificacion}</td>
               <td>${estudiante.nombre}</td>
-              <td>${estudiante.materia || "N/A"}</td>
+              <td>${estudiante.correo || '-'}</td>
+              <td>${estudiante.materia || '-'}</td>
+              <td>${estudiante.docente || '-'}</td>
               <td>
                 <span class="badge bg-primary fs-6">${estudiante.total_prestamos}</span>
               </td>
             </tr>
-          `).join("") : "<tr><td colspan=\"5\" class=\"text-center\">No se encontraron estudiantes</td></tr>"}
+          `).join("") : "<tr><td colspan=\"7\" class=\"text-center\">No se encontraron estudiantes</td></tr>"}
         </tbody>
       </table>
     </div>

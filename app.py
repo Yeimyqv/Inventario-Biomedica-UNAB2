@@ -585,6 +585,7 @@ def reporte_estudiantes():
             Usuario.id,
             Usuario.nombre,
             Usuario.identificacion,
+            Usuario.correo,
             Usuario.materia,
             Usuario.docente,
             db.func.count(Prestamo.id).label('total_prestamos')
@@ -620,6 +621,7 @@ def reporte_estudiantes():
                     'id': est.id,
                     'nombre': est.nombre,
                     'identificacion': est.identificacion,
+                    'correo': est.correo,
                     'materia': est.materia,
                     'docente': est.docente,
                     'total_prestamos': est.total_prestamos

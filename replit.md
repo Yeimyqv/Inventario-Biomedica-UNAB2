@@ -100,6 +100,8 @@ The application uses four main models:
 - June 25, 2025: Enhanced reports module with student search functionality and updated display format
 - June 25, 2025: Updated reports table structure to include email column for all user types
 - June 25, 2025: Assigned institutional email addresses to all faculty and lab staff members
+- June 25, 2025: Added comprehensive charts and graphs module using Chart.js for all report types
+- June 25, 2025: Implemented toggle functionality between table view, chart view, and combined view for reports
 
 ## User Preferences
 

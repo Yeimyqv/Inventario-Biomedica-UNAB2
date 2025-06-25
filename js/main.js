@@ -3128,7 +3128,7 @@ function generarGraficoPrestamos(data) {
   crearGraficoLineas('Préstamos por Fecha', fechas, cantidades, 'rgba(54, 162, 235, 0.8)');
 }
 
-function generarGraficoEstudiantes(data) {
+function generarGraficoEstudiantesBarras(data) {
   if (!data || !data.estudiantes || data.estudiantes.length === 0) return;
   
   // Tomar top 10 estudiantes
@@ -3136,10 +3136,32 @@ function generarGraficoEstudiantes(data) {
   const nombres = top10.map(est => est.nombre.length > 15 ? est.nombre.substring(0, 15) + '...' : est.nombre);
   const prestamos = top10.map(est => est.total_prestamos);
   
-  crearGraficoBarras('Top 10 Estudiantes', nombres, prestamos, 'rgba(75, 192, 192, 0.8)');
+  crearGraficoBarras('Top 10 Estudiantes - Ranking', nombres, prestamos, 'rgba(75, 192, 192, 0.8)');
 }
 
-function generarGraficoDocentes(data) {
+function generarGraficoEstudiantesCircular(data) {
+  if (!data || !data.estudiantes || data.estudiantes.length === 0) return;
+  
+  // Tomar top 8 estudiantes para gráfico circular
+  const top8 = data.estudiantes.slice(0, 8);
+  const nombres = top8.map(est => est.nombre.length > 20 ? est.nombre.substring(0, 20) + '...' : est.nombre);
+  const prestamos = top8.map(est => est.total_prestamos);
+  
+  crearGraficoPastel('Top 8 Estudiantes - Distribución', nombres, prestamos);
+}
+
+function generarGraficoDocentesBarras(data) {
+  if (!data || !data.docentes || data.docentes.length === 0) return;
+  
+  // Tomar top 10 docentes
+  const top10 = data.docentes.slice(0, 10);
+  const nombres = top10.map(doc => doc.nombre.length > 15 ? doc.nombre.substring(0, 15) + '...' : doc.nombre);
+  const productos = top10.map(doc => doc.total_productos);
+  
+  crearGraficoBarras('Top 10 Docentes - Ranking', nombres, productos, 'rgba(255, 159, 64, 0.8)');
+}
+
+function generarGraficoDocentesCircular(data) {
   if (!data || !data.docentes || data.docentes.length === 0) return;
   
   // Tomar top 8 docentes para gráfico circular
@@ -3147,10 +3169,21 @@ function generarGraficoDocentes(data) {
   const nombres = top8.map(doc => doc.nombre.length > 20 ? doc.nombre.substring(0, 20) + '...' : doc.nombre);
   const productos = top8.map(doc => doc.total_productos);
   
-  crearGraficoPastel('Distribución por Docentes', nombres, productos);
+  crearGraficoPastel('Top 8 Docentes - Distribución', nombres, productos);
 }
 
-function generarGraficoMaterias(data) {
+function generarGraficoMateriasBarras(data) {
+  if (!data || !data.materias || data.materias.length === 0) return;
+  
+  // Tomar top 10 materias
+  const top10 = data.materias.slice(0, 10);
+  const materias = top10.map(mat => mat.materia.length > 15 ? mat.materia.substring(0, 15) + '...' : mat.materia);
+  const productos = top10.map(mat => mat.total_productos);
+  
+  crearGraficoBarras('Top 10 Materias - Ranking', materias, productos, 'rgba(153, 102, 255, 0.8)');
+}
+
+function generarGraficoMateriasCircular(data) {
   if (!data || !data.materias || data.materias.length === 0) return;
   
   // Tomar top 8 materias para gráfico de pastel
@@ -3158,18 +3191,29 @@ function generarGraficoMaterias(data) {
   const materias = top8.map(mat => mat.materia.length > 20 ? mat.materia.substring(0, 20) + '...' : mat.materia);
   const productos = top8.map(mat => mat.total_productos);
   
-  crearGraficoPastel('Distribución por Materias', materias, productos);
+  crearGraficoPastel('Top 8 Materias - Distribución', materias, productos);
 }
 
-function generarGraficoProductos(data) {
+function generarGraficoProductosBarras(data) {
   if (!data || !data.productos || data.productos.length === 0) return;
   
   // Tomar top 10 productos
   const top10 = data.productos.slice(0, 10);
-  const nombres = top10.map(prod => prod.nombre.length > 20 ? prod.nombre.substring(0, 20) + '...' : prod.nombre);
+  const nombres = top10.map(prod => prod.nombre.length > 15 ? prod.nombre.substring(0, 15) + '...' : prod.nombre);
   const cantidades = top10.map(prod => prod.total_solicitado);
   
-  crearGraficoBarras('Top 10 Productos Más Solicitados', nombres, cantidades, 'rgba(153, 102, 255, 0.8)');
+  crearGraficoBarras('Top 10 Productos - Ranking', nombres, cantidades, 'rgba(255, 99, 132, 0.8)');
+}
+
+function generarGraficoProductosCircular(data) {
+  if (!data || !data.productos || data.productos.length === 0) return;
+  
+  // Tomar top 8 productos para gráfico circular
+  const top8 = data.productos.slice(0, 8);
+  const nombres = top8.map(prod => prod.nombre.length > 20 ? prod.nombre.substring(0, 20) + '...' : prod.nombre);
+  const cantidades = top8.map(prod => prod.total_solicitado);
+  
+  crearGraficoPastel('Top 8 Productos - Distribución', nombres, cantidades);
 }
 
 function crearGraficoLineas(titulo, etiquetas, datos, color) {

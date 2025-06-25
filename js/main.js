@@ -2980,6 +2980,117 @@ function mostrarReporteProductos(data) {
 // Función para cambiar entre vistas de reporte
 function cambiarVistaReporte(vista) {
   const btnTabla = document.getElementById('btn-vista-tabla');
+  const controlesGrafico = document.getElementById('controles-tipo-grafico');
+  const btnBarras = document.getElementById('btn-vista-grafico-barras');
+  const btnCircular = document.getElementById('btn-vista-grafico-circular');
+  const btnAmbosGraficos = document.getElementById('btn-vista-ambos-graficos');
+  const tablaContainer = document.getElementById('tabla-reporte');
+  const chartContainer = document.getElementById('chart-container');
+  
+  // Remover clase activa de todos los botones
+  [btnTabla, btnBarras, btnCircular, btnAmbosGraficos].forEach(btn => {
+    if (btn) {
+      btn.classList.remove('btn-light');
+      btn.classList.add('btn-outline-light');
+    }
+  });
+  
+  // Ocultar todos los controles primero
+  if (controlesGrafico) controlesGrafico.style.display = 'none';
+  
+  switch(vista) {
+    case 'tabla':
+      if (btnTabla) {
+        btnTabla.classList.remove('btn-outline-light');
+        btnTabla.classList.add('btn-light');
+      }
+      if (tablaContainer) tablaContainer.style.display = 'block';
+      if (chartContainer) chartContainer.style.display = 'none';
+      
+      // Mostrar controles de gráfico para reportes que no sean préstamos
+      if (tipoReporteActual !== 'prestamos' && controlesGrafico) {
+        controlesGrafico.style.display = 'inline-flex';
+      }
+      break;
+      
+    case 'grafico-barras':
+      if (btnBarras) {
+        btnBarras.classList.remove('btn-outline-light');
+        btnBarras.classList.add('btn-light');
+      }
+      if (tablaContainer) tablaContainer.style.display = 'none';
+      if (chartContainer) chartContainer.style.display = 'block';
+      
+      // Generar gráfico de barras según el tipo de reporte
+      generarGraficoSegunTipo('barras');
+      break;
+      
+    case 'grafico-circular':
+      if (btnCircular) {
+        btnCircular.classList.remove('btn-outline-light');
+        btnCircular.classList.add('btn-light');
+      }
+      if (tablaContainer) tablaContainer.style.display = 'none';
+      if (chartContainer) chartContainer.style.display = 'block';
+      
+      // Generar gráfico circular según el tipo de reporte
+      generarGraficoSegunTipo('circular');
+      break;
+      
+    case 'ambos-graficos':
+      if (btnAmbosGraficos) {
+        btnAmbosGraficos.classList.remove('btn-outline-light');
+        btnAmbosGraficos.classList.add('btn-light');
+      }
+      if (tablaContainer) tablaContainer.style.display = 'block';
+      if (chartContainer) chartContainer.style.display = 'block';
+      
+      // Generar gráfico de barras por defecto
+      generarGraficoSegunTipo('barras');
+      break;
+  }
+}
+
+// Función para generar gráfico según el tipo de reporte y estilo
+function generarGraficoSegunTipo(estiloGrafico) {
+  if (!ultimosDataReporte) return;
+  
+  try {
+    switch(tipoReporteActual) {
+      case 'estudiantes':
+        if (estiloGrafico === 'barras') {
+          generarGraficoEstudiantesBarras(ultimosDataReporte);
+        } else {
+          generarGraficoEstudiantesCircular(ultimosDataReporte);
+        }
+        break;
+      case 'docentes':
+        if (estiloGrafico === 'barras') {
+          generarGraficoDocentesBarras(ultimosDataReporte);
+        } else {
+          generarGraficoDocentesCircular(ultimosDataReporte);
+        }
+        break;
+      case 'materias':
+        if (estiloGrafico === 'barras') {
+          generarGraficoMateriasBarras(ultimosDataReporte);
+        } else {
+          generarGraficoMateriasCircular(ultimosDataReporte);
+        }
+        break;
+      case 'productos':
+        if (estiloGrafico === 'barras') {
+          generarGraficoProductosBarras(ultimosDataReporte);
+        } else {
+          generarGraficoProductosCircular(ultimosDataReporte);
+        }
+        break;
+    }
+  } catch (error) {
+    console.error('Error generando gráfico:', error);
+  }
+}
+  const btnTabla = document.getElementById('btn-vista-tabla');
   const btnGrafico = document.getElementById('btn-vista-grafico');
   const btnAmbos = document.getElementById('btn-vista-ambos');
   const contenidoTabla = document.getElementById('contenido-reporte-tabla');

@@ -2993,3 +2993,40 @@ function exportarReportePDF() {
 function exportarReporteExcel() {
   mostrarNotificacion("Exportación a Excel", "Funcionalidad en desarrollo", "info");
 }
+
+function obtenerClaseObservacionReporte(observacion) {
+  if (!observacion) return 'text-muted';
+  
+  // Observaciones positivas
+  if (observacion === 'Funciona correctamente') {
+    return 'text-success fw-bold';
+  }
+  
+  // Observaciones que requieren atención
+  const observacionesProblematicas = [
+    'No funciona / presenta fallas',
+    'Faltan accesorios / partes incompletas',
+    'Daños visibles (físicos)',
+    'Requiere mantenimiento / calibración',
+    'Contaminado / sucio',
+    'Pendiente por revisión técnica',
+    'Reportado como defectuoso por el usuario'
+  ];
+  
+  if (observacionesProblematicas.includes(observacion)) {
+    return 'text-danger fw-bold';
+  }
+  
+  // Observaciones neutras
+  const observacionesNeutrales = [
+    'No fue utilizado',
+    'No requiere devolución'
+  ];
+  
+  if (observacionesNeutrales.includes(observacion)) {
+    return 'text-info';
+  }
+  
+  // Otras observaciones (campo libre)
+  return 'text-warning';
+}

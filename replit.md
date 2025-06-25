@@ -95,8 +95,11 @@ The application uses four main models:
 - **Connection Pooling**: 300-second recycle with pre-ping
 - **Security**: Secret key from environment or development fallback
 
-## Changelog
-- June 25, 2025. Initial setup
+## Recent Changes
+- June 25, 2025: Initial setup and core functionality implementation
+- June 25, 2025: Enhanced reports module with student search functionality and updated display format
+- June 25, 2025: Updated reports table structure to include email column for all user types
+- June 25, 2025: Assigned institutional email addresses to all faculty and lab staff members
 
 ## User Preferences
 

@@ -2709,31 +2709,37 @@ function mostrarReportePrestamos(data) {
           <tr>
             <th>Fecha</th>
             <th>Usuario</th>
-            <th>Tipo</th>
+            <th>Correo</th>
             <th>Elemento</th>
             <th>Cantidad</th>
             <th>Estado</th>
+            <th>Observaciones</th>
           </tr>
         </thead>
         <tbody>
           ${data.prestamos.length > 0 ? data.prestamos.map(prestamo => `
             <tr>
               <td>${formatearFechaReporte(prestamo.fecha_prestamo)}</td>
-              <td>${prestamo.usuario_nombre || "N/A"}</td>
               <td>
-                <span class="badge ${prestamo.usuario_tipo === "estudiante" ? "bg-primary" : "bg-success"}">
-                  ${prestamo.usuario_tipo}
-                </span>
+                <strong>${prestamo.usuario_nombre}</strong><br>
+                <small class="text-muted">${prestamo.usuario_identificacion}</small>
               </td>
-              <td>${prestamo.elemento_nombre || "N/A"}</td>
-              <td><span class="badge bg-info">${prestamo.cantidad}</span></td>
+              <td>
+                <span class="text-info">${prestamo.usuario_correo || 'Sin correo'}</span>
+              </td>
+              <td>
+                <strong>${prestamo.elemento_nombre}</strong><br>
+                <small class="text-muted">Código: ${prestamo.elemento_codigo}</small>
+              </td>
+              <td><span class="badge bg-primary fs-6">${prestamo.cantidad}</span></td>
               <td>
                 <span class="badge ${obtenerClaseEstadoReporte(prestamo.estado)}">
                   ${prestamo.estado}
                 </span>
               </td>
+              <td>${prestamo.observaciones || '-'}</td>
             </tr>
-          `).join("") : "<tr><td colspan=\"6\" class=\"text-center\">No se encontraron préstamos</td></tr>"}
+          `).join("") : "<tr><td colspan=\"7\" class=\"text-center\">No se encontraron préstamos</td></tr>"}
         </tbody>
       </table>
     </div>

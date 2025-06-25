@@ -2737,7 +2737,7 @@ function mostrarReportePrestamos(data) {
                   ${prestamo.estado}
                 </span>
               </td>
-              <td>${prestamo.estado === 'devuelto' ? (prestamo.observaciones || '-') : '-'}</td>
+              <td>${prestamo.estado === 'devuelto' ? `<span class="${obtenerClaseObservacionReporte(prestamo.observaciones)}">${prestamo.observaciones || '-'}</span>` : '<span class="text-muted">-</span>'}</td>
             </tr>
           `).join("") : "<tr><td colspan=\"7\" class=\"text-center\">No se encontraron préstamos</td></tr>"}
         </tbody>

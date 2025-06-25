@@ -2472,9 +2472,36 @@ function mostrarModuloReportes() {
                 </button>
               </div>
             </div>
-            <div class="card-body" id="contenido-reporte">
-              <div class="text-center p-4">
-                <p class="text-muted">Seleccione un tipo de reporte para comenzar</p>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-12">
+                  <div class="btn-group" role="group" aria-label="Vista de reportes">
+                    <button type="button" class="btn btn-outline-primary active" id="btn-vista-tabla" onclick="cambiarVistaReporte('tabla')">
+                      <i class="fas fa-table me-2"></i>Tabla
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="btn-vista-grafico" onclick="cambiarVistaReporte('grafico')">
+                      <i class="fas fa-chart-bar me-2"></i>Gráfico
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="btn-vista-ambos" onclick="cambiarVistaReporte('ambos')">
+                      <i class="fas fa-columns me-2"></i>Ambos
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-12" id="contenido-reporte-tabla">
+                  <div class="text-center p-4">
+                    <p class="text-muted">Seleccione un tipo de reporte para comenzar</p>
+                  </div>
+                </div>
+                <div class="col-12" id="contenido-reporte-grafico" style="display: none;">
+                  <div class="card bg-dark">
+                    <div class="card-body">
+                      <canvas id="chart-reporte" width="400" height="200"></canvas>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

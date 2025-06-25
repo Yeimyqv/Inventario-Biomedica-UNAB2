@@ -3142,12 +3142,12 @@ function generarGraficoEstudiantes(data) {
 function generarGraficoDocentes(data) {
   if (!data || !data.docentes || data.docentes.length === 0) return;
   
-  // Tomar top 10 docentes
-  const top10 = data.docentes.slice(0, 10);
-  const nombres = top10.map(doc => doc.nombre.length > 15 ? doc.nombre.substring(0, 15) + '...' : doc.nombre);
-  const productos = top10.map(doc => doc.total_productos);
+  // Tomar top 8 docentes para gráfico circular
+  const top8 = data.docentes.slice(0, 8);
+  const nombres = top8.map(doc => doc.nombre.length > 20 ? doc.nombre.substring(0, 20) + '...' : doc.nombre);
+  const productos = top8.map(doc => doc.total_productos);
   
-  crearGraficoBarras('Top 10 Docentes', nombres, productos, 'rgba(255, 159, 64, 0.8)');
+  crearGraficoPastel('Distribución por Docentes', nombres, productos);
 }
 
 function generarGraficoMaterias(data) {
@@ -3192,25 +3192,34 @@ function crearGraficoLineas(titulo, etiquetas, datos, color) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
       plugins: {
         title: {
           display: true,
           text: titulo,
-          color: '#ffffff'
+          color: '#ffffff',
+          font: { size: 14 }
         },
         legend: {
           labels: {
-            color: '#ffffff'
+            color: '#ffffff',
+            font: { size: 12 }
           }
         }
       },
       scales: {
         x: {
-          ticks: { color: '#ffffff' },
+          ticks: { 
+            color: '#ffffff',
+            font: { size: 10 }
+          },
           grid: { color: 'rgba(255, 255, 255, 0.1)' }
         },
         y: {
-          ticks: { color: '#ffffff' },
+          ticks: { 
+            color: '#ffffff',
+            font: { size: 10 }
+          },
           grid: { color: 'rgba(255, 255, 255, 0.1)' }
         }
       }
@@ -3236,15 +3245,18 @@ function crearGraficoBarras(titulo, etiquetas, datos, color) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
       plugins: {
         title: {
           display: true,
           text: titulo,
-          color: '#ffffff'
+          color: '#ffffff',
+          font: { size: 14 }
         },
         legend: {
           labels: {
-            color: '#ffffff'
+            color: '#ffffff',
+            font: { size: 12 }
           }
         }
       },
@@ -3252,12 +3264,16 @@ function crearGraficoBarras(titulo, etiquetas, datos, color) {
         x: {
           ticks: { 
             color: '#ffffff',
-            maxRotation: 45
+            maxRotation: 45,
+            font: { size: 10 }
           },
           grid: { color: 'rgba(255, 255, 255, 0.1)' }
         },
         y: {
-          ticks: { color: '#ffffff' },
+          ticks: { 
+            color: '#ffffff',
+            font: { size: 10 }
+          },
           grid: { color: 'rgba(255, 255, 255, 0.1)' }
         }
       }
@@ -3293,16 +3309,21 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
       plugins: {
         title: {
           display: true,
           text: titulo,
-          color: '#ffffff'
+          color: '#ffffff',
+          font: { size: 14 }
         },
         legend: {
-          position: 'right',
+          position: 'bottom',
           labels: {
-            color: '#ffffff'
+            color: '#ffffff',
+            font: { size: 10 },
+            boxWidth: 12,
+            padding: 10
           }
         }
       }

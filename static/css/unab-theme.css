@@ -213,6 +213,28 @@ body {
   background: var(--unab-gray);
 }
 
+/* Reportes Module Button Overrides - Manteniendo consistencia con el esquema verde UNAB */
+.btn-outline-success {
+  border-color: var(--unab-primary) !important;
+  color: var(--unab-primary) !important;
+}
+
+.btn-outline-success:hover {
+  background-color: var(--unab-primary) !important;
+  border-color: var(--unab-primary) !important;
+  color: white !important;
+}
+
+.btn-success {
+  background-color: var(--unab-primary) !important;
+  border-color: var(--unab-primary) !important;
+}
+
+.btn-success:hover {
+  background-color: var(--unab-primary-dark) !important;
+  border-color: var(--unab-primary-dark) !important;
+}
+
 /* Footer styles */
 .unab-footer {
   background: white;

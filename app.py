@@ -225,15 +225,14 @@ with app.app_context():
                         (elementos_disponibles[14], estudiantes_ids[6], 1, datetime(2025, 5, 20), datetime(2025, 6, 3), 'devuelto', 'Primer acercamiento proyecto grado')
                     ]
                     
-                    for elemento_id, usuario_id, cantidad, fecha_prestamo, fecha_devolucion, estado, observaciones in prestamos_data:
+                    for elemento_id, usuario_id, cantidad, fecha_prestamo, fecha_devolucion, estado in prestamos_data:
                         prestamo = Prestamo(
                             elemento_id=elemento_id,
                             usuario_id=usuario_id,
                             cantidad=cantidad,
                             fecha_prestamo=fecha_prestamo,
                             fecha_devolucion_real=fecha_devolucion,
-                            estado=estado,
-                            observaciones=observaciones
+                            estado=estado
                         )
                         db.session.add(prestamo)
                     

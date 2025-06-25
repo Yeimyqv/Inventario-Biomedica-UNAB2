@@ -1854,6 +1854,12 @@ function volverAInterfazPrincipal() {
     prestamosSection.remove();
   }
   
+  // Ocultar sección de reportes si existe
+  const reportesSection = document.getElementById('reportes-section');
+  if (reportesSection) {
+    reportesSection.style.display = 'none';
+  }
+  
   // Mostrar la interfaz principal
   document.getElementById('interface').style.display = 'block';
 }

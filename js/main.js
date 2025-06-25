@@ -2743,7 +2743,10 @@ function mostrarReportePrestamos(data) {
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para préstamos
+  generarGraficoPrestamos(data);
 }
 
 function mostrarReporteEstudiantes(data) {
@@ -2791,7 +2794,10 @@ function mostrarReporteEstudiantes(data) {
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para estudiantes
+  generarGraficoEstudiantes(data);
 }
 
 function mostrarReporteDocentes(data) {
@@ -2837,7 +2843,10 @@ function mostrarReporteDocentes(data) {
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para docentes
+  generarGraficoDocentes(data);
 }
 
 function mostrarReporteMaterias(data) {
@@ -2887,7 +2896,10 @@ function mostrarReporteMaterias(data) {
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para materias
+  generarGraficoMaterias(data);
 }
 
 function mostrarReporteProductos(data) {
@@ -2930,11 +2942,47 @@ function mostrarReporteProductos(data) {
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para productos
+  generarGraficoProductos(data);
+}
+
+// Variable global para almacenar la instancia del gráfico actual
+let currentChart = null;
+
+// Función para cambiar entre vistas de reporte
+function cambiarVistaReporte(vista) {
+  const btnTabla = document.getElementById('btn-vista-tabla');
+  const btnGrafico = document.getElementById('btn-vista-grafico');
+  const btnAmbos = document.getElementById('btn-vista-ambos');
+  const contenidoTabla = document.getElementById('contenido-reporte-tabla');
+  const contenidoGrafico = document.getElementById('contenido-reporte-grafico');
+  
+  // Remover clase active de todos los botones
+  [btnTabla, btnGrafico, btnAmbos].forEach(btn => btn.classList.remove('active'));
+  
+  switch(vista) {
+    case 'tabla':
+      btnTabla.classList.add('active');
+      contenidoTabla.style.display = 'block';
+      contenidoGrafico.style.display = 'none';
+      break;
+    case 'grafico':
+      btnGrafico.classList.add('active');
+      contenidoTabla.style.display = 'none';
+      contenidoGrafico.style.display = 'block';
+      break;
+    case 'ambos':
+      btnAmbos.classList.add('active');
+      contenidoTabla.style.display = 'block';
+      contenidoGrafico.style.display = 'block';
+      break;
+  }
 }
 
 function mostrarCargandoReporte() {
-  document.getElementById("contenido-reporte").innerHTML = `
+  document.getElementById("contenido-reporte-tabla").innerHTML = `
     <div class="text-center p-5">
       <div class="spinner-border text-success" role="status">
         <span class="visually-hidden">Generando reporte...</span>
@@ -2945,7 +2993,7 @@ function mostrarCargandoReporte() {
 }
 
 function mostrarErrorReporte(mensaje) {
-  document.getElementById("contenido-reporte").innerHTML = `
+  document.getElementById("contenido-reporte-tabla").innerHTML = `
     <div class="alert alert-danger">
       <strong>Error:</strong> ${mensaje}
     </div>

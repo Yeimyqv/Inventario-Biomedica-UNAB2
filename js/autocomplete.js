@@ -27,7 +27,7 @@ function configurarEventosAutocompletado() {
       // Si se borra el ID, permitir editar el nombre nuevamente
       if (nombreInput) {
         nombreInput.readOnly = false;
-        nombreInput.classList.remove('text-muted');
+        nombreInput.classList.remove('bg-dark', 'text-light');
         nombreInput.value = '';
         
         // También limpiar el correo
@@ -86,7 +86,7 @@ async function buscarEstudiantePorId() {
       
       // Hacer el campo de nombre de solo lectura cuando se encuentra el estudiante
       nombreInput.readOnly = true;
-      nombreInput.classList.add('text-muted');
+      nombreInput.classList.add('bg-dark', 'text-light');
       
       console.log('Información cargada:', {
         nombre: estudiante.nombre,

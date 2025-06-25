@@ -515,6 +515,9 @@ def reporte_prestamos():
         tipo_usuario = request.args.get('tipo_usuario')
         materia = request.args.get('materia')
         elemento_id = request.args.get('elemento_id')
+        buscar_estudiante = request.args.get('buscar_estudiante')
+        
+        print(f"[DEBUG] Reporte préstamos - buscar_estudiante: '{buscar_estudiante}'")
         
         # Construir consulta base
         query = db.session.query(Prestamo).join(Usuario).join(Elemento)
@@ -532,6 +535,17 @@ def reporte_prestamos():
             query = query.filter(Usuario.materia.ilike(f'%{materia}%'))
         if elemento_id:
             query = query.filter(Prestamo.elemento_id == elemento_id)
+        
+        # Filtro de búsqueda de estudiante
+        if buscar_estudiante and buscar_estudiante.strip():
+            buscar_term = buscar_estudiante.strip()
+            print(f"[DEBUG] Aplicando filtro de búsqueda en préstamos: '{buscar_term}'")
+            query = query.filter(
+                db.or_(
+                    Usuario.nombre.ilike(f'%{buscar_term}%'),
+                    Usuario.identificacion.ilike(f'%{buscar_term}%')
+                )
+            )
         
         prestamos = query.all()
         
@@ -561,6 +575,8 @@ def reporte_estudiantes():
         fecha_fin = request.args.get('fecha_fin')
         buscar_estudiante = request.args.get('buscar_estudiante')
         
+        print(f"[DEBUG] Filtros recibidos - fecha_inicio: {fecha_inicio}, fecha_fin: {fecha_fin}, buscar_estudiante: '{buscar_estudiante}'")
+        
         # Consulta para contar préstamos por estudiante
         query = db.session.query(
             Usuario.id,
@@ -577,16 +593,22 @@ def reporte_estudiantes():
         if fecha_fin:
             query = query.filter(Prestamo.fecha_prestamo <= datetime.strptime(fecha_fin, '%Y-%m-%d'))
         
-        # Filtro de búsqueda de estudiante
-        if buscar_estudiante:
+        # Filtro de búsqueda de estudiante - mejorado para ser más flexible
+        if buscar_estudiante and buscar_estudiante.strip():
+            buscar_term = buscar_estudiante.strip()
+            print(f"[DEBUG] Aplicando filtro de búsqueda: '{buscar_term}'")
             query = query.filter(
                 db.or_(
-                    Usuario.nombre.ilike(f'%{buscar_estudiante}%'),
-                    Usuario.identificacion.ilike(f'%{buscar_estudiante}%')
+                    Usuario.nombre.ilike(f'%{buscar_term}%'),
+                    Usuario.identificacion.ilike(f'%{buscar_term}%')
                 )
             )
         
         estudiantes = query.group_by(Usuario.id).order_by(db.desc('total_prestamos')).all()
+        
+        print(f"[DEBUG] Encontrados {len(estudiantes)} estudiantes")
+        if buscar_estudiante and buscar_estudiante.strip():
+            print(f"[DEBUG] Primeros 3 estudiantes encontrados: {[est.nombre for est in estudiantes[:3]]}")
         
         resultado = {
             'total_estudiantes': len(estudiantes),

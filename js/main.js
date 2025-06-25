@@ -2512,6 +2512,31 @@ function mostrarModuloReportes() {
       }
     });
     
+    // Agregar evento especial para el campo de búsqueda de estudiante (con debounce)
+    const buscarEstudianteInput = document.getElementById('buscar-estudiante');
+    if (buscarEstudianteInput) {
+      let timeoutId;
+      buscarEstudianteInput.addEventListener('input', () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          // Aplicar filtros automáticamente cuando cambie el texto de búsqueda
+          const botones = document.querySelectorAll('#reportes-section .btn-group .btn');
+          botones.forEach((btn, index) => {
+            if (btn.classList.contains('active')) {
+              // Regenerar el reporte activo
+              switch(index) {
+                case 0: generarReportePrestamos(); break;
+                case 1: generarReporteEstudiantes(); break;
+                case 2: generarReporteDocentes(); break;
+                case 3: generarReporteMaterias(); break;
+                case 4: generarReporteProductos(); break;
+              }
+            }
+          });
+        }, 500); // Esperar 500ms después de que el usuario deje de escribir
+      });
+    }
+    
     // Cargar reporte de préstamos por defecto
     generarReportePrestamos();
   }, 200);
@@ -2647,11 +2672,17 @@ function obtenerFiltrosReporte() {
   const fechaFin = document.getElementById("fecha-fin-reporte")?.value;
   const tipoUsuario = document.getElementById("tipo-usuario-filtro")?.value;
   const materia = document.getElementById("materia-filtro")?.value;
+  const buscarEstudiante = document.getElementById("buscar-estudiante")?.value;
+  const docenteFiltro = document.getElementById("docente-filtro")?.value;
+  const limiteProductos = document.getElementById("limite-productos")?.value;
   
   if (fechaInicio) filtros.fecha_inicio = fechaInicio;
   if (fechaFin) filtros.fecha_fin = fechaFin;
   if (tipoUsuario) filtros.tipo_usuario = tipoUsuario;
   if (materia) filtros.materia = materia;
+  if (buscarEstudiante) filtros.buscar_estudiante = buscarEstudiante;
+  if (docenteFiltro) filtros.docente = docenteFiltro;
+  if (limiteProductos) filtros.limite = limiteProductos;
   
   return filtros;
 }

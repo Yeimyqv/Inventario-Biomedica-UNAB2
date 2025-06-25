@@ -2722,14 +2722,14 @@ function mostrarReportePrestamos(data) {
               <td>${formatearFechaReporte(prestamo.fecha_prestamo)}</td>
               <td>
                 <strong>${prestamo.usuario_nombre}</strong><br>
-                <small class="text-muted">${prestamo.usuario_identificacion}</small>
+                <small class="text-light">${prestamo.usuario_identificacion}</small>
               </td>
               <td>
                 <span class="text-info">${prestamo.usuario_correo || 'Sin correo'}</span>
               </td>
               <td>
                 <strong>${prestamo.elemento_nombre}</strong><br>
-                <small class="text-muted">Código: ${prestamo.elemento_codigo}</small>
+                <small class="text-light">Código: ${prestamo.elemento_codigo}</small>
               </td>
               <td><span class="badge bg-primary fs-6">${prestamo.cantidad}</span></td>
               <td>
@@ -2737,7 +2737,7 @@ function mostrarReportePrestamos(data) {
                   ${prestamo.estado}
                 </span>
               </td>
-              <td>${prestamo.observaciones || '-'}</td>
+              <td>${prestamo.estado === 'devuelto' ? (prestamo.observaciones || '-') : '-'}</td>
             </tr>
           `).join("") : "<tr><td colspan=\"7\" class=\"text-center\">No se encontraron préstamos</td></tr>"}
         </tbody>

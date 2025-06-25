@@ -3111,7 +3111,7 @@ function obtenerClaseObservacionReporte(observacion) {
 // ======= FUNCIONES PARA GRÁFICOS CON CHART.JS =======
 
 // Variable global para almacenar la instancia del gráfico actual
-let currentChart = null;
+var currentChart = null;
 
 function generarGraficoPrestamos(data) {
   if (!data || !data.prestamos || data.prestamos.length === 0) return;

@@ -289,7 +289,8 @@ function autenticarUsuario() {
   
   // Procesar datos adicionales para estudiantes
   if (currentUser.tipo === 'estudiante') {
-    const estudianteId = document.getElementById('user-id')?.value.trim();
+    const estudianteId = document.getElementById('estudiante-id')?.value.trim();
+    const estudianteCorreo = document.getElementById('estudiante-correo')?.value.trim();
     const docenteSelect = document.getElementById('estudiante-docente');
     const materiaSelect = document.getElementById('estudiante-materia');
     
@@ -306,7 +307,19 @@ function autenticarUsuario() {
       materia = otraMateria ? otraMateria.value.trim() : '';
     }
     
+    // Validaciones para estudiantes
+    if (!estudianteId) {
+      mostrarNotificacion('Error', 'Por favor ingrese su ID de estudiante', 'error');
+      return;
+    }
+    
+    if (!estudianteCorreo) {
+      mostrarNotificacion('Error', 'Por favor busque su ID para autocompletar el correo', 'error');
+      return;
+    }
+    
     currentUser.id_estudiante = estudianteId;
+    currentUser.correo = estudianteCorreo;
     currentUser.docente = docente;
     currentUser.materia = materia;
   }
@@ -592,31 +605,53 @@ function initCustomModals() {
 
 // Función para configurar eventos de autocompletado
 function configurarEventosAutocompletado() {
-  const userIdInput = document.getElementById('user-id');
-  const userEmailInput = document.getElementById('user-email');
+  const userIdInput = document.getElementById('estudiante-id');
+  const userEmailInput = document.getElementById('estudiante-correo');
+  const buscarBtn = document.getElementById('buscar-estudiante-btn');
   
+  // Función para buscar estudiante
+  async function buscarEstudiante(id) {
+    if (!id || id.length < 3) return;
+    
+    try {
+      const response = await fetch(`/api/buscar_estudiante/${id}`);
+      const data = await response.json();
+      
+      if (data.estudiante) {
+        if (userEmailInput) {
+          userEmailInput.value = data.estudiante.correo || '';
+        }
+        mostrarNotificacion('Estudiante encontrado', `${data.estudiante.nombre}`, 'success', 2000);
+      } else {
+        if (userEmailInput) {
+          userEmailInput.value = '';
+        }
+        mostrarNotificacion('No encontrado', 'Estudiante no encontrado', 'warning', 2000);
+      }
+    } catch (error) {
+      console.error('Error buscando estudiante:', error);
+      mostrarNotificacion('Error', 'Error al buscar estudiante', 'error', 2000);
+    }
+  }
+  
+  // Evento para input automático
   if (userIdInput) {
     userIdInput.addEventListener('input', async function() {
       const idValue = this.value.trim();
-      
-      if (idValue.length >= 3) {
-        try {
-          const response = await fetch(`/api/buscar_estudiante/${idValue}`);
-          const data = await response.json();
-          
-          if (data.estudiante) {
-            if (userEmailInput) {
-              userEmailInput.value = data.estudiante.correo || '';
-            }
-            mostrarNotificacion('Estudiante encontrado', `${data.estudiante.nombre}`, 'success', 2000);
-          } else {
-            if (userEmailInput) {
-              userEmailInput.value = '';
-            }
-          }
-        } catch (error) {
-          console.error('Error buscando estudiante:', error);
-        }
+      if (idValue.length >= 6) {
+        await buscarEstudiante(idValue);
+      }
+    });
+  }
+  
+  // Evento para botón de búsqueda
+  if (buscarBtn) {
+    buscarBtn.addEventListener('click', async function() {
+      const idValue = userIdInput ? userIdInput.value.trim() : '';
+      if (idValue) {
+        await buscarEstudiante(idValue);
+      } else {
+        mostrarNotificacion('Error', 'Ingrese un ID de estudiante', 'error');
       }
     });
   }

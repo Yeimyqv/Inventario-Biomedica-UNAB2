@@ -486,7 +486,7 @@ function mostrarReporteProductos(data) {
 
 // Funciones auxiliares
 function mostrarCargandoReporte() {
-  document.getElementById('contenido-reporte').innerHTML = `
+  document.getElementById('contenido-reporte-tabla').innerHTML = `
     <div class="text-center p-5">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Generando reporte...</span>
@@ -501,7 +501,7 @@ function ocultarCargandoReporte() {
 }
 
 function mostrarErrorReporte(mensaje) {
-  document.getElementById('contenido-reporte').innerHTML = `
+  document.getElementById('contenido-reporte-tabla').innerHTML = `
     <div class="alert alert-danger">
       <strong>Error:</strong> ${mensaje}
     </div>

@@ -646,10 +646,14 @@ function configurarEventosAutocompletado() {
           userEmailInput.value = data.correo || `${id.toLowerCase()}@unab.edu.co`;
         }
         
-        // También actualizar el campo de nombre si existe
+        // También actualizar el campo de nombre si existe y bloquearlo para edición
         const nombreInput = document.getElementById('user-name');
         if (nombreInput) {
           nombreInput.value = data.nombre;
+          nombreInput.readOnly = true;
+          nombreInput.style.backgroundColor = '#e9ecef';
+          nombreInput.style.cursor = 'not-allowed';
+          nombreInput.title = 'Nombre cargado automáticamente - No editable';
         }
         
         mostrarNotificacion('Estudiante encontrado', `${data.nombre}`, 'success', 3000);
@@ -660,6 +664,10 @@ function configurarEventosAutocompletado() {
         const nombreInput = document.getElementById('user-name');
         if (nombreInput) {
           nombreInput.value = '';
+          nombreInput.readOnly = false;
+          nombreInput.style.backgroundColor = '';
+          nombreInput.style.cursor = '';
+          nombreInput.title = '';
         }
         mostrarNotificacion('No encontrado', 'Estudiante no encontrado', 'warning', 3000);
       }

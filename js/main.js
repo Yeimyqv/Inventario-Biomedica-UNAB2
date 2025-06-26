@@ -560,6 +560,22 @@ async function cargarCategorias() {
           option.textContent = categoria.nombre;
           categoriaSelect.appendChild(option);
         });
+        
+        // Agregar evento de cambio para cargar elementos
+        categoriaSelect.addEventListener('change', async function() {
+          const categoriaId = this.value;
+          if (categoriaId) {
+            await cargarElementosPorCategoria(categoriaId);
+          } else {
+            // Limpiar selección de elementos
+            const elementoSelect = document.getElementById('elemento-select');
+            if (elementoSelect) {
+              elementoSelect.innerHTML = '<option value="">Selecciona un elemento</option>';
+              elementoSelect.disabled = true;
+            }
+          }
+        });
+        
         mostrarNotificacion('Éxito', `${data.length} categorías cargadas`, 'success', 2000);
       } else {
         throw new Error('Formato de datos incorrecto');
@@ -568,6 +584,73 @@ async function cargarCategorias() {
   } catch (error) {
     console.error('Error cargando categorías:', error);
     mostrarNotificacion('Error', `No se pudieron cargar las categorías: ${error.message}`, 'error', 5000);
+  }
+}
+
+// Función para cargar elementos por categoría
+async function cargarElementosPorCategoria(categoriaId) {
+  try {
+    console.log(`Cargando elementos para categoría: ${categoriaId}`);
+    const response = await fetch(`/api/elementos/categoria/${categoriaId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Elementos recibidos:', data);
+    
+    const elementoSelect = document.getElementById('elemento-select');
+    if (elementoSelect) {
+      elementoSelect.innerHTML = '<option value="">Selecciona un elemento</option>';
+      
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(elemento => {
+          const option = document.createElement('option');
+          option.value = elemento.id;
+          option.textContent = `${elemento.nombre} (Disponibles: ${elemento.disponibles || elemento.cantidad})`;
+          elementoSelect.appendChild(option);
+        });
+        elementoSelect.disabled = false;
+        
+        // Agregar evento de cambio para mostrar detalles del elemento
+        elementoSelect.addEventListener('change', function() {
+          const elementoId = this.value;
+          if (elementoId) {
+            const elementoSeleccionado = data.find(e => e.id == elementoId);
+            if (elementoSeleccionado) {
+              mostrarDetallesElemento(elementoSeleccionado);
+            }
+          }
+        });
+        
+        mostrarNotificacion('Elementos cargados', `${data.length} elementos disponibles`, 'success', 2000);
+      } else {
+        elementoSelect.innerHTML = '<option value="">No hay elementos disponibles</option>';
+        elementoSelect.disabled = true;
+        mostrarNotificacion('Sin elementos', 'No hay elementos en esta categoría', 'warning', 3000);
+      }
+    }
+  } catch (error) {
+    console.error('Error cargando elementos:', error);
+    mostrarNotificacion('Error', `No se pudieron cargar los elementos: ${error.message}`, 'error', 5000);
+  }
+}
+
+// Función para mostrar detalles del elemento seleccionado
+function mostrarDetallesElemento(elemento) {
+  const detallesDiv = document.getElementById('elemento-detalles');
+  if (detallesDiv) {
+    detallesDiv.innerHTML = `
+      <div class="card bg-dark border-success">
+        <div class="card-body">
+          <h5 class="card-title text-success">${elemento.nombre}</h5>
+          <p class="card-text">${elemento.descripcion || 'Sin descripción'}</p>
+          <p class="text-light"><strong>Código:</strong> ${elemento.codigo}</p>
+          <p class="text-light"><strong>Cantidad disponible:</strong> ${elemento.disponibles || elemento.cantidad}</p>
+          <p class="text-light"><strong>Ubicación:</strong> ${elemento.ubicacion || 'No especificada'}</p>
+        </div>
+      </div>
+    `;
   }
 }
 

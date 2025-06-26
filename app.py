@@ -294,8 +294,19 @@ def get_categorias():
 @app.route('/api/elementos/categoria/<int:categoria_id>')
 def get_elementos_by_categoria(categoria_id):
     """Obtener elementos por categoría."""
-    elementos = Elemento.query.filter_by(categoria_id=categoria_id).all()
-    return jsonify([elemento.to_dict() for elemento in elementos])
+    try:
+        elementos = Elemento.query.filter_by(categoria_id=categoria_id).all()
+        elementos_list = []
+        for elemento in elementos:
+            elemento_dict = elemento.to_dict()
+            elemento_dict['disponibles'] = elemento.disponibles()
+            elementos_list.append(elemento_dict)
+        
+        print(f"Enviando {len(elementos_list)} elementos para categoría {categoria_id}")
+        return jsonify(elementos_list)
+    except Exception as e:
+        print(f"Error obteniendo elementos para categoría {categoria_id}: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # API para obtener detalle de un elemento
 @app.route('/api/elemento/<int:elemento_id>')

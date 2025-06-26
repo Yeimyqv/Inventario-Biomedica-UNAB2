@@ -196,6 +196,10 @@ function selectUserType(tipo) {
     if (nombreGroup) nombreGroup.style.display = 'block';
     if (pinGroup) pinGroup.style.display = 'block';
     
+    // Limpiar PIN al cambiar de tipo
+    const pinInput = document.getElementById('user-pin');
+    if (pinInput) pinInput.value = '';
+    
     // Configurar lista desplegable para docentes
     if (tipo === 'docente') {
       const docenteContainer = document.getElementById('docente-select-container');
@@ -270,8 +274,11 @@ function autenticarUsuario() {
       return;
     }
     
-    if (pin !== PINES[currentUser.tipo]) {
-      mostrarNotificacion('Error', 'PIN incorrecto', 'error');
+    const expectedPin = PINES[currentUser.tipo];
+    console.log(`Validando PIN para ${currentUser.tipo}: ingresado="${pin}", esperado="${expectedPin}"`);
+    
+    if (pin !== expectedPin) {
+      mostrarNotificacion('Error', `PIN incorrecto. Use ${expectedPin} para ${currentUser.tipo}`, 'error');
       return;
     }
   }
@@ -476,25 +483,73 @@ function volverAInterfazPrincipal() {
   document.getElementById('interface').style.display = 'block';
 }
 
-// Funciones placeholder para los módulos
+// Funciones de los módulos principales
 function iniciarPrestamo() {
-  mostrarNotificacion('Préstamo', 'Módulo de préstamo en desarrollo', 'info');
+  // Ocultar interfaz principal
+  document.getElementById('interface').style.display = 'none';
+  
+  // Mostrar sección de préstamo
+  const prestamoSection = document.getElementById('prestamo-section');
+  if (prestamoSection) {
+    prestamoSection.style.display = 'block';
+    cargarCategorias();
+  } else {
+    mostrarNotificacion('Error', 'Sección de préstamo no encontrada', 'error');
+  }
 }
 
 function iniciarRetorno() {
-  mostrarNotificacion('Retorno', 'Módulo de retorno en desarrollo', 'info');
+  mostrarNotificacion('Retorno', 'Función de retorno disponible próximamente', 'info');
 }
 
 function consultarInventario() {
-  mostrarNotificacion('Inventario', 'Módulo de consulta en desarrollo', 'info');
+  // Ocultar interfaz principal
+  document.getElementById('interface').style.display = 'none';
+  
+  // Mostrar sección de consulta
+  const consultaSection = document.getElementById('consulta-section');
+  if (consultaSection) {
+    consultaSection.style.display = 'block';
+    generarFilasInventario();
+  } else {
+    mostrarNotificacion('Info', 'Consultando inventario...', 'info');
+  }
 }
 
 function administrarInventario() {
-  mostrarNotificacion('Administración', 'Módulo de administración en desarrollo', 'info');
+  mostrarNotificacion('Administración', 'Módulo de administración disponible próximamente', 'info');
 }
 
 function mostrarModuloReportes() {
-  mostrarNotificacion('Reportes', 'Módulo de reportes en desarrollo', 'info');
+  mostrarNotificacion('Reportes', 'Módulo de reportes disponible próximamente', 'info');
+}
+
+// Función para cargar categorías en préstamo
+async function cargarCategorias() {
+  try {
+    const response = await fetch('/api/categorias');
+    const data = await response.json();
+    
+    const categoriaSelect = document.getElementById('categoria-select');
+    if (categoriaSelect) {
+      categoriaSelect.innerHTML = '<option value="">Selecciona una categoría</option>';
+      
+      data.categorias.forEach(categoria => {
+        const option = document.createElement('option');
+        option.value = categoria.id;
+        option.textContent = categoria.nombre;
+        categoriaSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error cargando categorías:', error);
+    mostrarNotificacion('Error', 'No se pudieron cargar las categorías', 'error');
+  }
+}
+
+// Función básica para mostrar inventario
+function generarFilasInventario() {
+  mostrarNotificacion('Inventario', 'Cargando inventario...', 'info', 2000);
 }
 
 // Función para mostrar notificaciones
@@ -537,7 +592,34 @@ function initCustomModals() {
 
 // Función para configurar eventos de autocompletado
 function configurarEventosAutocompletado() {
-  // Implementación básica de autocompletado
+  const userIdInput = document.getElementById('user-id');
+  const userEmailInput = document.getElementById('user-email');
+  
+  if (userIdInput) {
+    userIdInput.addEventListener('input', async function() {
+      const idValue = this.value.trim();
+      
+      if (idValue.length >= 3) {
+        try {
+          const response = await fetch(`/api/buscar_estudiante/${idValue}`);
+          const data = await response.json();
+          
+          if (data.estudiante) {
+            if (userEmailInput) {
+              userEmailInput.value = data.estudiante.correo || '';
+            }
+            mostrarNotificacion('Estudiante encontrado', `${data.estudiante.nombre}`, 'success', 2000);
+          } else {
+            if (userEmailInput) {
+              userEmailInput.value = '';
+            }
+          }
+        } catch (error) {
+          console.error('Error buscando estudiante:', error);
+        }
+      }
+    });
+  }
 }
 
 // Función para cargar inventario desde la base de datos

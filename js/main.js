@@ -1,11 +1,12 @@
 
-
 // Variables globales
 let currentUser = {
   id: null,
   tipo: null,
   nombre: null
 };
+
+let currentUserType = null;
 
 let elementoSeleccionado = null;
 let categoriaSeleccionada = null;

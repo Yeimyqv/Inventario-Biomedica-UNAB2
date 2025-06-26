@@ -517,11 +517,14 @@ function mostrarReportePrestamos(data) {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Fecha</th>
-            <th>Usuario</th>
-            <th>Elemento</th>
+            <th>Fecha Préstamo</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Producto</th>
+            <th>Categoría</th>
             <th>Cantidad</th>
             <th>Estado</th>
+            <th>Observaciones</th>
           </tr>
         </thead>
         <tbody>
@@ -529,12 +532,34 @@ function mostrarReportePrestamos(data) {
             <tr>
               <td>${prestamo.id}</td>
               <td>${formatearFechaReporte(prestamo.fecha_prestamo)}</td>
-              <td>${prestamo.usuario_nombre}</td>
-              <td>${prestamo.elemento_nombre}</td>
-              <td>${prestamo.cantidad}</td>
-              <td><span class="badge ${obtenerClaseEstadoReporte(prestamo.estado)}">${prestamo.estado}</span></td>
+              <td>
+                <div><strong>${prestamo.usuario_nombre}</strong></div>
+                <small class="text-muted">ID: ${prestamo.usuario_identificacion}</small>
+                ${prestamo.usuario_materia ? `<br><small class="text-info">${prestamo.usuario_materia}</small>` : ''}
+                ${prestamo.usuario_docente ? `<br><small class="text-warning">Docente: ${prestamo.usuario_docente}</small>` : ''}
+              </td>
+              <td>${prestamo.usuario_correo || '-'}</td>
+              <td>
+                <div><strong>${prestamo.elemento_nombre}</strong></div>
+                <small class="text-muted">Código: ${prestamo.elemento_codigo}</small>
+              </td>
+              <td><span class="badge bg-secondary">${prestamo.elemento_categoria}</span></td>
+              <td><span class="badge bg-info">${prestamo.cantidad}</span></td>
+              <td>
+                <span class="badge ${obtenerClaseEstadoReporte(prestamo.estado)}">
+                  ${prestamo.estado === 'prestado' ? 'No devuelto' : 
+                    prestamo.estado === 'devuelto' ? 'Devuelto' : prestamo.estado}
+                </span>
+                ${prestamo.fecha_devolucion_real ? 
+                  `<br><small class="text-muted">Devuelto: ${formatearFechaReporte(prestamo.fecha_devolucion_real)}</small>` : ''}
+              </td>
+              <td>
+                ${prestamo.observaciones ? 
+                  `<span class="badge ${obtenerClaseObservacionReporte(prestamo.observaciones)}">${prestamo.observaciones}</span>` : 
+                  '<span class="text-muted">Sin observaciones</span>'}
+              </td>
             </tr>
-          `).join("") : "<tr><td colspan=\"6\" class=\"text-center\">No se encontraron préstamos</td></tr>"}
+          `).join("") : "<tr><td colspan=\"9\" class=\"text-center\">No se encontraron préstamos</td></tr>"}
         </tbody>
       </table>
     </div>
@@ -552,7 +577,8 @@ function obtenerFiltrosReporte() {
     materia: document.getElementById('materia-filtro')?.value || '',
     buscar_estudiante: document.getElementById('buscar-estudiante')?.value || '',
     docente: document.getElementById('docente-filtro')?.value || '',
-    limite_productos: document.getElementById('limite-productos')?.value || '10'
+    producto_especifico: document.getElementById('producto-especifico')?.value || '',
+    limite_productos: document.getElementById('limite-productos')?.value || '50'
   };
 }
 
@@ -603,6 +629,20 @@ function obtenerClaseEstadoReporte(estado) {
     case 'vencido': return 'bg-danger';
     default: return 'bg-secondary';
   }
+}
+
+function obtenerClaseObservacionReporte(observacion) {
+  if (!observacion) return 'bg-secondary';
+  
+  const obs = observacion.toLowerCase();
+  if (obs.includes('bueno') || obs.includes('excelente') || obs.includes('perfecto')) {
+    return 'bg-success';
+  } else if (obs.includes('regular') || obs.includes('advertencia') || obs.includes('cuidado')) {
+    return 'bg-warning text-dark';
+  } else if (obs.includes('dañado') || obs.includes('roto') || obs.includes('malo')) {
+    return 'bg-danger';
+  }
+  return 'bg-info';
 }
 
 function cambiarVistaReporte(vista) {

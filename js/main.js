@@ -786,9 +786,9 @@ function mostrarModuloReportes() {
   }, 200);
 }
 
-// Variables globales para reportes
-let ultimosDataReporte = null;
-let tipoReporteActual = null;
+// Variables globales para reportes (ya declaradas arriba)
+// let ultimosDataReporte = null; - ya existe
+// let tipoReporteActual = null; - ya existe como tipoReporteActual
 let currentChart = null;
 
 async function generarReportePrestamos() {

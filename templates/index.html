@@ -312,6 +312,72 @@
         </div>
       </div>
     </section>
+
+    <!-- Sección de reportes -->
+    <section id="reportes-section" class="my-5" style="display: none;">
+      <div class="panel-container">
+        <div class="panel-header d-flex justify-content-between align-items-center">
+          <h2 class="panel-title">MÓDULO DE REPORTES</h2>
+          <button class="btn btn-sm btn-outline-light" onclick="volverAInterfazPrincipal()">Volver al menú</button>
+        </div>
+        <div class="panel-content">
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <h4 class="text-success mb-3">Filtros de Reportes</h4>
+              <form id="filtros-reporte">
+                <div class="row">
+                  <div class="col-md-3">
+                    <label for="fecha-inicio" class="form-label">Fecha Inicio:</label>
+                    <input type="date" class="form-control" id="fecha-inicio">
+                  </div>
+                  <div class="col-md-3">
+                    <label for="fecha-fin" class="form-label">Fecha Fin:</label>
+                    <input type="date" class="form-control" id="fecha-fin">
+                  </div>
+                  <div class="col-md-3">
+                    <label for="tipo-usuario" class="form-label">Tipo Usuario:</label>
+                    <select class="form-select" id="tipo-usuario">
+                      <option value="">Todos</option>
+                      <option value="estudiante">Estudiantes</option>
+                      <option value="docente">Docentes</option>
+                      <option value="laboratorista">Laboratoristas</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label for="materia-filtro" class="form-label">Materia:</label>
+                    <input type="text" class="form-control" id="materia-filtro" placeholder="Nombre de materia">
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <h4 class="text-success mb-3">Tipos de Reportes</h4>
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-success" onclick="generarReportePrestamos()">Préstamos Realizados</button>
+                <button type="button" class="btn btn-outline-success" onclick="generarReporteEstudiantes()">Estudiantes</button>
+                <button type="button" class="btn btn-outline-success" onclick="generarReporteDocentes()">Docentes</button>
+                <button type="button" class="btn btn-outline-success" onclick="generarReporteMaterias()">Materias</button>
+                <button type="button" class="btn btn-outline-success" onclick="generarReporteProductos()">Productos</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div id="reporte-resultado">
+                <p class="text-light">Selecciona un tipo de reporte para comenzar</p>
+              </div>
+              <div id="reporte-grafico" style="display: none;">
+                <canvas id="chart-canvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
   
   <!-- Footer -->
@@ -334,8 +400,10 @@
   <!-- Los datos del inventario se cargan dinámicamente desde la BD -->
   
   <!-- Scripts de la aplicación -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/autocomplete.js"></script>
+  <script src="/js/reportes.js"></script>
   <script src="/js/main.js"></script>
 </body>
 </html>

@@ -534,7 +534,21 @@ function administrarInventario() {
 }
 
 function mostrarModuloReportes() {
-  mostrarNotificacion('Reportes', 'Módulo de reportes disponible próximamente', 'info');
+  // Ocultar interfaz principal
+  document.getElementById('interface').style.display = 'none';
+  
+  // Mostrar sección de reportes
+  const reportesSection = document.getElementById('reportes-section');
+  if (reportesSection) {
+    reportesSection.style.display = 'block';
+    
+    // Inicializar módulo de reportes si existe
+    if (typeof inicializarReportes === 'function') {
+      inicializarReportes();
+    }
+  } else {
+    mostrarNotificacion('Error', 'Sección de reportes no encontrada', 'error');
+  }
 }
 
 // Función para cargar categorías en préstamo

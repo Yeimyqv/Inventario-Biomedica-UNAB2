@@ -1232,4 +1232,3 @@ function volverASeleccionUsuario() {
   };
   currentUserType = null;
 }
-}

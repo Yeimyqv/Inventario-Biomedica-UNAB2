@@ -2457,23 +2457,6 @@ function mostrarModuloReportes() {
         </div>
       </div>
       
-      <!-- Botones para alternar vista -->
-      <div class="row mb-3">
-        <div class="col-12">
-          <div class="btn-group" role="group" aria-label="Vista de reportes">
-            <button type="button" class="btn btn-outline-primary active" id="btn-vista-tabla" onclick="cambiarVistaReporte('tabla')">
-              <i class="fas fa-table me-2"></i>Tabla
-            </button>
-            <button type="button" class="btn btn-outline-primary" id="btn-vista-grafico" onclick="cambiarVistaReporte('grafico')">
-              <i class="fas fa-chart-bar me-2"></i>Gráfico
-            </button>
-            <button type="button" class="btn btn-outline-primary" id="btn-vista-ambos" onclick="cambiarVistaReporte('ambos')">
-              <i class="fas fa-columns me-2"></i>Ambos
-            </button>
-          </div>
-        </div>
-      </div>
-      
       <!-- Contenido del reporte -->
       <div class="row">
         <div class="col-12">
@@ -2490,13 +2473,35 @@ function mostrarModuloReportes() {
               </div>
             </div>
             <div class="card-body">
-              <div id="contenido-reporte-tabla">
-                <div class="text-center p-4">
-                  <p class="text-muted">Seleccione un tipo de reporte para comenzar</p>
+              <div class="row mb-3">
+                <div class="col-12">
+                  <div class="btn-group" role="group" aria-label="Vista de reportes">
+                    <button type="button" class="btn btn-outline-primary active" id="btn-vista-tabla" onclick="cambiarVistaReporte('tabla')">
+                      <i class="fas fa-table me-2"></i>Tabla
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="btn-vista-grafico" onclick="cambiarVistaReporte('grafico')">
+                      <i class="fas fa-chart-bar me-2"></i>Gráfico
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="btn-vista-ambos" onclick="cambiarVistaReporte('ambos')">
+                      <i class="fas fa-columns me-2"></i>Ambos
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div id="contenido-reporte-grafico" style="display: none;">
-                <canvas id="chart-reporte" width="400" height="200"></canvas>
+              
+              <div class="row">
+                <div class="col-12" id="contenido-reporte-tabla">
+                  <div class="text-center p-4">
+                    <p class="text-muted">Seleccione un tipo de reporte para comenzar</p>
+                  </div>
+                </div>
+                <div class="col-12" id="contenido-reporte-grafico" style="display: none;">
+                  <div class="card bg-dark">
+                    <div class="card-body">
+                      <canvas id="chart-reporte" width="400" height="200"></canvas>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2970,8 +2975,7 @@ function mostrarReporteProductos(data) {
   generarGraficoProductos(data);
 }
 
-// Variable global para almacenar la instancia del gráfico actual
-let currentChart = null;
+// Variable global para gráficos (declarada más abajo)
 
 // Función para cambiar entre vistas de reporte
 function cambiarVistaReporte(vista) {
@@ -3101,4 +3105,214 @@ function obtenerClaseObservacionReporte(observacion) {
   
   // Otras observaciones (campo libre)
   return 'text-warning';
+}
+
+// ======= FUNCIONES PARA GRÁFICOS CON CHART.JS =======
+
+// Variable global para almacenar la instancia del gráfico actual
+var currentChart = null;
+
+function generarGraficoPrestamos(data) {
+  if (!data || !data.prestamos || data.prestamos.length === 0) return;
+  
+  // Agrupar préstamos por fecha
+  const prestamosPorFecha = {};
+  data.prestamos.forEach(prestamo => {
+    const fecha = prestamo.fecha_prestamo.split('T')[0]; // Solo la fecha, sin hora
+    prestamosPorFecha[fecha] = (prestamosPorFecha[fecha] || 0) + 1;
+  });
+  
+  const fechas = Object.keys(prestamosPorFecha).sort();
+  const cantidades = fechas.map(fecha => prestamosPorFecha[fecha]);
+  
+  crearGraficoLineas('Préstamos por Fecha', fechas, cantidades, 'rgba(54, 162, 235, 0.8)');
+}
+
+function generarGraficoEstudiantes(data) {
+  if (!data || !data.estudiantes || data.estudiantes.length === 0) return;
+  
+  // Tomar top 10 estudiantes
+  const top10 = data.estudiantes.slice(0, 10);
+  const nombres = top10.map(est => est.nombre.length > 15 ? est.nombre.substring(0, 15) + '...' : est.nombre);
+  const prestamos = top10.map(est => est.total_prestamos);
+  
+  crearGraficoBarras('Top 10 Estudiantes', nombres, prestamos, 'rgba(75, 192, 192, 0.8)');
+}
+
+function generarGraficoDocentes(data) {
+  if (!data || !data.docentes || data.docentes.length === 0) return;
+  
+  // Tomar top 10 docentes
+  const top10 = data.docentes.slice(0, 10);
+  const nombres = top10.map(doc => doc.nombre.length > 15 ? doc.nombre.substring(0, 15) + '...' : doc.nombre);
+  const productos = top10.map(doc => doc.total_productos);
+  
+  crearGraficoBarras('Top 10 Docentes', nombres, productos, 'rgba(255, 159, 64, 0.8)');
+}
+
+function generarGraficoMaterias(data) {
+  if (!data || !data.materias || data.materias.length === 0) return;
+  
+  // Tomar top 8 materias para gráfico de pastel
+  const top8 = data.materias.slice(0, 8);
+  const materias = top8.map(mat => mat.materia.length > 20 ? mat.materia.substring(0, 20) + '...' : mat.materia);
+  const productos = top8.map(mat => mat.total_productos);
+  
+  crearGraficoPastel('Distribución por Materias', materias, productos);
+}
+
+function generarGraficoProductos(data) {
+  if (!data || !data.productos || data.productos.length === 0) return;
+  
+  // Tomar top 10 productos
+  const top10 = data.productos.slice(0, 10);
+  const nombres = top10.map(prod => prod.nombre.length > 20 ? prod.nombre.substring(0, 20) + '...' : prod.nombre);
+  const cantidades = top10.map(prod => prod.total_solicitado);
+  
+  crearGraficoBarras('Top 10 Productos Más Solicitados', nombres, cantidades, 'rgba(153, 102, 255, 0.8)');
+}
+
+function crearGraficoLineas(titulo, etiquetas, datos, color) {
+  destruirGraficoAnterior();
+  
+  const ctx = document.getElementById('chart-reporte').getContext('2d');
+  currentChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: 'Préstamos',
+        data: datos,
+        borderColor: color,
+        backgroundColor: color.replace('0.8', '0.2'),
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: titulo,
+          color: '#ffffff'
+        },
+        legend: {
+          labels: {
+            color: '#ffffff'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#ffffff' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        },
+        y: {
+          ticks: { color: '#ffffff' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        }
+      }
+    }
+  });
+}
+
+function crearGraficoBarras(titulo, etiquetas, datos, color) {
+  destruirGraficoAnterior();
+  
+  const ctx = document.getElementById('chart-reporte').getContext('2d');
+  currentChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: 'Cantidad',
+        data: datos,
+        backgroundColor: color,
+        borderColor: color.replace('0.8', '1'),
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: titulo,
+          color: '#ffffff'
+        },
+        legend: {
+          labels: {
+            color: '#ffffff'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { 
+            color: '#ffffff',
+            maxRotation: 45
+          },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        },
+        y: {
+          ticks: { color: '#ffffff' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        }
+      }
+    }
+  });
+}
+
+function crearGraficoPastel(titulo, etiquetas, datos) {
+  destruirGraficoAnterior();
+  
+  const colores = [
+    'rgba(255, 99, 132, 0.8)',
+    'rgba(54, 162, 235, 0.8)',
+    'rgba(255, 205, 86, 0.8)',
+    'rgba(75, 192, 192, 0.8)',
+    'rgba(153, 102, 255, 0.8)',
+    'rgba(255, 159, 64, 0.8)',
+    'rgba(199, 199, 199, 0.8)',
+    'rgba(83, 102, 255, 0.8)'
+  ];
+  
+  const ctx = document.getElementById('chart-reporte').getContext('2d');
+  currentChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        data: datos,
+        backgroundColor: colores.slice(0, datos.length),
+        borderColor: colores.slice(0, datos.length).map(color => color.replace('0.8', '1')),
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: titulo,
+          color: '#ffffff'
+        },
+        legend: {
+          position: 'right',
+          labels: {
+            color: '#ffffff'
+          }
+        }
+      }
+    }
+  });
+}
+
+function destruirGraficoAnterior() {
+  if (currentChart) {
+    currentChart.destroy();
+    currentChart = null;
+  }
 }

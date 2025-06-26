@@ -1,6 +1,10 @@
-// Variables globales para reportes
-let tipoReporteActual = null;
-let ultimosDataReporte = null;
+// Variables globales para reportes (evitar redeclaración)
+if (typeof tipoReporteActual === 'undefined') {
+  var tipoReporteActual = null;
+}
+if (typeof ultimosDataReporte === 'undefined') {
+  var ultimosDataReporte = null;
+}
 
 async function generarReportePrestamos() {
   try {

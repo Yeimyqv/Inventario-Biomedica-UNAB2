@@ -10,8 +10,7 @@ let elementoSeleccionado = null;
 let categoriaSeleccionada = null;
 let currentLaboratory = null;
 let INVENTARIO = [];
-let tipoReporteActual = '';
-let ultimosDataReporte = null;
+// Variables de reportes movidas a reports_working.js para evitar conflictos
 
 // Objeto para almacenar los PINes de docentes y laboratoristas
 const PINES = {

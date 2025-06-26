@@ -13,12 +13,16 @@ let datosReporte = null;
 function inicializarReportes() {
     console.log('Inicializando módulo de reportes...');
     
-    // Configurar fechas por defecto para capturar todos los préstamos
+    // Configurar fechas por defecto (último mes)
+    const hoy = new Date();
+    const haceUnMes = new Date();
+    haceUnMes.setMonth(haceUnMes.getMonth() - 1);
+    
     const fechaInicio = document.getElementById('fecha-inicio-reporte');
     const fechaFin = document.getElementById('fecha-fin-reporte');
     
-    if (fechaInicio) fechaInicio.value = '2025-05-01';
-    if (fechaFin) fechaFin.value = '2025-06-30';
+    if (fechaInicio) fechaInicio.value = haceUnMes.toISOString().split('T')[0];
+    if (fechaFin) fechaFin.value = hoy.toISOString().split('T')[0];
     
     // Cargar reporte de préstamos por defecto
     generarReportePrestamos();

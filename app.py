@@ -150,107 +150,10 @@ with app.app_context():
         except Exception as e:
             print(f"Error creando usuarios del sistema: {str(e)}")
     
-    def crear_prestamos_de_prueba():
-        """Crear préstamos de prueba si no existen en la base de datos."""
-        try:
-            from models import Prestamo
-            
-            # Verificar si ya hay préstamos en la base de datos
-            prestamos_count = Prestamo.query.count()
-            
-            if prestamos_count == 0:
-                print("Creando préstamos de prueba...")
-                
-                # Obtener usuarios de estudiantes reales que existen
-                estudiantes_reales = [
-                    'U00054496', 'U00062931', 'U00092674', 'U00097909', 'U00098538',
-                    'U00101887', 'U00101916', 'U00111973', 'U00115436', 'U00117595',
-                    'U00118399', 'U00120120', 'U00122102', 'U00122174', 'U00123283',
-                    'U00139049', 'U00156628', 'U00160276'
-                ]
-                
-                estudiantes_ids = []
-                for ident in estudiantes_reales:
-                    usuario = Usuario.query.filter_by(identificacion=ident).first()
-                    if usuario:
-                        estudiantes_ids.append(usuario.id)
-                
-                # Obtener docentes
-                docentes_ids = [u.id for u in Usuario.query.filter_by(tipo='docente').all()[:5]]
-                
-                # Obtener elementos disponibles
-                elementos_disponibles = [e.id for e in Elemento.query.filter(Elemento.cantidad > 0).limit(15).all()]
-                
-                if len(estudiantes_ids) >= 10 and len(docentes_ids) >= 3 and len(elementos_disponibles) >= 10:
-                    from datetime import datetime
-                    
-                    # Crear 30 préstamos con datos realistas
-                    prestamos_data = [
-                        # Préstamos recientes - junio 2025
-                        (elementos_disponibles[0], estudiantes_ids[0], 1, datetime(2025, 6, 18), None, 'prestado'),
-                        (elementos_disponibles[1], estudiantes_ids[1], 1, datetime(2025, 6, 17), None, 'prestado'),
-                        (elementos_disponibles[2], estudiantes_ids[2], 2, datetime(2025, 6, 16), datetime(2025, 6, 18), 'devuelto'),
-                        (elementos_disponibles[3], estudiantes_ids[3], 1, datetime(2025, 6, 15), None, 'prestado'),
-                        (elementos_disponibles[4], estudiantes_ids[4], 1, datetime(2025, 6, 14), None, 'prestado'),
-                        (elementos_disponibles[5], estudiantes_ids[5], 1, datetime(2025, 6, 13), datetime(2025, 6, 17), 'devuelto'),
-                        (elementos_disponibles[6], estudiantes_ids[6], 2, datetime(2025, 6, 12), None, 'prestado'),
-                        (elementos_disponibles[7], estudiantes_ids[7], 1, datetime(2025, 6, 11), None, 'prestado'),
-                        (elementos_disponibles[8], estudiantes_ids[8], 1, datetime(2025, 6, 10), datetime(2025, 6, 15), 'devuelto'),
-                        (elementos_disponibles[9], estudiantes_ids[9], 1, datetime(2025, 6, 9), None, 'prestado'),
-                        
-                        # Préstamos de docentes
-                        (elementos_disponibles[10], docentes_ids[0], 3, datetime(2025, 6, 8), datetime(2025, 6, 16), 'devuelto'),
-                        (elementos_disponibles[11], docentes_ids[1], 2, datetime(2025, 6, 7), None, 'prestado'),
-                        (elementos_disponibles[12], docentes_ids[2], 1, datetime(2025, 6, 6), datetime(2025, 6, 14), 'devuelto'),
-                        (elementos_disponibles[13], docentes_ids[3] if len(docentes_ids) > 3 else docentes_ids[0], 2, datetime(2025, 6, 5), None, 'prestado'),
-                        (elementos_disponibles[14], docentes_ids[4] if len(docentes_ids) > 4 else docentes_ids[1], 1, datetime(2025, 6, 4), None, 'prestado'),
-                        
-                        # Más préstamos de estudiantes - junio
-                        (elementos_disponibles[0], estudiantes_ids[10], 1, datetime(2025, 6, 3), datetime(2025, 6, 12), 'devuelto'),
-                        (elementos_disponibles[1], estudiantes_ids[11], 1, datetime(2025, 6, 2), None, 'prestado'),
-                        (elementos_disponibles[2], estudiantes_ids[12], 2, datetime(2025, 6, 1), datetime(2025, 6, 10), 'devuelto'),
-                        (elementos_disponibles[3], estudiantes_ids[13], 1, datetime(2025, 5, 31), None, 'prestado'),
-                        (elementos_disponibles[4], estudiantes_ids[14], 1, datetime(2025, 5, 30), datetime(2025, 6, 8), 'devuelto'),
-                        
-                        # Préstamos de mayo 2025
-                        (elementos_disponibles[5], estudiantes_ids[15], 1, datetime(2025, 5, 29), None, 'prestado'),
-                        (elementos_disponibles[6], estudiantes_ids[16], 1, datetime(2025, 5, 28), None, 'prestado'),
-                        (elementos_disponibles[7], estudiantes_ids[17], 1, datetime(2025, 5, 27), datetime(2025, 6, 5), 'devuelto'),
-                        (elementos_disponibles[8], estudiantes_ids[0], 1, datetime(2025, 5, 26), datetime(2025, 6, 3), 'devuelto'),
-                        (elementos_disponibles[9], estudiantes_ids[1], 1, datetime(2025, 5, 25), None, 'prestado'),
-                        (elementos_disponibles[10], estudiantes_ids[2], 1, datetime(2025, 5, 24), datetime(2025, 5, 30), 'devuelto'),
-                        (elementos_disponibles[11], estudiantes_ids[3], 2, datetime(2025, 5, 23), datetime(2025, 5, 31), 'devuelto'),
-                        (elementos_disponibles[12], estudiantes_ids[4], 1, datetime(2025, 5, 22), datetime(2025, 6, 1), 'devuelto'),
-                        (elementos_disponibles[13], estudiantes_ids[5], 1, datetime(2025, 5, 21), datetime(2025, 6, 2), 'devuelto'),
-                        (elementos_disponibles[14], estudiantes_ids[6], 1, datetime(2025, 5, 20), datetime(2025, 6, 3), 'devuelto')
-                    ]
-                    
-                    for elemento_id, usuario_id, cantidad, fecha_prestamo, fecha_devolucion, estado in prestamos_data:
-                        prestamo = Prestamo(
-                            elemento_id=elemento_id,
-                            usuario_id=usuario_id,
-                            cantidad=cantidad,
-                            fecha_prestamo=fecha_prestamo,
-                            fecha_devolucion_real=fecha_devolucion,
-                            estado=estado
-                        )
-                        db.session.add(prestamo)
-                    
-                    db.session.commit()
-                    print(f"Creados {len(prestamos_data)} préstamos de prueba")
-                else:
-                    print(f"Datos insuficientes: {len(estudiantes_ids)} estudiantes, {len(docentes_ids)} docentes, {len(elementos_disponibles)} elementos")
-            else:
-                print(f"Ya existen {prestamos_count} préstamos en la base de datos")
-        
-        except Exception as e:
-            print(f"Error creando préstamos de prueba: {e}")
-    
     # Cargar datos iniciales
     cargar_inventario_inicial()
     cargar_estudiantes_iniciales()
     inicializar_usuarios_sistema()
-    crear_prestamos_de_prueba()
 
 # Rutas para archivos estáticos
 @app.route('/')
@@ -294,19 +197,8 @@ def get_categorias():
 @app.route('/api/elementos/categoria/<int:categoria_id>')
 def get_elementos_by_categoria(categoria_id):
     """Obtener elementos por categoría."""
-    try:
-        elementos = Elemento.query.filter_by(categoria_id=categoria_id).all()
-        elementos_list = []
-        for elemento in elementos:
-            elemento_dict = elemento.to_dict()
-            elemento_dict['disponibles'] = elemento.disponibles()
-            elementos_list.append(elemento_dict)
-        
-        print(f"Enviando {len(elementos_list)} elementos para categoría {categoria_id}")
-        return jsonify(elementos_list)
-    except Exception as e:
-        print(f"Error obteniendo elementos para categoría {categoria_id}: {e}")
-        return jsonify({'error': str(e)}), 500
+    elementos = Elemento.query.filter_by(categoria_id=categoria_id).all()
+    return jsonify([elemento.to_dict() for elemento in elementos])
 
 # API para obtener detalle de un elemento
 @app.route('/api/elemento/<int:elemento_id>')
@@ -322,76 +214,45 @@ def prestar_elemento():
     data = request.json
     
     # Validar datos
-    if not all(k in data for k in ('elemento_id', 'usuario_data', 'cantidad')):
+    if not all(k in data for k in ('elemento_id', 'usuario_id', 'cantidad')):
         return jsonify({'error': 'Datos incompletos'}), 400
     
-    try:
-        # Obtener elemento
-        elemento = Elemento.query.get(data['elemento_id'])
-        if not elemento:
-            return jsonify({'error': 'Elemento no encontrado'}), 404
-        
-        cantidad = int(data['cantidad'])
-        
-        # Verificar disponibilidad
-        if elemento.disponibles() < cantidad:
-            return jsonify({'error': 'No hay suficientes unidades disponibles'}), 400
-        
-        # Buscar o crear usuario
-        usuario_data = data['usuario_data']
-        
-        # Para estudiantes, buscar por identificación
-        if usuario_data['tipo'] == 'estudiante':
-            usuario = Usuario.query.filter_by(
-                identificacion=usuario_data['identificacion'],
-                tipo='estudiante'
-            ).first()
-            
-            if not usuario:
-                return jsonify({'error': 'Estudiante no encontrado en la base de datos'}), 404
-                
-        else:
-            # Para docentes/laboratoristas, buscar por nombre o crear
-            usuario = Usuario.query.filter_by(
-                nombre=usuario_data['nombre'],
-                tipo=usuario_data['tipo']
-            ).first()
-            
-            if not usuario:
-                # Crear usuario temporal
-                usuario = Usuario(
-                    tipo=usuario_data['tipo'],
-                    nombre=usuario_data['nombre'],
-                    identificacion=usuario_data.get('identificacion', usuario_data['nombre'])
-                )
-                db.session.add(usuario)
-                db.session.flush()  # Para obtener el ID
-        
-        # Crear préstamo
-        fecha_devolucion = datetime.utcnow() + timedelta(days=7)  # Por defecto: 7 días
-        
-        prestamo = Prestamo(
-            elemento_id=elemento.id,
-            usuario_id=usuario.id,
-            cantidad=cantidad,
-            fecha_prestamo=datetime.utcnow(),
-            fecha_devolucion_esperada=fecha_devolucion,
-            estado='prestado'
-        )
-        
-        db.session.add(prestamo)
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'mensaje': f'Préstamo de {cantidad} unidad(es) de {elemento.nombre} realizado correctamente para {usuario.nombre}',
-            'prestamo': prestamo.to_dict()
-        })
-        
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error en préstamo: {e}")
-        return jsonify({'error': str(e)}), 500
+    # Obtener elemento y usuario
+    elemento = Elemento.query.get(data['elemento_id'])
+    usuario = Usuario.query.get(data['usuario_id'])
+    
+    if not elemento:
+        return jsonify({'error': 'Elemento no encontrado'}), 404
+    
+    if not usuario:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    
+    cantidad = int(data['cantidad'])
+    
+    # Verificar disponibilidad
+    if elemento.disponibles() < cantidad:
+        return jsonify({'error': 'No hay suficientes unidades disponibles'}), 400
+    
+    # Crear préstamo
+    fecha_devolucion = datetime.utcnow() + timedelta(days=7)  # Por defecto: 7 días
+    
+    prestamo = Prestamo(
+        elemento_id=elemento.id,
+        usuario_id=usuario.id,
+        cantidad=cantidad,
+        fecha_prestamo=datetime.utcnow(),
+        fecha_devolucion_esperada=fecha_devolucion,
+        estado='prestado'
+    )
+    
+    db.session.add(prestamo)
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'mensaje': f'Préstamo de {cantidad} unidad(es) de {elemento.nombre} realizado correctamente',
+        'prestamo': prestamo.to_dict()
+    })
 
 # API para retornar elemento
 @app.route('/api/retornar', methods=['POST'])
@@ -415,10 +276,6 @@ def retornar_elemento():
     # Actualizar préstamo
     prestamo.estado = 'devuelto'
     prestamo.fecha_devolucion_real = datetime.utcnow()
-    
-    # Guardar observaciones de devolución si se proporcionan
-    if 'observaciones' in data and data['observaciones']:
-        prestamo.observaciones = data['observaciones']
     
     db.session.commit()
     
@@ -560,78 +417,42 @@ def reporte_prestamos():
         tipo_usuario = request.args.get('tipo_usuario')
         materia = request.args.get('materia')
         elemento_id = request.args.get('elemento_id')
-        buscar_estudiante = request.args.get('buscar_estudiante')
         
-        print(f"[DEBUG] Reporte préstamos - buscar_estudiante: '{buscar_estudiante}'")
-        
-        # Construir consulta base con joins
-        query = db.session.query(Prestamo).join(Usuario).join(Elemento).join(Categoria)
+        # Construir consulta base
+        query = db.session.query(Prestamo).join(Usuario).join(Elemento)
         
         # Aplicar filtros de fecha
         if fecha_inicio:
-            fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
-            query = query.filter(Prestamo.fecha_prestamo >= fecha_inicio_dt)
-            
+            query = query.filter(Prestamo.fecha_prestamo >= datetime.strptime(fecha_inicio, '%Y-%m-%d'))
         if fecha_fin:
-            fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d') + timedelta(days=1)
-            query = query.filter(Prestamo.fecha_prestamo < fecha_fin_dt)
+            query = query.filter(Prestamo.fecha_prestamo <= datetime.strptime(fecha_fin, '%Y-%m-%d'))
         
         # Aplicar filtros adicionales
         if tipo_usuario:
             query = query.filter(Usuario.tipo == tipo_usuario)
-            
-        if materia and materia.strip():
+        if materia:
             query = query.filter(Usuario.materia.ilike(f'%{materia}%'))
-            
         if elemento_id:
             query = query.filter(Prestamo.elemento_id == elemento_id)
         
-        # Filtro de búsqueda de estudiante
-        if buscar_estudiante and buscar_estudiante.strip():
-            buscar_term = buscar_estudiante.strip()
-            query = query.filter(
-                db.or_(
-                    Usuario.nombre.ilike(f'%{buscar_term}%'),
-                    Usuario.identificacion.ilike(f'%{buscar_term}%')
-                )
-            )
-        
-        # Ordenar por fecha descendente
-        query = query.order_by(Prestamo.fecha_prestamo.desc())
-        
         prestamos = query.all()
         
-        # Convertir a formato JSON detallado
-        prestamos_json = []
-        for prestamo in prestamos:
-            prestamos_json.append({
-                'id': prestamo.id,
-                'fecha_prestamo': prestamo.fecha_prestamo.isoformat(),
-                'fecha_devolucion_real': prestamo.fecha_devolucion_real.isoformat() if prestamo.fecha_devolucion_real else None,
-                'cantidad': prestamo.cantidad,
-                'estado': prestamo.estado,
-                'observaciones': prestamo.observaciones or '',
-                'usuario_nombre': prestamo.usuario.nombre,
-                'usuario_identificacion': prestamo.usuario.identificacion,
-                'usuario_tipo': prestamo.usuario.tipo,
-                'usuario_correo': prestamo.usuario.correo or '',
-                'usuario_materia': prestamo.usuario.materia or '',
-                'usuario_docente': prestamo.usuario.docente or '',
-                'elemento_nombre': prestamo.elemento.nombre,
-                'elemento_codigo': prestamo.elemento.codigo,
-                'elemento_categoria': prestamo.elemento.categoria.nombre
-            })
+        # Preparar respuesta
+        resultado = {
+            'total_prestamos': len(prestamos),
+            'prestamos': [prestamo.to_dict() for prestamo in prestamos],
+            'filtros_aplicados': {
+                'fecha_inicio': fecha_inicio,
+                'fecha_fin': fecha_fin,
+                'tipo_usuario': tipo_usuario,
+                'materia': materia,
+                'elemento_id': elemento_id
+            }
+        }
         
-        return jsonify({
-            'success': True,
-            'total_prestamos': len(prestamos_json),
-            'prestamos': prestamos_json
-        })
+        return jsonify(resultado)
         
     except Exception as e:
-        print(f"[ERROR] Error en reporte_prestamos: {str(e)}")
-        import traceback
-        traceback.print_exc()
         return jsonify({'error': f'Error generando reporte de préstamos: {str(e)}'}), 500
 
 @app.route('/api/reportes/estudiantes', methods=['GET'])
@@ -642,14 +463,11 @@ def reporte_estudiantes():
         fecha_fin = request.args.get('fecha_fin')
         buscar_estudiante = request.args.get('buscar_estudiante')
         
-        print(f"[DEBUG] Filtros recibidos - fecha_inicio: {fecha_inicio}, fecha_fin: {fecha_fin}, buscar_estudiante: '{buscar_estudiante}'")
-        
         # Consulta para contar préstamos por estudiante
         query = db.session.query(
             Usuario.id,
             Usuario.nombre,
             Usuario.identificacion,
-            Usuario.correo,
             Usuario.materia,
             Usuario.docente,
             db.func.count(Prestamo.id).label('total_prestamos')
@@ -661,22 +479,16 @@ def reporte_estudiantes():
         if fecha_fin:
             query = query.filter(Prestamo.fecha_prestamo <= datetime.strptime(fecha_fin, '%Y-%m-%d'))
         
-        # Filtro de búsqueda de estudiante - mejorado para ser más flexible
-        if buscar_estudiante and buscar_estudiante.strip():
-            buscar_term = buscar_estudiante.strip()
-            print(f"[DEBUG] Aplicando filtro de búsqueda: '{buscar_term}'")
+        # Filtro de búsqueda de estudiante
+        if buscar_estudiante:
             query = query.filter(
                 db.or_(
-                    Usuario.nombre.ilike(f'%{buscar_term}%'),
-                    Usuario.identificacion.ilike(f'%{buscar_term}%')
+                    Usuario.nombre.ilike(f'%{buscar_estudiante}%'),
+                    Usuario.identificacion.ilike(f'%{buscar_estudiante}%')
                 )
             )
         
         estudiantes = query.group_by(Usuario.id).order_by(db.desc('total_prestamos')).all()
-        
-        print(f"[DEBUG] Encontrados {len(estudiantes)} estudiantes")
-        if buscar_estudiante and buscar_estudiante.strip():
-            print(f"[DEBUG] Primeros 3 estudiantes encontrados: {[est.nombre for est in estudiantes[:3]]}")
         
         resultado = {
             'total_estudiantes': len(estudiantes),
@@ -685,7 +497,6 @@ def reporte_estudiantes():
                     'id': est.id,
                     'nombre': est.nombre,
                     'identificacion': est.identificacion,
-                    'correo': est.correo,
                     'materia': est.materia,
                     'docente': est.docente,
                     'total_prestamos': est.total_prestamos
@@ -711,7 +522,6 @@ def reporte_docentes():
             Usuario.id,
             Usuario.nombre,
             Usuario.identificacion,
-            Usuario.correo,
             db.func.count(Prestamo.id).label('numero_prestamos'),
             db.func.sum(Prestamo.cantidad).label('total_productos')
         ).join(Prestamo).filter(Usuario.tipo == 'docente')
@@ -747,7 +557,6 @@ def reporte_docentes():
             ranking_docentes[doc.nombre] = {
                 'nombre': doc.nombre,
                 'identificacion': doc.identificacion,
-                'correo': doc.correo,
                 'numero_prestamos': doc.numero_prestamos,
                 'total_productos': doc.total_productos,
                 'tipo': 'directo'
@@ -846,6 +655,7 @@ def reporte_productos():
         query = db.session.query(
             Elemento.id,
             Elemento.nombre,
+            Elemento.codigo,
             Categoria.nombre.label('categoria'),
             db.func.count(Prestamo.id).label('numero_prestamos'),
             db.func.sum(Prestamo.cantidad).label('total_solicitado')
@@ -870,6 +680,7 @@ def reporte_productos():
                 {
                     'id': prod.id,
                     'nombre': prod.nombre,
+                    'codigo': prod.codigo,
                     'categoria': prod.categoria,
                     'numero_prestamos': prod.numero_prestamos,
                     'total_solicitado': prod.total_solicitado

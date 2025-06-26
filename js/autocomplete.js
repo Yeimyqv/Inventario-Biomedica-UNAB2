@@ -20,25 +20,6 @@ function configurarEventosAutocompletado() {
     }
   });
   
-  // Evento para permitir edición del nombre cuando se borra el ID
-  idInput.addEventListener('input', function() {
-    const nombreInput = document.getElementById('user-name');
-    if (this.value.trim() === '') {
-      // Si se borra el ID, permitir editar el nombre nuevamente
-      if (nombreInput) {
-        nombreInput.readOnly = false;
-        nombreInput.classList.remove('bg-dark', 'text-light');
-        nombreInput.value = '';
-        
-        // También limpiar el correo
-        const correoInput = document.getElementById('estudiante-correo');
-        if (correoInput) {
-          correoInput.value = '';
-        }
-      }
-    }
-  });
-  
   // Evento al hacer clic en el botón buscar
   buscarBtn.addEventListener('click', function() {
     console.log('Botón buscar estudiante clickeado');
@@ -83,10 +64,6 @@ async function buscarEstudiantePorId() {
       // Autocompletar campos si se encontró el estudiante
       nombreInput.value = estudiante.nombre || '';
       correoInput.value = estudiante.correo || '';
-      
-      // Hacer el campo de nombre de solo lectura cuando se encuentra el estudiante
-      nombreInput.readOnly = true;
-      nombreInput.classList.add('bg-dark', 'text-light');
       
       console.log('Información cargada:', {
         nombre: estudiante.nombre,

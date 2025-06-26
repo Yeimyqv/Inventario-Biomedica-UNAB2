@@ -615,7 +615,7 @@ function configurarEventosAutocompletado() {
     
     try {
       console.log(`Buscando estudiante con ID: ${id}`);
-      const response = await fetch(`/api/buscar_estudiante/${id}`);
+      const response = await fetch(`/api/estudiante/${id}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -624,18 +624,19 @@ function configurarEventosAutocompletado() {
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
       
-      if (data.estudiante) {
+      // El endpoint /api/estudiante devuelve directamente los datos del estudiante
+      if (data && data.nombre) {
         if (userEmailInput) {
-          userEmailInput.value = data.estudiante.correo || `${id.toLowerCase()}@unab.edu.co`;
+          userEmailInput.value = data.correo || `${id.toLowerCase()}@unab.edu.co`;
         }
         
         // También actualizar el campo de nombre si existe
         const nombreInput = document.getElementById('user-name');
         if (nombreInput) {
-          nombreInput.value = data.estudiante.nombre;
+          nombreInput.value = data.nombre;
         }
         
-        mostrarNotificacion('Estudiante encontrado', `${data.estudiante.nombre}`, 'success', 3000);
+        mostrarNotificacion('Estudiante encontrado', `${data.nombre}`, 'success', 3000);
       } else {
         if (userEmailInput) {
           userEmailInput.value = '';
@@ -644,7 +645,7 @@ function configurarEventosAutocompletado() {
         if (nombreInput) {
           nombreInput.value = '';
         }
-        mostrarNotificacion('No encontrado', data.message || 'Estudiante no encontrado', 'warning', 3000);
+        mostrarNotificacion('No encontrado', 'Estudiante no encontrado', 'warning', 3000);
       }
     } catch (error) {
       console.error('Error buscando estudiante:', error);

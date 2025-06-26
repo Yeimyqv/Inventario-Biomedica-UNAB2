@@ -2473,7 +2473,7 @@ function mostrarModuloReportes() {
               </div>
             </div>
             <div class="card-body">
-              <div class="row mb-3">
+              <div class="row mb-3" id="controles-vista-reporte" style="display: none;">
                 <div class="col-12">
                   <div class="btn-group" role="group" aria-label="Vista de reportes">
                     <button type="button" class="btn btn-outline-primary active" id="btn-vista-tabla" onclick="cambiarVistaReporte('tabla')">

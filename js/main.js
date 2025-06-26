@@ -63,22 +63,17 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Inicializar modales personalizados
   initCustomModals();
   
-  // Mostrar directamente la selección de usuario (ya no hay sección lab-selection)
+  // Mostrar directamente la selección de usuario
   document.getElementById('user-selection').style.display = 'block';
   
   // Cargar el inventario desde la base de datos en segundo plano
   try {
-    const loadingMsg = mostrarNotificacion('Cargando', 'Cargando datos del sistema...', 'info', 3000);
+    console.log('Cargando inventario...');
     INVENTARIO = await cargarInventarioDesdeDB();
     console.log(`Inventario cargado: ${INVENTARIO.length} categorías`);
-    
-    // Cerrar la notificación inmediatamente después de cargar
-    if (loadingMsg && loadingMsg.close) {
-      loadingMsg.close();
-    }
   } catch (error) {
     console.error('Error al cargar el inventario:', error);
-    mostrarNotificacion('Error', 'Hubo un problema al cargar el inventario. Algunas funciones podrían no estar disponibles.', 'error', 5000);
+    mostrarNotificacion('Error', 'Hubo un problema al cargar el inventario.', 'error', 5000);
   }
 });
 
@@ -3529,4 +3524,26 @@ function destruirGraficoAnterior() {
     currentChart.destroy();
     currentChart = null;
   }
+}
+
+// Función para volver a la selección de usuario desde cualquier parte
+function volverASeleccionUsuario() {
+  // Ocultar todas las secciones
+  document.getElementById('auth-section').style.display = 'none';
+  document.getElementById('interface').style.display = 'none';
+  document.getElementById('prestamo-section').style.display = 'none';
+  document.getElementById('retorno-section').style.display = 'none';
+  document.getElementById('consulta-section').style.display = 'none';
+  document.getElementById('admin-section').style.display = 'none';
+  
+  // Mostrar selección de usuario
+  document.getElementById('user-selection').style.display = 'block';
+  
+  // Resetear datos del usuario
+  currentUser = {
+    id: null,
+    tipo: null,
+    nombre: null
+  };
+  currentUserType = null;
 }

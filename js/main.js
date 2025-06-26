@@ -615,11 +615,16 @@ async function cargarElementosPorCategoria(categoriaId) {
         // Agregar evento de cambio para mostrar detalles del elemento
         elementoSelect.addEventListener('change', function() {
           const elementoId = this.value;
+          const btnPrestamo = document.getElementById('btn-realizar-prestamo');
+          
           if (elementoId) {
             const elementoSeleccionado = data.find(e => e.id == elementoId);
             if (elementoSeleccionado) {
               mostrarDetallesElemento(elementoSeleccionado);
+              btnPrestamo.disabled = false;
             }
+          } else {
+            btnPrestamo.disabled = true;
           }
         });
         
@@ -651,6 +656,73 @@ function mostrarDetallesElemento(elemento) {
         </div>
       </div>
     `;
+  }
+}
+
+// Función para realizar préstamo
+async function realizarPrestamo() {
+  try {
+    const elementoSelect = document.getElementById('elemento-select');
+    const cantidadInput = document.getElementById('cantidad-input');
+    
+    const elementoId = elementoSelect.value;
+    const cantidad = parseInt(cantidadInput.value);
+    
+    if (!elementoId) {
+      mostrarNotificacion('Error', 'Selecciona un elemento', 'error');
+      return;
+    }
+    
+    if (!cantidad || cantidad < 1) {
+      mostrarNotificacion('Error', 'Ingresa una cantidad válida', 'error');
+      return;
+    }
+    
+    // Crear usuario temporal para el préstamo
+    const usuarioData = {
+      tipo: currentUser.tipo,
+      nombre: currentUser.nombre,
+      identificacion: currentUser.id_estudiante || currentUser.nombre,
+      correo: currentUser.correo || '',
+      docente: currentUser.docente || '',
+      materia: currentUser.materia || ''
+    };
+    
+    const prestamoData = {
+      elemento_id: parseInt(elementoId),
+      usuario_data: usuarioData,
+      cantidad: cantidad
+    };
+    
+    const response = await fetch('/api/prestar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(prestamoData)
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok && result.success) {
+      mostrarNotificacion('Éxito', result.mensaje, 'success');
+      
+      // Limpiar formulario
+      cantidadInput.value = '';
+      elementoSelect.selectedIndex = 0;
+      document.getElementById('btn-realizar-prestamo').disabled = true;
+      
+      // Recargar elementos para actualizar disponibilidad
+      const categoriaSelect = document.getElementById('categoria-select');
+      if (categoriaSelect.value) {
+        await cargarElementosPorCategoria(categoriaSelect.value);
+      }
+    } else {
+      mostrarNotificacion('Error', result.error || 'Error realizando préstamo', 'error');
+    }
+  } catch (error) {
+    console.error('Error realizando préstamo:', error);
+    mostrarNotificacion('Error', 'Error al procesar préstamo', 'error');
   }
 }
 

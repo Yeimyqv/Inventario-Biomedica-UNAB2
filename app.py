@@ -322,45 +322,76 @@ def prestar_elemento():
     data = request.json
     
     # Validar datos
-    if not all(k in data for k in ('elemento_id', 'usuario_id', 'cantidad')):
+    if not all(k in data for k in ('elemento_id', 'usuario_data', 'cantidad')):
         return jsonify({'error': 'Datos incompletos'}), 400
     
-    # Obtener elemento y usuario
-    elemento = Elemento.query.get(data['elemento_id'])
-    usuario = Usuario.query.get(data['usuario_id'])
-    
-    if not elemento:
-        return jsonify({'error': 'Elemento no encontrado'}), 404
-    
-    if not usuario:
-        return jsonify({'error': 'Usuario no encontrado'}), 404
-    
-    cantidad = int(data['cantidad'])
-    
-    # Verificar disponibilidad
-    if elemento.disponibles() < cantidad:
-        return jsonify({'error': 'No hay suficientes unidades disponibles'}), 400
-    
-    # Crear préstamo
-    fecha_devolucion = datetime.utcnow() + timedelta(days=7)  # Por defecto: 7 días
-    
-    prestamo = Prestamo(
-        elemento_id=elemento.id,
-        usuario_id=usuario.id,
-        cantidad=cantidad,
-        fecha_prestamo=datetime.utcnow(),
-        fecha_devolucion_esperada=fecha_devolucion,
-        estado='prestado'
-    )
-    
-    db.session.add(prestamo)
-    db.session.commit()
-    
-    return jsonify({
-        'success': True,
-        'mensaje': f'Préstamo de {cantidad} unidad(es) de {elemento.nombre} realizado correctamente',
-        'prestamo': prestamo.to_dict()
-    })
+    try:
+        # Obtener elemento
+        elemento = Elemento.query.get(data['elemento_id'])
+        if not elemento:
+            return jsonify({'error': 'Elemento no encontrado'}), 404
+        
+        cantidad = int(data['cantidad'])
+        
+        # Verificar disponibilidad
+        if elemento.disponibles() < cantidad:
+            return jsonify({'error': 'No hay suficientes unidades disponibles'}), 400
+        
+        # Buscar o crear usuario
+        usuario_data = data['usuario_data']
+        
+        # Para estudiantes, buscar por identificación
+        if usuario_data['tipo'] == 'estudiante':
+            usuario = Usuario.query.filter_by(
+                identificacion=usuario_data['identificacion'],
+                tipo='estudiante'
+            ).first()
+            
+            if not usuario:
+                return jsonify({'error': 'Estudiante no encontrado en la base de datos'}), 404
+                
+        else:
+            # Para docentes/laboratoristas, buscar por nombre o crear
+            usuario = Usuario.query.filter_by(
+                nombre=usuario_data['nombre'],
+                tipo=usuario_data['tipo']
+            ).first()
+            
+            if not usuario:
+                # Crear usuario temporal
+                usuario = Usuario(
+                    tipo=usuario_data['tipo'],
+                    nombre=usuario_data['nombre'],
+                    identificacion=usuario_data.get('identificacion', usuario_data['nombre'])
+                )
+                db.session.add(usuario)
+                db.session.flush()  # Para obtener el ID
+        
+        # Crear préstamo
+        fecha_devolucion = datetime.utcnow() + timedelta(days=7)  # Por defecto: 7 días
+        
+        prestamo = Prestamo(
+            elemento_id=elemento.id,
+            usuario_id=usuario.id,
+            cantidad=cantidad,
+            fecha_prestamo=datetime.utcnow(),
+            fecha_devolucion_esperada=fecha_devolucion,
+            estado='prestado'
+        )
+        
+        db.session.add(prestamo)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'mensaje': f'Préstamo de {cantidad} unidad(es) de {elemento.nombre} realizado correctamente para {usuario.nombre}',
+            'prestamo': prestamo.to_dict()
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error en préstamo: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # API para retornar elemento
 @app.route('/api/retornar', methods=['POST'])

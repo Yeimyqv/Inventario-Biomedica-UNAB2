@@ -651,9 +651,10 @@ function configurarEventosAutocompletado() {
         if (nombreInput) {
           nombreInput.value = data.nombre;
           nombreInput.readOnly = true;
-          nombreInput.style.backgroundColor = '#f8f9fa';
-          nombreInput.style.color = '#495057';
-          nombreInput.style.border = '1px solid #ced4da';
+          nombreInput.style.backgroundColor = '#1a1a1a';
+          nombreInput.style.color = '#ffffff';
+          nombreInput.style.border = '2px solid #45d509';
+          nombreInput.style.borderRadius = '5px';
           nombreInput.title = 'Nombre cargado automáticamente desde la base de datos';
         }
         
@@ -669,6 +670,7 @@ function configurarEventosAutocompletado() {
           nombreInput.style.backgroundColor = '';
           nombreInput.style.color = '';
           nombreInput.style.border = '';
+          nombreInput.style.borderRadius = '';
           nombreInput.title = '';
         }
         mostrarNotificacion('No encontrado', 'Estudiante no encontrado', 'warning', 3000);

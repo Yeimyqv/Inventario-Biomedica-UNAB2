@@ -2578,6 +2578,10 @@ function mostrarModuloReportes() {
   }, 200);
 }
 
+// Variables necesarias antes de las funciones de reporte
+tipoReporteActual = '';
+ultimosDataReporte = null;
+
 async function generarReportePrestamos() {
   try {
     mostrarCargandoReporte();
@@ -3011,7 +3015,8 @@ function mostrarReporteProductos(data) {
   // Los gráficos se generan bajo demanda
 }
 
-// Variable global para gráficos (declarada más abajo)
+// Variable global para gráficos
+let currentChart = null;
 
 // Función para cambiar entre vistas de reporte
 function cambiarVistaReporte(vista) {
@@ -3020,7 +3025,7 @@ function cambiarVistaReporte(vista) {
   const btnBarras = document.getElementById('btn-vista-grafico-barras');
   const btnCircular = document.getElementById('btn-vista-grafico-circular');
   const btnAmbosGraficos = document.getElementById('btn-vista-ambos-graficos');
-  const tablaContainer = document.getElementById('tabla-reporte');
+  const tablaContainer = document.getElementById('contenido-reporte-tabla');
   const chartContainer = document.getElementById('chart-container');
   
   // Remover clase activa de todos los botones

@@ -3527,21 +3527,27 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
       afterDatasetsDraw: function(chart) {
         const ctx = chart.ctx;
         ctx.save();
-        ctx.font = 'bold 11px Arial';
+        ctx.font = 'bold 10px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,0.7)';
-        ctx.shadowBlur = 2;
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 3;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
         
         chart.data.datasets.forEach((dataset, i) => {
           const meta = chart.getDatasetMeta(i);
           meta.data.forEach((bar, index) => {
             const data = dataset.data[index];
             const percentage = porcentajes[index];
-            const x = bar.x + 5;
+            const x = bar.x + 8; // Más separado del borde
             const y = bar.y;
-            ctx.fillText(`${data} (${percentage}%)`, x, y);
+            
+            // Asegurar que el texto sea visible
+            if (bar.width > 40) { // Solo mostrar si hay espacio suficiente
+              ctx.fillText(`${data} (${percentage}%)`, x, y);
+            }
           });
         });
         ctx.restore();
@@ -3616,7 +3622,8 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
                     strokeStyle: data.datasets[0].borderColor[i],
                     lineWidth: data.datasets[0].borderWidth,
                     hidden: false,
-                    index: i
+                    index: i,
+                    fontColor: '#ffffff' // Forzar color blanco
                   };
                 });
               }
@@ -3650,11 +3657,12 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
             
             ctx.save();
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 11px Arial';
+            ctx.font = 'bold 12px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 2;
+            ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+            ctx.lineWidth = 3;
+            ctx.strokeText(`${percentage}%`, position.x, position.y);
             ctx.fillText(`${percentage}%`, position.x, position.y);
             ctx.restore();
           });

@@ -103,6 +103,8 @@ The application uses four main models:
 - June 25, 2025: Added comprehensive charts and graphs module using Chart.js for ranking reports only
 - June 25, 2025: Implemented toggle functionality between table view, chart view, and combined view for ranking reports
 - June 26, 2025: Configured charts to only appear in ranking reports (students, teachers, subjects) as per user requirements
+- June 26, 2025: Implemented PDF export functionality with jsPDF library - table-only reports export tables, ranking reports export both tables and charts
+- June 26, 2025: Added CSV export functionality for Excel compatibility with proper data formatting
 
 ## User Preferences
 

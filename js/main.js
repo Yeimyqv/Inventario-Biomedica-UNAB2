@@ -3089,11 +3089,217 @@ function obtenerClaseEstadoReporte(estado) {
 }
 
 function exportarReportePDF() {
-  mostrarNotificacion("Exportación a PDF", "Funcionalidad en desarrollo", "info");
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Obtener el título del reporte actual
+    const tituloReporte = document.getElementById("titulo-reporte")?.textContent || "Reporte";
+    const fechaActual = new Date().toLocaleDateString('es-CO');
+    
+    // Configurar encabezado del PDF
+    doc.setFontSize(18);
+    doc.text('Sistema de Gestión de Laboratorio - UNAB', 20, 20);
+    doc.setFontSize(14);
+    doc.text(`${tituloReporte}`, 20, 35);
+    doc.setFontSize(10);
+    doc.text(`Generado el: ${fechaActual}`, 20, 45);
+    
+    let yPosition = 60;
+    
+    // Determinar tipo de reporte actual
+    const tipoReporte = determinarTipoReporte();
+    
+    if (tipoReporte === 'ranking') {
+      // Para reportes de ranking: exportar tabla y gráficos
+      yPosition = exportarTablaAPDF(doc, yPosition);
+      yPosition = exportarGraficosAPDF(doc, yPosition);
+    } else {
+      // Para reportes de préstamos y productos: solo tabla
+      yPosition = exportarTablaAPDF(doc, yPosition);
+    }
+    
+    // Guardar el PDF
+    const nombreArchivo = `${tituloReporte.replace(/\s+/g, '_')}_${fechaActual.replace(/\//g, '-')}.pdf`;
+    doc.save(nombreArchivo);
+    
+    mostrarNotificacion("Exportación exitosa", "El reporte PDF ha sido descargado", "success");
+    
+  } catch (error) {
+    console.error("Error exportando PDF:", error);
+    mostrarNotificacion("Error", "No se pudo exportar el PDF. Verifique que hay datos para exportar.", "error");
+  }
+}
+
+function determinarTipoReporte() {
+  const tituloReporte = document.getElementById("titulo-reporte")?.textContent || "";
+  if (tituloReporte.includes("Estudiantes") || tituloReporte.includes("Docentes") || tituloReporte.includes("Materias")) {
+    return 'ranking';
+  }
+  return 'tabla';
+}
+
+function exportarTablaAPDF(doc, yPosition) {
+  const tabla = document.querySelector('#contenido-reporte-tabla table');
+  if (!tabla) {
+    doc.text('No hay datos de tabla para exportar', 20, yPosition);
+    return yPosition + 20;
+  }
+  
+  // Extraer datos de la tabla
+  const encabezados = [];
+  const filas = [];
+  
+  // Obtener encabezados
+  const thead = tabla.querySelector('thead tr');
+  if (thead) {
+    thead.querySelectorAll('th').forEach(th => {
+      encabezados.push(th.textContent.trim());
+    });
+  }
+  
+  // Obtener filas de datos
+  const tbody = tabla.querySelector('tbody');
+  if (tbody) {
+    tbody.querySelectorAll('tr').forEach(tr => {
+      const fila = [];
+      tr.querySelectorAll('td').forEach(td => {
+        // Limpiar texto de elementos HTML y obtener solo el texto
+        let texto = td.textContent.trim();
+        // Remover emojis y caracteres especiales para PDF
+        texto = texto.replace(/[🥇🥈🥉]/g, '');
+        fila.push(texto);
+      });
+      if (fila.length > 0 && !fila.join('').includes('No se encontraron')) {
+        filas.push(fila);
+      }
+    });
+  }
+  
+  if (encabezados.length > 0 && filas.length > 0) {
+    doc.autoTable({
+      head: [encabezados],
+      body: filas,
+      startY: yPosition,
+      theme: 'grid',
+      styles: {
+        fontSize: 8,
+        cellPadding: 3
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 248, 255]
+      }
+    });
+    
+    return doc.lastAutoTable.finalY + 20;
+  } else {
+    doc.text('No hay datos disponibles para exportar', 20, yPosition);
+    return yPosition + 20;
+  }
+}
+
+function exportarGraficosAPDF(doc, yPosition) {
+  try {
+    // Verificar si la página actual tiene espacio, si no, agregar nueva página
+    if (yPosition > 200) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    doc.setFontSize(12);
+    doc.text('Gráficos del Reporte', 20, yPosition);
+    yPosition += 15;
+    
+    // Exportar gráfico de barras
+    const chartBarras = document.getElementById('chart-reporte');
+    if (chartBarras && currentChart) {
+      const imgBarras = currentChart.toBase64Image();
+      doc.addImage(imgBarras, 'PNG', 20, yPosition, 80, 60);
+      doc.text('Gráfico de Barras', 20, yPosition - 5);
+    }
+    
+    // Exportar gráfico de pastel
+    const chartPastel = document.getElementById('chart-reporte-pastel');
+    if (chartPastel && currentChartPastel) {
+      const imgPastel = currentChartPastel.toBase64Image();
+      doc.addImage(imgPastel, 'PNG', 110, yPosition, 80, 60);
+      doc.text('Gráfico de Distribución', 110, yPosition - 5);
+    }
+    
+    return yPosition + 70;
+    
+  } catch (error) {
+    console.error("Error exportando gráficos:", error);
+    doc.text('Error al exportar gráficos', 20, yPosition);
+    return yPosition + 20;
+  }
 }
 
 function exportarReporteExcel() {
-  mostrarNotificacion("Exportación a Excel", "Funcionalidad en desarrollo", "info");
+  try {
+    const tabla = document.querySelector('#contenido-reporte-tabla table');
+    if (!tabla) {
+      mostrarNotificacion("Error", "No hay datos de tabla para exportar", "error");
+      return;
+    }
+    
+    // Obtener el título del reporte
+    const tituloReporte = document.getElementById("titulo-reporte")?.textContent || "Reporte";
+    const fechaActual = new Date().toLocaleDateString('es-CO');
+    
+    // Crear contenido CSV
+    let csvContent = `${tituloReporte}\nGenerado el: ${fechaActual}\n\n`;
+    
+    // Extraer encabezados
+    const thead = tabla.querySelector('thead tr');
+    if (thead) {
+      const encabezados = [];
+      thead.querySelectorAll('th').forEach(th => {
+        encabezados.push(`"${th.textContent.trim()}"`);
+      });
+      csvContent += encabezados.join(',') + '\n';
+    }
+    
+    // Extraer filas de datos
+    const tbody = tabla.querySelector('tbody');
+    if (tbody) {
+      tbody.querySelectorAll('tr').forEach(tr => {
+        const fila = [];
+        tr.querySelectorAll('td').forEach(td => {
+          let texto = td.textContent.trim();
+          // Remover emojis y limpiar texto
+          texto = texto.replace(/[🥇🥈🥉]/g, '');
+          fila.push(`"${texto}"`);
+        });
+        if (fila.length > 0 && !fila.join('').includes('No se encontraron')) {
+          csvContent += fila.join(',') + '\n';
+        }
+      });
+    }
+    
+    // Crear y descargar archivo
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    const nombreArchivo = `${tituloReporte.replace(/\s+/g, '_')}_${fechaActual.replace(/\//g, '-')}.csv`;
+    link.setAttribute('download', nombreArchivo);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    mostrarNotificacion("Exportación exitosa", "El archivo CSV ha sido descargado", "success");
+    
+  } catch (error) {
+    console.error("Error exportando CSV:", error);
+    mostrarNotificacion("Error", "No se pudo exportar el archivo CSV", "error");
+  }
 }
 
 function obtenerClaseObservacionReporte(observacion) {

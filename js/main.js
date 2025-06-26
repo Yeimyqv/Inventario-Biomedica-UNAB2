@@ -2496,9 +2496,26 @@ function mostrarModuloReportes() {
                   </div>
                 </div>
                 <div class="col-12" id="contenido-reporte-grafico" style="display: none;">
-                  <div class="card bg-dark">
-                    <div class="card-body">
-                      <canvas id="chart-reporte" width="400" height="200"></canvas>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <div class="card bg-dark">
+                        <div class="card-header">
+                          <h6 class="card-title mb-0">Gráfico de Barras</h6>
+                        </div>
+                        <div class="card-body">
+                          <canvas id="chart-reporte" width="400" height="300"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <div class="card bg-dark">
+                        <div class="card-header">
+                          <h6 class="card-title mb-0">Gráfico de Pastel</h6>
+                        </div>
+                        <div class="card-body">
+                          <canvas id="chart-reporte-pastel" width="400" height="300"></canvas>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -3142,10 +3159,14 @@ function generarGraficoEstudiantes(data) {
   
   // Tomar top 10 estudiantes
   const top10 = data.estudiantes.slice(0, 10);
-  const nombres = top10.map(est => est.nombre.length > 15 ? est.nombre.substring(0, 15) + '...' : est.nombre);
+  const nombres = top10.map(est => est.nombre.length > 20 ? est.nombre.substring(0, 20) + '...' : est.nombre);
   const prestamos = top10.map(est => est.total_prestamos);
   
-  crearGraficoBarras('Top 10 Estudiantes', nombres, prestamos, 'rgba(75, 192, 192, 0.8)');
+  // Crear ambos gráficos: barras horizontales y pastel
+  crearGraficoBarrasHorizontales('Top 10 Estudiantes - Barras', nombres, prestamos, 'rgba(75, 192, 192, 0.8)');
+  setTimeout(() => {
+    crearGraficoPastel('Top 10 Estudiantes - Distribución', nombres, prestamos);
+  }, 100);
 }
 
 function generarGraficoDocentes(data) {
@@ -3153,21 +3174,29 @@ function generarGraficoDocentes(data) {
   
   // Tomar top 10 docentes
   const top10 = data.docentes.slice(0, 10);
-  const nombres = top10.map(doc => doc.nombre.length > 15 ? doc.nombre.substring(0, 15) + '...' : doc.nombre);
+  const nombres = top10.map(doc => doc.nombre.length > 20 ? doc.nombre.substring(0, 20) + '...' : doc.nombre);
   const productos = top10.map(doc => doc.total_productos);
   
-  crearGraficoBarras('Top 10 Docentes', nombres, productos, 'rgba(255, 159, 64, 0.8)');
+  // Crear ambos gráficos: barras horizontales y pastel
+  crearGraficoBarrasHorizontales('Top 10 Docentes - Barras', nombres, productos, 'rgba(255, 159, 64, 0.8)');
+  setTimeout(() => {
+    crearGraficoPastel('Top 10 Docentes - Distribución', nombres, productos);
+  }, 100);
 }
 
 function generarGraficoMaterias(data) {
   if (!data || !data.materias || data.materias.length === 0) return;
   
-  // Tomar top 8 materias para gráfico de pastel
-  const top8 = data.materias.slice(0, 8);
-  const materias = top8.map(mat => mat.materia.length > 20 ? mat.materia.substring(0, 20) + '...' : mat.materia);
-  const productos = top8.map(mat => mat.total_productos);
+  // Tomar top 10 materias
+  const top10 = data.materias.slice(0, 10);
+  const materias = top10.map(mat => mat.materia.length > 25 ? mat.materia.substring(0, 25) + '...' : mat.materia);
+  const productos = top10.map(mat => mat.total_productos);
   
-  crearGraficoPastel('Distribución por Materias', materias, productos);
+  // Crear ambos gráficos: barras horizontales y pastel
+  crearGraficoBarrasHorizontales('Top 10 Materias - Barras', materias, productos, 'rgba(153, 102, 255, 0.8)');
+  setTimeout(() => {
+    crearGraficoPastel('Top 10 Materias - Distribución', materias, productos);
+  }, 100);
 }
 
 function generarGraficoProductos(data) {
@@ -3227,7 +3256,7 @@ function crearGraficoLineas(titulo, etiquetas, datos, color) {
   });
 }
 
-function crearGraficoBarras(titulo, etiquetas, datos, color) {
+function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
   destruirGraficoAnterior();
   
   const ctx = document.getElementById('chart-reporte').getContext('2d');
@@ -3244,12 +3273,14 @@ function crearGraficoBarras(titulo, etiquetas, datos, color) {
       }]
     },
     options: {
+      indexAxis: 'y', // Esto hace las barras horizontales
       responsive: true,
       plugins: {
         title: {
           display: true,
           text: titulo,
-          color: '#ffffff'
+          color: '#ffffff',
+          font: { size: 16 }
         },
         legend: {
           labels: {
@@ -3259,14 +3290,14 @@ function crearGraficoBarras(titulo, etiquetas, datos, color) {
       },
       scales: {
         x: {
-          ticks: { 
-            color: '#ffffff',
-            maxRotation: 45
-          },
+          ticks: { color: '#ffffff' },
           grid: { color: 'rgba(255, 255, 255, 0.1)' }
         },
         y: {
-          ticks: { color: '#ffffff' },
+          ticks: { 
+            color: '#ffffff',
+            font: { size: 11 }
+          },
           grid: { color: 'rgba(255, 255, 255, 0.1)' }
         }
       }
@@ -3274,8 +3305,15 @@ function crearGraficoBarras(titulo, etiquetas, datos, color) {
   });
 }
 
+// Variable global para el segundo gráfico (pastel)
+var currentChartPastel = null;
+
 function crearGraficoPastel(titulo, etiquetas, datos) {
-  destruirGraficoAnterior();
+  // Destruir gráfico de pastel anterior
+  if (currentChartPastel) {
+    currentChartPastel.destroy();
+    currentChartPastel = null;
+  }
   
   const colores = [
     'rgba(255, 99, 132, 0.8)',
@@ -3285,11 +3323,13 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
     'rgba(153, 102, 255, 0.8)',
     'rgba(255, 159, 64, 0.8)',
     'rgba(199, 199, 199, 0.8)',
-    'rgba(83, 102, 255, 0.8)'
+    'rgba(83, 102, 255, 0.8)',
+    'rgba(255, 206, 84, 0.8)',
+    'rgba(75, 192, 150, 0.8)'
   ];
   
-  const ctx = document.getElementById('chart-reporte').getContext('2d');
-  currentChart = new Chart(ctx, {
+  const ctx = document.getElementById('chart-reporte-pastel').getContext('2d');
+  currentChartPastel = new Chart(ctx, {
     type: 'pie',
     data: {
       labels: etiquetas,
@@ -3306,12 +3346,15 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
         title: {
           display: true,
           text: titulo,
-          color: '#ffffff'
+          color: '#ffffff',
+          font: { size: 14 }
         },
         legend: {
-          position: 'right',
+          position: 'bottom',
           labels: {
-            color: '#ffffff'
+            color: '#ffffff',
+            font: { size: 10 },
+            boxWidth: 15
           }
         }
       }
@@ -3323,5 +3366,9 @@ function destruirGraficoAnterior() {
   if (currentChart) {
     currentChart.destroy();
     currentChart = null;
+  }
+  if (currentChartPastel) {
+    currentChartPastel.destroy();
+    currentChartPastel = null;
   }
 }

@@ -478,5 +478,11 @@
   <script src="/js/autocomplete.js"></script>
 
   <script src="/js/main.js"></script>
+  <script>
+    // Ensure functions are globally available
+    if (typeof selectUserType === 'undefined') {
+      console.error('selectUserType function not loaded');
+    }
+  </script>
 </body>
 </html>

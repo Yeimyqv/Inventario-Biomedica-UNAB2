@@ -2061,8 +2061,7 @@ function exportarReporteExcel() {
   mostrarNotificacion('Exportar', 'Función de exportar a Excel disponible próximamente', 'info');
 }
 
-// Variables globales para gráficos (mantener esta declaración)
-let currentChart = null;
+// Variables globales para gráficos (declared at top of file)
 
 function destruirGraficoAnterior() {
   if (currentChart) {

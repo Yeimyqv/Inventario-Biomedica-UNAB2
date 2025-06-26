@@ -541,22 +541,33 @@ function mostrarModuloReportes() {
 async function cargarCategorias() {
   try {
     const response = await fetch('/api/categorias');
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
     const data = await response.json();
+    console.log('Datos de categorías recibidos:', data);
     
     const categoriaSelect = document.getElementById('categoria-select');
     if (categoriaSelect) {
       categoriaSelect.innerHTML = '<option value="">Selecciona una categoría</option>';
       
-      data.categorias.forEach(categoria => {
-        const option = document.createElement('option');
-        option.value = categoria.id;
-        option.textContent = categoria.nombre;
-        categoriaSelect.appendChild(option);
-      });
+      // Los datos vienen directamente como array
+      if (Array.isArray(data)) {
+        data.forEach(categoria => {
+          const option = document.createElement('option');
+          option.value = categoria.id;
+          option.textContent = categoria.nombre;
+          categoriaSelect.appendChild(option);
+        });
+        mostrarNotificacion('Éxito', `${data.length} categorías cargadas`, 'success', 2000);
+      } else {
+        throw new Error('Formato de datos incorrecto');
+      }
     }
   } catch (error) {
     console.error('Error cargando categorías:', error);
-    mostrarNotificacion('Error', 'No se pudieron cargar las categorías', 'error');
+    mostrarNotificacion('Error', `No se pudieron cargar las categorías: ${error.message}`, 'error', 5000);
   }
 }
 
@@ -569,17 +580,22 @@ function generarFilasInventario() {
 function mostrarNotificacion(titulo, mensaje, tipo = 'info', autoCloseMs = 0) {
   console.log(`${tipo.toUpperCase()}: ${titulo} - ${mensaje}`);
   
+  // Remover notificaciones anteriores del mismo tipo
+  const existingAlerts = document.querySelectorAll('.alert.position-fixed');
+  existingAlerts.forEach(alert => alert.remove());
+  
   // Crear elemento de notificación simple
   const notification = document.createElement('div');
-  notification.className = `alert alert-${tipo === 'error' ? 'danger' : tipo === 'success' ? 'success' : 'info'} alert-dismissible fade show position-fixed`;
+  notification.className = `alert alert-${tipo === 'error' ? 'danger' : tipo === 'success' ? 'success' : tipo === 'warning' ? 'warning' : 'info'} alert-dismissible fade show position-fixed`;
   notification.style.top = '20px';
   notification.style.right = '20px';
   notification.style.zIndex = '9999';
   notification.style.minWidth = '300px';
+  notification.style.maxWidth = '400px';
   
   notification.innerHTML = `
-    <strong>${titulo}</strong> ${mensaje}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <strong>${titulo}:</strong> ${mensaje}
+    <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
   `;
   
   document.body.appendChild(notification);
@@ -683,7 +699,8 @@ async function cargarInventarioDesdeDB() {
     if (!response.ok) throw new Error('Error al cargar categorías');
     
     const data = await response.json();
-    return data.categorias || [];
+    console.log('Categorías cargadas:', data);
+    return data || [];
   } catch (error) {
     console.error('Error cargando inventario:', error);
     return [];

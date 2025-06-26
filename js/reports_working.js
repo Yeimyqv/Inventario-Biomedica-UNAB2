@@ -248,6 +248,38 @@ function mostrarReportePrestamos(data) {
 }
 
 function mostrarReporteEstudiantes(data) {
+  ocultarCargandoReporte();
+  
+  // Crear controles de vista si no existen
+  if (!document.getElementById('controles-vista-reporte')) {
+    const controlesHTML = `
+      <div id="controles-vista-reporte" class="mb-3 d-flex justify-content-between align-items-center">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-light btn-sm" onclick="cambiarVistaReporte('tabla')" id="vista-tabla">
+            <i class="fas fa-table"></i> Tabla
+          </button>
+          <button type="button" class="btn btn-outline-light btn-sm" onclick="cambiarVistaReporte('grafico')" id="vista-grafico">
+            <i class="fas fa-chart-bar"></i> Gráfico
+          </button>
+          <button type="button" class="btn btn-outline-light btn-sm" onclick="cambiarVistaReporte('combinado')" id="vista-combinado">
+            <i class="fas fa-th"></i> Combinado
+          </button>
+        </div>
+        <div id="controles-tipo-grafico" class="btn-group" role="group" style="display: none;">
+          <button type="button" class="btn btn-outline-success btn-sm" onclick="generarGraficoSegunTipo('barras')" id="grafico-barras">
+            <i class="fas fa-chart-bar"></i> Barras
+          </button>
+          <button type="button" class="btn btn-outline-success btn-sm" onclick="generarGraficoSegunTipo('circular')" id="grafico-circular">
+            <i class="fas fa-chart-pie"></i> Circular
+          </button>
+        </div>
+      </div>
+    `;
+    
+    const contenidoReporte = document.getElementById('contenido-reporte');
+    contenidoReporte.insertAdjacentHTML('beforebegin', controlesHTML);
+  }
+  
   const contenido = `
     <div class="row mb-4">
       <div class="col-12">
@@ -257,38 +289,44 @@ function mostrarReporteEstudiantes(data) {
       </div>
     </div>
     
-    <div class="table-responsive">
-      <table class="table table-striped table-dark">
-        <thead>
-          <tr>
-            <th>Ranking</th>
-            <th>Identificación</th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Materia</th>
-            <th>Docente</th>
-            <th>Total Préstamos</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${data.estudiantes.map((estudiante, index) => `
-            <tr ${index < 3 ? 'class="table-warning"' : ''}>
-              <td>
-                <strong>#${index + 1}</strong>
-                ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''}
-              </td>
-              <td>${estudiante.identificacion}</td>
-              <td>${estudiante.nombre}</td>
-              <td>${estudiante.correo || 'N/A'}</td>
-              <td>${estudiante.materia || 'N/A'}</td>
-              <td>${estudiante.docente || 'N/A'}</td>
-              <td>
-                <span class="badge bg-primary fs-6">${estudiante.total_prestamos}</span>
-              </td>
+    <div id="tabla-reporte">
+      <div class="table-responsive">
+        <table class="table table-striped table-dark">
+          <thead>
+            <tr>
+              <th>Ranking</th>
+              <th>Identificación</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Materia</th>
+              <th>Docente</th>
+              <th>Total Préstamos</th>
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            ${data.estudiantes.map((estudiante, index) => `
+              <tr ${index < 3 ? 'class="table-warning"' : ''}>
+                <td>
+                  <strong>#${index + 1}</strong>
+                  ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''}
+                </td>
+                <td>${estudiante.identificacion}</td>
+                <td>${estudiante.nombre}</td>
+                <td>${estudiante.correo || 'N/A'}</td>
+                <td>${estudiante.materia || 'N/A'}</td>
+                <td>${estudiante.docente || 'N/A'}</td>
+                <td>
+                  <span class="badge bg-primary fs-6">${estudiante.total_prestamos}</span>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div id="grafico-reporte" style="display: none;">
+      <canvas id="reportChart" width="400" height="200"></canvas>
     </div>
   `;
   
@@ -458,6 +496,10 @@ function mostrarCargandoReporte() {
   `;
 }
 
+function ocultarCargandoReporte() {
+  // El contenido se reemplaza por el reporte, no necesita acción adicional
+}
+
 function mostrarErrorReporte(mensaje) {
   document.getElementById('contenido-reporte').innerHTML = `
     <div class="alert alert-danger">
@@ -519,8 +561,505 @@ function obtenerClaseTipoDocente(tipo) {
 }
 
 function cambiarVistaReporte(vista) {
-  // Esta función se implementará más adelante para cambio de vistas
-  console.log(`Cambiando vista a: ${vista}`);
+  const tablaReporte = document.getElementById('tabla-reporte');
+  const graficoReporte = document.getElementById('grafico-reporte');
+  const botones = document.querySelectorAll('#controles-vista-reporte .btn');
+  
+  // Remover clase active de todos los botones
+  botones.forEach(btn => {
+    btn.classList.remove('btn-light');
+    btn.classList.add('btn-outline-light');
+  });
+  
+  // Activar botón correspondiente
+  const botonActivo = document.getElementById(`vista-${vista}`);
+  if (botonActivo) {
+    botonActivo.classList.remove('btn-outline-light');
+    botonActivo.classList.add('btn-light');
+  }
+  
+  switch (vista) {
+    case 'tabla':
+      if (tablaReporte) tablaReporte.style.display = 'block';
+      if (graficoReporte) graficoReporte.style.display = 'none';
+      break;
+    case 'grafico':
+      if (tablaReporte) tablaReporte.style.display = 'none';
+      if (graficoReporte) graficoReporte.style.display = 'block';
+      generarGraficoSegunTipo('barras');
+      break;
+    case 'combinado':
+      if (tablaReporte) tablaReporte.style.display = 'block';
+      if (graficoReporte) graficoReporte.style.display = 'block';
+      generarGraficoSegunTipo('barras');
+      break;
+  }
+}
+
+function generarGraficoSegunTipo(tipo) {
+  if (!ultimosDataReporte) return;
+  
+  switch (tipoReporteActual) {
+    case 'estudiantes':
+      if (tipo === 'barras') {
+        generarGraficoEstudiantesBarras(ultimosDataReporte);
+      } else if (tipo === 'circular') {
+        generarGraficoEstudiantesCircular(ultimosDataReporte);
+      }
+      break;
+    case 'docentes':
+      if (tipo === 'barras') {
+        generarGraficoDocentesBarras(ultimosDataReporte);
+      } else if (tipo === 'circular') {
+        generarGraficoDocentesCircular(ultimosDataReporte);
+      }
+      break;
+    case 'materias':
+      if (tipo === 'barras') {
+        generarGraficoMateriasBarras(ultimosDataReporte);
+      } else if (tipo === 'circular') {
+        generarGraficoMateriasCircular(ultimosDataReporte);
+      }
+      break;
+    case 'productos':
+      if (tipo === 'barras') {
+        generarGraficoProductosBarras(ultimosDataReporte);
+      } else if (tipo === 'circular') {
+        generarGraficoProductosCircular(ultimosDataReporte);
+      }
+      break;
+  }
+}
+
+let graficoActual = null;
+
+function destruirGraficoAnterior() {
+  if (graficoActual) {
+    graficoActual.destroy();
+    graficoActual = null;
+  }
+}
+
+function generarGraficoEstudiantesBarras(data) {
+  destruirGraficoAnterior();
+  const ctx = document.getElementById('reportChart');
+  if (!ctx) return;
+  
+  const top10 = data.estudiantes.slice(0, 10);
+  const etiquetas = top10.map(est => est.nombre.split(' ').slice(0, 2).join(' '));
+  const datos = top10.map(est => est.total_prestamos);
+  
+  graficoActual = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: 'Número de Préstamos',
+        data: datos,
+        backgroundColor: 'rgba(69, 213, 9, 0.6)',
+        borderColor: '#45d509',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Top 10 Estudiantes por Número de Préstamos',
+          color: 'white'
+        },
+        legend: {
+          labels: {
+            color: 'white'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: 'white'
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        },
+        x: {
+          ticks: {
+            color: 'white',
+            maxRotation: 45
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        }
+      }
+    }
+  });
+}
+
+function generarGraficoEstudiantesCircular(data) {
+  destruirGraficoAnterior();
+  const ctx = document.getElementById('reportChart');
+  if (!ctx) return;
+  
+  const top5 = data.estudiantes.slice(0, 5);
+  const etiquetas = top5.map(est => est.nombre.split(' ').slice(0, 2).join(' '));
+  const datos = top5.map(est => est.total_prestamos);
+  
+  const colores = [
+    'rgba(255, 99, 132, 0.8)',
+    'rgba(54, 162, 235, 0.8)',
+    'rgba(255, 205, 86, 0.8)',
+    'rgba(75, 192, 192, 0.8)',
+    'rgba(153, 102, 255, 0.8)'
+  ];
+  
+  graficoActual = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        data: datos,
+        backgroundColor: colores,
+        borderColor: colores.map(color => color.replace('0.8', '1')),
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Top 5 Estudiantes por Número de Préstamos',
+          color: 'white'
+        },
+        legend: {
+          labels: {
+            color: 'white'
+          }
+        }
+      }
+    }
+  });
+}
+
+function generarGraficoDocentesBarras(data) {
+  destruirGraficoAnterior();
+  const ctx = document.getElementById('reportChart');
+  if (!ctx) return;
+  
+  const etiquetas = data.docentes.map(doc => doc.nombre.split(' ').slice(0, 2).join(' '));
+  const datos = data.docentes.map(doc => doc.total_productos);
+  
+  graficoActual = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: 'Total de Productos Utilizados',
+        data: datos,
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: '#36a2eb',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Docentes por Uso de Insumos',
+          color: 'white'
+        },
+        legend: {
+          labels: {
+            color: 'white'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: 'white'
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        },
+        x: {
+          ticks: {
+            color: 'white',
+            maxRotation: 45
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        }
+      }
+    }
+  });
+}
+
+function generarGraficoDocentesCircular(data) {
+  destruirGraficoAnterior();
+  const ctx = document.getElementById('reportChart');
+  if (!ctx) return;
+  
+  const etiquetas = data.docentes.map(doc => doc.nombre.split(' ').slice(0, 2).join(' '));
+  const datos = data.docentes.map(doc => doc.total_productos);
+  
+  const colores = [
+    'rgba(255, 99, 132, 0.8)',
+    'rgba(54, 162, 235, 0.8)',
+    'rgba(255, 205, 86, 0.8)',
+    'rgba(75, 192, 192, 0.8)',
+    'rgba(153, 102, 255, 0.8)',
+    'rgba(255, 159, 64, 0.8)'
+  ];
+  
+  graficoActual = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        data: datos,
+        backgroundColor: colores,
+        borderColor: colores.map(color => color.replace('0.8', '1')),
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Distribución de Uso de Insumos por Docente',
+          color: 'white'
+        },
+        legend: {
+          labels: {
+            color: 'white'
+          }
+        }
+      }
+    }
+  });
+}
+
+function generarGraficoMateriasBarras(data) {
+  destruirGraficoAnterior();
+  const ctx = document.getElementById('reportChart');
+  if (!ctx) return;
+  
+  const etiquetas = data.materias.map(mat => mat.materia);
+  const datos = data.materias.map(mat => mat.total_productos);
+  
+  graficoActual = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: 'Total de Productos Utilizados',
+        data: datos,
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: '#4bc0c0',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Materias por Uso de Insumos',
+          color: 'white'
+        },
+        legend: {
+          labels: {
+            color: 'white'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: 'white'
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        },
+        x: {
+          ticks: {
+            color: 'white',
+            maxRotation: 45
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        }
+      }
+    }
+  });
+}
+
+function generarGraficoMateriasCircular(data) {
+  destruirGraficoAnterior();
+  const ctx = document.getElementById('reportChart');
+  if (!ctx) return;
+  
+  const etiquetas = data.materias.map(mat => mat.materia);
+  const datos = data.materias.map(mat => mat.total_productos);
+  
+  const colores = [
+    'rgba(255, 99, 132, 0.8)',
+    'rgba(54, 162, 235, 0.8)',
+    'rgba(255, 205, 86, 0.8)',
+    'rgba(75, 192, 192, 0.8)',
+    'rgba(153, 102, 255, 0.8)',
+    'rgba(255, 159, 64, 0.8)',
+    'rgba(199, 199, 199, 0.8)',
+    'rgba(83, 102, 255, 0.8)'
+  ];
+  
+  graficoActual = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        data: datos,
+        backgroundColor: colores,
+        borderColor: colores.map(color => color.replace('0.8', '1')),
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Distribución de Uso de Insumos por Materia',
+          color: 'white'
+        },
+        legend: {
+          labels: {
+            color: 'white'
+          }
+        }
+      }
+    }
+  });
+}
+
+function generarGraficoProductosBarras(data) {
+  destruirGraficoAnterior();
+  const ctx = document.getElementById('reportChart');
+  if (!ctx) return;
+  
+  const etiquetas = data.productos.map(prod => prod.nombre.length > 20 ? prod.nombre.substring(0, 20) + '...' : prod.nombre);
+  const datos = data.productos.map(prod => prod.total_solicitado);
+  
+  graficoActual = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: 'Total Solicitado',
+        data: datos,
+        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+        borderColor: '#ff9f40',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: `Top ${data.limite_aplicado} Productos Más Solicitados`,
+          color: 'white'
+        },
+        legend: {
+          labels: {
+            color: 'white'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: 'white'
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        },
+        x: {
+          ticks: {
+            color: 'white',
+            maxRotation: 45
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        }
+      }
+    }
+  });
+}
+
+function generarGraficoProductosCircular(data) {
+  destruirGraficoAnterior();
+  const ctx = document.getElementById('reportChart');
+  if (!ctx) return;
+  
+  const top8 = data.productos.slice(0, 8);
+  const etiquetas = top8.map(prod => prod.nombre.length > 15 ? prod.nombre.substring(0, 15) + '...' : prod.nombre);
+  const datos = top8.map(prod => prod.total_solicitado);
+  
+  const colores = [
+    'rgba(255, 99, 132, 0.8)',
+    'rgba(54, 162, 235, 0.8)',
+    'rgba(255, 205, 86, 0.8)',
+    'rgba(75, 192, 192, 0.8)',
+    'rgba(153, 102, 255, 0.8)',
+    'rgba(255, 159, 64, 0.8)',
+    'rgba(199, 199, 199, 0.8)',
+    'rgba(83, 102, 255, 0.8)'
+  ];
+  
+  graficoActual = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        data: datos,
+        backgroundColor: colores,
+        borderColor: colores.map(color => color.replace('0.8', '1')),
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Top 8 Productos Más Solicitados',
+          color: 'white'
+        },
+        legend: {
+          labels: {
+            color: 'white'
+          }
+        }
+      }
+    }
+  });
 }
 
 function exportarReportePDF() {

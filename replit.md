@@ -2,98 +2,106 @@
 
 ## Overview
 
-This is a Flask-based laboratory inventory management system designed for the Biomedical Engineering laboratories at UNAB (Universidad Autónoma de Bucaramanga). The system handles equipment lending, returns, user management, and reporting for laboratory resources across different user types (students, teachers, and lab technicians).
+This is a Flask-based web application for managing biomedical engineering laboratory inventory at Universidad Autónoma de Bucaramanga (UNAB). The system handles equipment loans, returns, user management, and generates reports for laboratory staff. It supports three user types: students, teachers, and laboratory technicians, each with different access levels and capabilities.
 
 ## System Architecture
 
-The application follows a traditional web application architecture with:
+### Backend Architecture
+- **Framework**: Flask 3.1.0 with Python 3.11
+- **Database ORM**: SQLAlchemy 2.0.40 with Flask-SQLAlchemy 3.1.1
+- **Database**: PostgreSQL with psycopg2-binary adapter
+- **Web Server**: Gunicorn 23.0.0 for production deployment
+- **Validation**: Email-validator for user email validation
 
-- **Frontend**: HTML templates with JavaScript for dynamic interactions
-- **Backend**: Flask web framework with Python
-- **Database**: PostgreSQL with SQLAlchemy ORM
-- **Deployment**: Gunicorn WSGI server on Replit
+### Frontend Architecture
+- **Template Engine**: Jinja2 (Flask's default)
+- **CSS Framework**: Bootstrap 5.3.0 with custom CSS
+- **JavaScript**: Vanilla JavaScript with modular approach
+- **UI Components**: Custom modals, notifications, and responsive design
+- **Font**: Google Fonts Roboto family
 
-### Core Components
-
-- **Flask Application** (`app.py`, `main.py`): Main application entry point and configuration
-- **Database Models** (`models.py`): SQLAlchemy models for data persistence
-- **Templates** (`templates/`): HTML templates for the web interface
-- **Static Assets** (`static/`): CSS, JavaScript, and image files
-- **Data Import Scripts** (`import_inventory.py`, `import_students.py`): CSV data importers
+### Database Schema
+The application uses four main models:
+- **Categoria**: Product categories (amplifiers, Arduino, sensors, etc.)
+- **Elemento**: Inventory items with category relationships
+- **Usuario**: Users (students, teachers, laboratory staff)
+- **Prestamo**: Loan records linking users and elements
 
 ## Key Components
 
-### Database Models
+### User Management
+- **Student Access**: Simple name-based identification with autocomplete
+- **Teacher/Lab Staff Access**: PIN-based authentication (DOC1234/LAB5678)
+- **Role-based Permissions**: Different interfaces and capabilities per user type
 
-1. **Categoria**: Equipment categories (Amplifiers, Arduino, Sensors, etc.)
-2. **Elemento**: Individual inventory items with stock tracking
-3. **Usuario**: System users (students, teachers, lab technicians)
-4. **Prestamo**: Loan records tracking who borrowed what and when
+### Inventory Management
+- **CSV Import System**: Automated inventory loading from CSV files
+- **Category-based Organization**: Elements grouped by categories
+- **Real-time Stock Tracking**: Automatic quantity updates on loans/returns
+- **Image Support**: Product images with placeholder fallback
 
-### User Types and Access Control
+### Loan System
+- **Loan Processing**: Create loans with user, element, and quantity tracking
+- **Return Processing**: Only laboratory staff can process returns
+- **Status Tracking**: Active loans vs. returned items
+- **Observation System**: Return conditions and notes
 
-- **Students**: Can borrow and view their loans (no PIN required)
-- **Teachers**: Can borrow equipment with PIN authentication (DOC1234)
-- **Lab Technicians**: Full system access with PIN authentication (LAB5678)
-  - Inventory management
-  - Loan processing and returns
-  - Report generation
-  - User management
-
-### Frontend Architecture
-
-- **Landing Page**: Multi-location selector (currently only Sede Jardín active)
-- **User Selection Interface**: Role-based authentication flow
-- **Inventory Management**: Category-based equipment browsing
-- **Loan/Return System**: Equipment tracking with quantity management
-- **Reporting Module**: Advanced analytics for lab technicians
+### Reporting Module
+- **Loan Reports**: Filtered by date range, user type, subject
+- **User Analytics**: Student and teacher usage statistics
+- **Subject Analysis**: Most active subjects and materials
+- **Export Capabilities**: PDF and Excel export functionality
 
 ## Data Flow
 
-1. **User Authentication**: Role selection → PIN verification (if required)
-2. **Equipment Browsing**: Category selection → Item selection → Quantity input
-3. **Loan Processing**: Confirmation → Database update → Inventory adjustment
-4. **Return Processing**: Lab technician validates condition → Database update
-5. **Reporting**: Query database → Generate filtered reports → Export options
+1. **User Authentication**: Users select type and authenticate (PIN for staff)
+2. **Inventory Loading**: System loads from database, falls back to CSV import
+3. **Loan Creation**: User selects items, system validates availability
+4. **Return Processing**: Lab staff processes returns with observations
+5. **Report Generation**: System aggregates data for various report types
 
 ## External Dependencies
 
 ### Python Packages
-- **Flask**: Web framework and templating
-- **Flask-SQLAlchemy**: Database ORM
-- **SQLAlchemy**: Database toolkit
-- **psycopg2-binary**: PostgreSQL adapter
-- **email-validator**: Email validation utilities
-- **gunicorn**: WSGI HTTP server
+- **Flask**: Web framework and routing
+- **SQLAlchemy**: Database ORM and migrations
+- **Gunicorn**: WSGI HTTP Server for production
+- **psycopg2-binary**: PostgreSQL database adapter
+- **email-validator**: Email validation with DNS checking
 
 ### Frontend Libraries
-- **Bootstrap 5.3**: UI framework and responsive design
-- **Google Fonts (Roboto)**: Typography
-- **Custom CSS**: UNAB branding and theme
+- **Bootstrap 5.3.0**: CSS framework via CDN
+- **Google Fonts**: Roboto font family
 
-### Database
-- **PostgreSQL**: Primary data storage
-- **CSV Import**: Initial data loading from spreadsheets
+### Development Tools
+- **Nix**: Package management and environment setup
+- **UV**: Python package manager (lock file present)
 
 ## Deployment Strategy
 
-The application is configured for deployment on Replit with:
+### Production Environment
+- **Platform**: Replit with autoscale deployment target
+- **Server**: Gunicorn bound to 0.0.0.0:5000
+- **Database**: Environment-configured PostgreSQL
+- **Process Management**: Automatic restarts and port handling
 
-- **Nix Environment**: Python 3.11 with PostgreSQL
-- **Gunicorn Server**: Production WSGI server
-- **Auto-scaling**: Configured for autoscale deployment target
-- **Port Configuration**: Internal port 5000, external port 80
-- **Environment Variables**: Database URL and Flask secret key
+### Development Environment
+- **Local Server**: Flask development server with debug mode
+- **Hot Reload**: Template auto-reload enabled
+- **Database**: SQLite fallback for development
 
-### Environment Setup
-- Database connection via `DATABASE_URL` environment variable
-- Flask secret key via `FLASK_SECRET_KEY` environment variable
-- Automatic database initialization on startup
-- CSV data import for inventory and student records
+### Configuration Management
+- **Environment Variables**: Database URL, Flask secret key
+- **Connection Pooling**: 300-second recycle with pre-ping
+- **Security**: Secret key from environment or development fallback
 
-## Changelog
-
-- June 26, 2025. Initial setup
+## Recent Changes
+- June 25, 2025: Initial setup and core functionality implementation
+- June 25, 2025: Enhanced reports module with student search functionality and updated display format
+- June 25, 2025: Updated reports table structure to include email column for all user types
+- June 25, 2025: Assigned institutional email addresses to all faculty and lab staff members
+- June 25, 2025: Added comprehensive charts and graphs module using Chart.js for all report types
+- June 25, 2025: Implemented toggle functionality between table view, chart view, and combined view for reports
 
 ## User Preferences
 

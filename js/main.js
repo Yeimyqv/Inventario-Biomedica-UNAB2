@@ -1,3 +1,5 @@
+
+
 // Variables globales
 let currentUser = {
   id: null,
@@ -1742,22 +1744,18 @@ function registrarDevolucion(prestamoId) {
     setTimeout(() => {
       modalOverlay.remove();
       
-      // Actualizar estado del préstamo
-      prestamo.estado = 'devuelto';
-      prestamo.fecha_devolucion = new Date().toLocaleString();
-      prestamo.observaciones = observacion;
-      prestamos[index] = prestamo;
-      
-      // Actualizar inventario: devolver la cantidad al stock disponible
-      INVENTARIO.forEach(categoria => {
-        const elemento = categoria.elementos.find(e => e.id === prestamo.elemento_id);
-        if (elemento) {
-          elemento.cantidad += prestamo.cantidad;
+      // Realizar retorno usando la API
+      retornarElemento(prestamoId, observacion).then(response => {
+        if (response && response.success) {
+          // Actualizar inventario local si es necesario
+          INVENTARIO.forEach(categoria => {
+            const elemento = categoria.elementos.find(e => e.id === prestamo.elemento_id);
+            if (elemento) {
+              elemento.cantidad += prestamo.cantidad;
+            }
+          });
         }
       });
-      
-      // Guardar cambios
-      localStorage.setItem('prestamos', JSON.stringify(prestamos));
       
       // Mostrar confirmación
       mostrarNotificacion('Éxito', 'Elemento devuelto correctamente', 'success');
@@ -1852,6 +1850,12 @@ function volverAInterfazPrincipal() {
   const prestamosSection = document.getElementById('prestamos-section');
   if (prestamosSection) {
     prestamosSection.remove();
+  }
+  
+  // Ocultar sección de reportes si existe
+  const reportesSection = document.getElementById('reportes-section');
+  if (reportesSection) {
+    reportesSection.style.display = 'none';
   }
   
   // Mostrar la interfaz principal
@@ -2334,13 +2338,9 @@ function mostrarModuloReportes() {
     reportesSection.className = "container-fluid p-4";
     reportesSection.style.display = "none";
     
-    // Configurar fechas por defecto (último mes)
-    const hoy = new Date();
-    const haceUnMes = new Date();
-    haceUnMes.setMonth(haceUnMes.getMonth() - 1);
-    
-    const fechaInicio = haceUnMes.toISOString().split("T")[0];
-    const fechaFin = hoy.toISOString().split("T")[0];
+    // Configurar fechas por defecto para incluir todos los datos de prueba
+    const fechaInicio = "2025-05-01";
+    const fechaFin = "2025-06-30";
     
     reportesSection.innerHTML = `
       <div class="row mb-4">
@@ -2381,7 +2381,52 @@ function mostrarModuloReportes() {
                 </div>
                 <div class="col-md-3 mb-3">
                   <label for="materia-filtro" class="form-label">Materia:</label>
-                  <input type="text" class="form-control" id="materia-filtro" placeholder="Filtrar por materia">
+                  <select class="form-select" id="materia-filtro">
+                    <option value="">Todas las materias</option>
+                    <option value="Tele-Robótica">Tele-Robótica</option>
+                    <option value="Instrumentación">Instrumentación</option>
+                    <option value="Electrónica análoga">Electrónica análoga</option>
+                    <option value="Electrónica de potencia">Electrónica de potencia</option>
+                    <option value="Sistemas embebidos">Sistemas embebidos</option>
+                    <option value="Sistemas digitales">Sistemas digitales</option>
+                    <option value="Proyecto Integrador">Proyecto Integrador</option>
+                    <option value="Proyecto de grado">Proyecto de grado</option>
+                    <option value="Circuitos eléctricos">Circuitos eléctricos</option>
+                    <option value="Biomecánica clínica">Biomecánica clínica</option>
+                    <option value="Procesamiento de señales">Procesamiento de señales</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="buscar-estudiante" class="form-label">Buscar Estudiante:</label>
+                  <input type="text" class="form-control" id="buscar-estudiante" placeholder="Nombre o identificación">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="docente-filtro" class="form-label">Filtrar por Docente:</label>
+                  <select class="form-select" id="docente-filtro">
+                    <option value="">Todos los docentes</option>
+                    <option value="Alejandro Arboleda Carvajal">Alejandro Arboleda Carvajal</option>
+                    <option value="Carlos Julio Arizmendi Pereira">Carlos Julio Arizmendi Pereira</option>
+                    <option value="Leidy Rocío Pico Martínez">Leidy Rocío Pico Martínez</option>
+                    <option value="Luis Felipe Buitrago Castro">Luis Felipe Buitrago Castro</option>
+                    <option value="Lusvin Javier Amado Forero">Lusvin Javier Amado Forero</option>
+                    <option value="Mario Fernando Morales Cordero">Mario Fernando Morales Cordero</option>
+                    <option value="Mateo Escobar Jaramillo">Mateo Escobar Jaramillo</option>
+                    <option value="Nayibe Chio Cho">Nayibe Chio Cho</option>
+                    <option value="Víctor Alfonso Solarte David">Víctor Alfonso Solarte David</option>
+                    <option value="William Alexander Salamanca Becerra">William Alexander Salamanca Becerra</option>
+                    <option value="Yeimy Liseth Quintana Villamizar">Yeimy Liseth Quintana Villamizar</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="limite-productos" class="form-label">Límite de Productos:</label>
+                  <select class="form-select" id="limite-productos">
+                    <option value="5">Top 5</option>
+                    <option value="10" selected>Top 10</option>
+                    <option value="20">Top 20</option>
+                    <option value="50">Top 50</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -2443,8 +2488,62 @@ function mostrarModuloReportes() {
   // Mostrar la sección
   reportesSection.style.display = "block";
   
-  // Cargar reporte de préstamos por defecto
-  setTimeout(() => generarReportePrestamos(), 100);
+  // Configurar aplicación automática de filtros
+  setTimeout(() => {
+    // Agregar eventos para aplicar filtros automáticamente
+    const filtros = ['fecha-inicio-reporte', 'fecha-fin-reporte', 'tipo-usuario-filtro', 'materia-filtro', 'docente-filtro', 'limite-productos'];
+    filtros.forEach(filtroId => {
+      const elemento = document.getElementById(filtroId);
+      if (elemento) {
+        elemento.addEventListener('change', () => {
+          // Aplicar filtros automáticamente cuando cambie cualquier valor
+          setTimeout(() => {
+            const botones = document.querySelectorAll('#reportes-section .btn-group .btn');
+            botones.forEach((btn, index) => {
+              if (btn.classList.contains('active')) {
+                // Regenerar el reporte activo
+                switch(index) {
+                  case 0: generarReportePrestamos(); break;
+                  case 1: generarReporteEstudiantes(); break;
+                  case 2: generarReporteDocentes(); break;
+                  case 3: generarReporteMaterias(); break;
+                  case 4: generarReporteProductos(); break;
+                }
+              }
+            });
+          }, 100);
+        });
+      }
+    });
+    
+    // Agregar evento especial para el campo de búsqueda de estudiante (con debounce)
+    const buscarEstudianteInput = document.getElementById('buscar-estudiante');
+    if (buscarEstudianteInput) {
+      let timeoutId;
+      buscarEstudianteInput.addEventListener('input', () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          // Aplicar filtros automáticamente cuando cambie el texto de búsqueda
+          const botones = document.querySelectorAll('#reportes-section .btn-group .btn');
+          botones.forEach((btn, index) => {
+            if (btn.classList.contains('active')) {
+              // Regenerar el reporte activo
+              switch(index) {
+                case 0: generarReportePrestamos(); break;
+                case 1: generarReporteEstudiantes(); break;
+                case 2: generarReporteDocentes(); break;
+                case 3: generarReporteMaterias(); break;
+                case 4: generarReporteProductos(); break;
+              }
+            }
+          });
+        }, 500); // Esperar 500ms después de que el usuario deje de escribir
+      });
+    }
+    
+    // Cargar reporte de préstamos por defecto
+    generarReportePrestamos();
+  }, 200);
 }
 
 async function generarReportePrestamos() {
@@ -2577,11 +2676,17 @@ function obtenerFiltrosReporte() {
   const fechaFin = document.getElementById("fecha-fin-reporte")?.value;
   const tipoUsuario = document.getElementById("tipo-usuario-filtro")?.value;
   const materia = document.getElementById("materia-filtro")?.value;
+  const buscarEstudiante = document.getElementById("buscar-estudiante")?.value;
+  const docenteFiltro = document.getElementById("docente-filtro")?.value;
+  const limiteProductos = document.getElementById("limite-productos")?.value;
   
   if (fechaInicio) filtros.fecha_inicio = fechaInicio;
   if (fechaFin) filtros.fecha_fin = fechaFin;
   if (tipoUsuario) filtros.tipo_usuario = tipoUsuario;
   if (materia) filtros.materia = materia;
+  if (buscarEstudiante) filtros.buscar_estudiante = buscarEstudiante;
+  if (docenteFiltro) filtros.docente = docenteFiltro;
+  if (limiteProductos) filtros.limite = limiteProductos;
   
   return filtros;
 }
@@ -2602,37 +2707,46 @@ function mostrarReportePrestamos(data) {
           <tr>
             <th>Fecha</th>
             <th>Usuario</th>
-            <th>Tipo</th>
+            <th>Correo</th>
             <th>Elemento</th>
             <th>Cantidad</th>
             <th>Estado</th>
+            <th>Observaciones</th>
           </tr>
         </thead>
         <tbody>
           ${data.prestamos.length > 0 ? data.prestamos.map(prestamo => `
             <tr>
               <td>${formatearFechaReporte(prestamo.fecha_prestamo)}</td>
-              <td>${prestamo.usuario_nombre || "N/A"}</td>
               <td>
-                <span class="badge ${prestamo.usuario_tipo === "estudiante" ? "bg-primary" : "bg-success"}">
-                  ${prestamo.usuario_tipo}
-                </span>
+                <strong>${prestamo.usuario_nombre}</strong><br>
+                <small class="text-light">${prestamo.usuario_identificacion}</small>
               </td>
-              <td>${prestamo.elemento_nombre || "N/A"}</td>
-              <td><span class="badge bg-info">${prestamo.cantidad}</span></td>
+              <td>
+                <span class="text-info">${prestamo.usuario_correo || 'Sin correo'}</span>
+              </td>
+              <td>
+                <strong>${prestamo.elemento_nombre}</strong><br>
+                <small class="text-light">Código: ${prestamo.elemento_codigo}</small>
+              </td>
+              <td><span class="badge bg-primary fs-6">${prestamo.cantidad}</span></td>
               <td>
                 <span class="badge ${obtenerClaseEstadoReporte(prestamo.estado)}">
                   ${prestamo.estado}
                 </span>
               </td>
+              <td>${prestamo.estado === 'devuelto' && prestamo.observaciones ? `<span class="${obtenerClaseObservacionReporte(prestamo.observaciones)}">${prestamo.observaciones}</span>` : '-'}</td>
             </tr>
-          `).join("") : "<tr><td colspan=\"6\" class=\"text-center\">No se encontraron préstamos</td></tr>"}
+          `).join("") : "<tr><td colspan=\"7\" class=\"text-center\">No se encontraron préstamos</td></tr>"}
         </tbody>
       </table>
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para préstamos
+  generarGraficoPrestamos(data);
 }
 
 function mostrarReporteEstudiantes(data) {
@@ -2650,9 +2764,11 @@ function mostrarReporteEstudiantes(data) {
         <thead>
           <tr>
             <th>Ranking</th>
-            <th>Identificación</th>
+            <th>ID</th>
             <th>Nombre</th>
+            <th>Correo</th>
             <th>Materia</th>
+            <th>Docente</th>
             <th>Total Préstamos</th>
           </tr>
         </thead>
@@ -2665,18 +2781,23 @@ function mostrarReporteEstudiantes(data) {
               </td>
               <td>${estudiante.identificacion}</td>
               <td>${estudiante.nombre}</td>
-              <td>${estudiante.materia || "N/A"}</td>
+              <td>${estudiante.correo || '-'}</td>
+              <td>${estudiante.materia || '-'}</td>
+              <td>${estudiante.docente || '-'}</td>
               <td>
                 <span class="badge bg-primary fs-6">${estudiante.total_prestamos}</span>
               </td>
             </tr>
-          `).join("") : "<tr><td colspan=\"5\" class=\"text-center\">No se encontraron estudiantes</td></tr>"}
+          `).join("") : "<tr><td colspan=\"7\" class=\"text-center\">No se encontraron estudiantes</td></tr>"}
         </tbody>
       </table>
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para estudiantes
+  generarGraficoEstudiantes(data);
 }
 
 function mostrarReporteDocentes(data) {
@@ -2695,8 +2816,9 @@ function mostrarReporteDocentes(data) {
           <tr>
             <th>Ranking</th>
             <th>Docente</th>
+            <th>Correo</th>
             <th>Número de Préstamos</th>
-            <th>Total Productos</th>
+            <th>Número de Productos</th>
           </tr>
         </thead>
         <tbody>
@@ -2707,6 +2829,7 @@ function mostrarReporteDocentes(data) {
                 ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
               </td>
               <td>${docente.nombre}</td>
+              <td>${docente.correo || '-'}</td>
               <td>
                 <span class="badge bg-info">${docente.numero_prestamos}</span>
               </td>
@@ -2714,13 +2837,16 @@ function mostrarReporteDocentes(data) {
                 <span class="badge bg-primary fs-6">${docente.total_productos}</span>
               </td>
             </tr>
-          `).join("") : "<tr><td colspan=\"4\" class=\"text-center\">No se encontraron docentes</td></tr>"}
+          `).join("") : "<tr><td colspan=\"5\" class=\"text-center\">No se encontraron docentes</td></tr>"}
         </tbody>
       </table>
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para docentes
+  generarGraficoDocentes(data);
 }
 
 function mostrarReporteMaterias(data) {
@@ -2770,7 +2896,10 @@ function mostrarReporteMaterias(data) {
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para materias
+  generarGraficoMaterias(data);
 }
 
 function mostrarReporteProductos(data) {
@@ -2789,9 +2918,8 @@ function mostrarReporteProductos(data) {
         <thead>
           <tr>
             <th>Ranking</th>
-            <th>Código</th>
-            <th>Producto</th>
             <th>Categoría</th>
+            <th>Elemento</th>
             <th>Total Solicitado</th>
           </tr>
         </thead>
@@ -2802,24 +2930,59 @@ function mostrarReporteProductos(data) {
                 <strong>#${index + 1}</strong>
                 ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
               </td>
-              <td><code>${producto.codigo}</code></td>
-              <td>${producto.nombre}</td>
               <td><span class="badge bg-secondary">${producto.categoria}</span></td>
+              <td>${producto.nombre}</td>
               <td>
                 <span class="badge bg-primary fs-6">${producto.total_solicitado}</span>
               </td>
             </tr>
-          `).join("") : "<tr><td colspan=\"5\" class=\"text-center\">No se encontraron productos</td></tr>"}
+          `).join("") : "<tr><td colspan=\"4\" class=\"text-center\">No se encontraron productos</td></tr>"}
         </tbody>
       </table>
     </div>
   `;
   
-  document.getElementById("contenido-reporte").innerHTML = contenido;
+  document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
+  
+  // Generar gráfico para productos
+  generarGraficoProductos(data);
+}
+
+// Variable global para almacenar la instancia del gráfico actual
+let currentChart = null;
+
+// Función para cambiar entre vistas de reporte
+function cambiarVistaReporte(vista) {
+  const btnTabla = document.getElementById('btn-vista-tabla');
+  const btnGrafico = document.getElementById('btn-vista-grafico');
+  const btnAmbos = document.getElementById('btn-vista-ambos');
+  const contenidoTabla = document.getElementById('contenido-reporte-tabla');
+  const contenidoGrafico = document.getElementById('contenido-reporte-grafico');
+  
+  // Remover clase active de todos los botones
+  [btnTabla, btnGrafico, btnAmbos].forEach(btn => btn.classList.remove('active'));
+  
+  switch(vista) {
+    case 'tabla':
+      btnTabla.classList.add('active');
+      contenidoTabla.style.display = 'block';
+      contenidoGrafico.style.display = 'none';
+      break;
+    case 'grafico':
+      btnGrafico.classList.add('active');
+      contenidoTabla.style.display = 'none';
+      contenidoGrafico.style.display = 'block';
+      break;
+    case 'ambos':
+      btnAmbos.classList.add('active');
+      contenidoTabla.style.display = 'block';
+      contenidoGrafico.style.display = 'block';
+      break;
+  }
 }
 
 function mostrarCargandoReporte() {
-  document.getElementById("contenido-reporte").innerHTML = `
+  document.getElementById("contenido-reporte-tabla").innerHTML = `
     <div class="text-center p-5">
       <div class="spinner-border text-success" role="status">
         <span class="visually-hidden">Generando reporte...</span>
@@ -2830,7 +2993,7 @@ function mostrarCargandoReporte() {
 }
 
 function mostrarErrorReporte(mensaje) {
-  document.getElementById("contenido-reporte").innerHTML = `
+  document.getElementById("contenido-reporte-tabla").innerHTML = `
     <div class="alert alert-danger">
       <strong>Error:</strong> ${mensaje}
     </div>
@@ -2879,4 +3042,41 @@ function exportarReportePDF() {
 
 function exportarReporteExcel() {
   mostrarNotificacion("Exportación a Excel", "Funcionalidad en desarrollo", "info");
+}
+
+function obtenerClaseObservacionReporte(observacion) {
+  if (!observacion) return 'text-muted';
+  
+  // Observaciones positivas
+  if (observacion === 'Funciona correctamente') {
+    return 'text-success fw-bold';
+  }
+  
+  // Observaciones que requieren atención
+  const observacionesProblematicas = [
+    'No funciona / presenta fallas',
+    'Faltan accesorios / partes incompletas',
+    'Daños visibles (físicos)',
+    'Requiere mantenimiento / calibración',
+    'Contaminado / sucio',
+    'Pendiente por revisión técnica',
+    'Reportado como defectuoso por el usuario'
+  ];
+  
+  if (observacionesProblematicas.includes(observacion)) {
+    return 'text-danger fw-bold';
+  }
+  
+  // Observaciones neutras
+  const observacionesNeutrales = [
+    'No fue utilizado',
+    'No requiere devolución'
+  ];
+  
+  if (observacionesNeutrales.includes(observacion)) {
+    return 'text-info';
+  }
+  
+  // Otras observaciones (campo libre)
+  return 'text-warning';
 }

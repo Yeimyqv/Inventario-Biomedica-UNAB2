@@ -801,8 +801,15 @@ async function generarReportePrestamos() {
     const filtros = obtenerFiltrosReporte();
     const params = new URLSearchParams(filtros);
     
+    console.log('Solicitando datos de préstamos...');
     const response = await fetch(`/api/reportes/prestamos?${params}`);
+    
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+    }
+    
     const data = await response.json();
+    console.log('Datos de préstamos recibidos:', data);
     
     if (data.error) {
       throw new Error(data.error);
@@ -1328,20 +1335,25 @@ function mostrarErrorReporte(mensaje) {
 }
 
 function actualizarTituloReporte(titulo) {
-  document.getElementById("titulo-reporte").textContent = titulo;
+  const tituloElement = document.getElementById("titulo-reporte");
+  if (tituloElement) {
+    tituloElement.textContent = titulo;
+  }
 }
 
 function activarBotonReporte(indice) {
   const botones = document.querySelectorAll("#reportes-section .btn-group .btn");
-  botones.forEach((btn, i) => {
-    if (i === indice) {
-      btn.classList.remove("btn-outline-success");
-      btn.classList.add("btn-success", "active");
-    } else {
-      btn.classList.remove("btn-success", "active");
-      btn.classList.add("btn-outline-success");
-    }
-  });
+  if (botones && botones.length > 0) {
+    botones.forEach((btn, i) => {
+      if (i === indice) {
+        btn.classList.remove("btn-outline-success");
+        btn.classList.add("btn-success", "active");
+      } else {
+        btn.classList.remove("btn-success", "active");
+        btn.classList.add("btn-outline-success");
+      }
+    });
+  }
 }
 
 function formatearFechaReporte(fecha) {

@@ -673,7 +673,7 @@ function exportarReporteExcel() {
   alert('Función de exportación Excel en desarrollo');
 }
 
-let currentChart = null;
+// Chart variable is defined in main.js
 
 function generarGraficoSegunTipo(tipo) {
   if (!ultimosDataReporte) {
@@ -688,8 +688,8 @@ function generarGraficoSegunTipo(tipo) {
   }
 
   // Destruir gráfico anterior si existe
-  if (currentChart) {
-    currentChart.destroy();
+  if (window.currentChart) {
+    window.currentChart.destroy();
   }
 
   const ctx = canvas.getContext('2d');
@@ -726,7 +726,7 @@ function generarGraficoPrestamos(ctx, data, tipo) {
   const valores = Object.values(prestamosPorMes);
 
   if (tipo === 'barras') {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: etiquetas,
@@ -749,7 +749,7 @@ function generarGraficoPrestamos(ctx, data, tipo) {
       }
     });
   } else {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: etiquetas,
@@ -782,7 +782,7 @@ function generarGraficoEstudiantes(ctx, data, tipo) {
   const valores = data.estudiantes.slice(0, 10).map(e => e.total_prestamos);
 
   if (tipo === 'barras') {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: etiquetas,
@@ -805,7 +805,7 @@ function generarGraficoEstudiantes(ctx, data, tipo) {
       }
     });
   } else {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'pie',
       data: {
         labels: etiquetas,
@@ -843,7 +843,7 @@ function generarGraficoDocentes(ctx, data, tipo) {
   const valores = data.docentes.slice(0, 10).map(d => d.total_prestamos);
 
   if (tipo === 'barras') {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: etiquetas,
@@ -866,7 +866,7 @@ function generarGraficoDocentes(ctx, data, tipo) {
       }
     });
   } else {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: etiquetas,
@@ -899,7 +899,7 @@ function generarGraficoMaterias(ctx, data, tipo) {
   const valores = data.materias.slice(0, 10).map(m => m.total_prestamos);
 
   if (tipo === 'barras') {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: etiquetas,
@@ -922,7 +922,7 @@ function generarGraficoMaterias(ctx, data, tipo) {
       }
     });
   } else {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'pie',
       data: {
         labels: etiquetas,
@@ -958,7 +958,7 @@ function generarGraficoProductos(ctx, data, tipo) {
   const valores = data.productos.slice(0, 10).map(p => p.total_prestamos);
 
   if (tipo === 'barras') {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: etiquetas,
@@ -981,7 +981,7 @@ function generarGraficoProductos(ctx, data, tipo) {
       }
     });
   } else {
-    currentChart = new Chart(ctx, {
+    window.currentChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: etiquetas,

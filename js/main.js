@@ -789,7 +789,7 @@ function mostrarModuloReportes() {
 // Variables globales para reportes (ya declaradas arriba)
 // let ultimosDataReporte = null; - ya existe
 // let tipoReporteActual = null; - ya existe como tipoReporteActual
-let currentChart = null;
+// let currentChart = null; - se declara más abajo
 
 async function generarReportePrestamos() {
   try {
@@ -2033,7 +2033,7 @@ function exportarReporteExcel() {
   mostrarNotificacion('Exportar', 'Función de exportar a Excel disponible próximamente', 'info');
 }
 
-// Variables globales para gráficos
+// Variables globales para gráficos (mantener esta declaración)
 let currentChart = null;
 
 function destruirGraficoAnterior() {

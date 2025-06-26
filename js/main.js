@@ -2578,10 +2578,6 @@ function mostrarModuloReportes() {
   }, 200);
 }
 
-// Variables necesarias antes de las funciones de reporte
-tipoReporteActual = '';
-ultimosDataReporte = null;
-
 async function generarReportePrestamos() {
   try {
     mostrarCargandoReporte();

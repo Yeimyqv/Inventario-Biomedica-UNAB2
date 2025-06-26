@@ -313,6 +313,143 @@
       </div>
     </section>
 
+    <!-- Sección de reportes (sólo para laboratoristas) -->
+    <section id="reportes-section" class="my-5" style="display: none;">
+      <div class="panel-container">
+        <div class="panel-header d-flex justify-content-between align-items-center">
+          <h2 class="panel-title" id="titulo-reporte">MÓDULO DE REPORTES</h2>
+          <button class="btn btn-sm btn-outline-light" onclick="volverAInterfazPrincipal()">Volver al menú</button>
+        </div>
+        <div class="panel-content">
+          <!-- Barra de navegación de reportes -->
+          <div class="d-flex justify-content-center mb-4">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-success" onclick="generarReportePrestamos()">
+                <i class="fas fa-list"></i> Préstamos
+              </button>
+              <button type="button" class="btn btn-outline-success" onclick="generarReporteEstudiantes()">
+                <i class="fas fa-users"></i> Estudiantes
+              </button>
+              <button type="button" class="btn btn-outline-success" onclick="generarReporteDocentes()">
+                <i class="fas fa-chalkboard-teacher"></i> Docentes
+              </button>
+              <button type="button" class="btn btn-outline-success" onclick="generarReporteMaterias()">
+                <i class="fas fa-book"></i> Materias
+              </button>
+              <button type="button" class="btn btn-outline-success" onclick="generarReporteProductos()">
+                <i class="fas fa-box"></i> Productos
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtros de reporte -->
+          <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+              <label for="fecha-inicio-reporte" class="form-label">Fecha inicio:</label>
+              <input type="date" class="form-control" id="fecha-inicio-reporte">
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="fecha-fin-reporte" class="form-label">Fecha fin:</label>
+              <input type="date" class="form-control" id="fecha-fin-reporte">
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="tipo-usuario-filtro" class="form-label">Tipo de Usuario:</label>
+              <select class="form-select" id="tipo-usuario-filtro">
+                <option value="">Todos</option>
+                <option value="estudiante">Estudiantes</option>
+                <option value="docente">Docentes</option>
+              </select>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="materia-filtro" class="form-label">Materia:</label>
+              <select class="form-select" id="materia-filtro">
+                <option value="">Todas las materias</option>
+                <option value="Tele-Robótica">Tele-Robótica</option>
+                <option value="Instrumentación">Instrumentación</option>
+                <option value="Electrónica análoga">Electrónica análoga</option>
+                <option value="Electrónica de potencia">Electrónica de potencia</option>
+                <option value="Sistemas embebidos">Sistemas embebidos</option>
+                <option value="Sistemas digitales">Sistemas digitales</option>
+                <option value="Proyecto Integrador">Proyecto Integrador</option>
+                <option value="Proyecto de grado">Proyecto de grado</option>
+                <option value="Circuitos eléctricos">Circuitos eléctricos</option>
+                <option value="Biomecánica clínica">Biomecánica clínica</option>
+                <option value="Procesamiento de señales">Procesamiento de señales</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Filtros adicionales -->
+          <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+              <label for="buscar-estudiante" class="form-label">Buscar Estudiante:</label>
+              <input type="text" class="form-control" id="buscar-estudiante" placeholder="Nombre o identificación">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="docente-filtro" class="form-label">Filtrar por Docente:</label>
+              <select class="form-select" id="docente-filtro">
+                <option value="">Todos los docentes</option>
+                <option value="Alejandro Arboleda Carvajal">Alejandro Arboleda Carvajal</option>
+                <option value="Carlos Julio Arizmendi Pereira">Carlos Julio Arizmendi Pereira</option>
+                <option value="Leidy Rocío Pico Martínez">Leidy Rocío Pico Martínez</option>
+                <option value="Luis Felipe Buitrago Castro">Luis Felipe Buitrago Castro</option>
+                <option value="Lusvin Javier Amado Forero">Lusvin Javier Amado Forero</option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="limite-productos" class="form-label">Límite de productos:</label>
+              <select class="form-select" id="limite-productos">
+                <option value="10">Top 10</option>
+                <option value="15">Top 15</option>
+                <option value="20">Top 20</option>
+                <option value="25">Top 25</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Controles de vista -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <button type="button" class="btn btn-light" id="btn-vista-tabla" onclick="cambiarVistaReporte('tabla')">
+                <i class="fas fa-table"></i> Tabla
+              </button>
+              <div class="btn-group ms-2" id="controles-tipo-grafico" style="display: none;">
+                <button type="button" class="btn btn-outline-light" id="btn-vista-grafico-barras" onclick="cambiarVistaReporte('grafico-barras')">
+                  <i class="fas fa-chart-bar"></i> Barras
+                </button>
+                <button type="button" class="btn btn-outline-light" id="btn-vista-grafico-circular" onclick="cambiarVistaReporte('grafico-circular')">
+                  <i class="fas fa-chart-pie"></i> Circular
+                </button>
+                <button type="button" class="btn btn-outline-light" id="btn-vista-ambos-graficos" onclick="cambiarVistaReporte('ambos-graficos')">
+                  <i class="fas fa-chart-line"></i> Ambos
+                </button>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-outline-light" onclick="exportarReportePDF()">
+                <i class="fas fa-file-pdf"></i> PDF
+              </button>
+              <button type="button" class="btn btn-outline-light" onclick="exportarReporteExcel()">
+                <i class="fas fa-file-excel"></i> Excel
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenido del reporte (tabla) -->
+          <div id="contenido-reporte-tabla">
+            <div class="text-center p-5">
+              <p class="text-white">Selecciona un tipo de reporte para comenzar</p>
+            </div>
+          </div>
+
+          <!-- Contenido del reporte (gráfico) -->
+          <div id="chart-container" style="display: none;">
+            <canvas id="reportChart" width="400" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
 
   </div>
   

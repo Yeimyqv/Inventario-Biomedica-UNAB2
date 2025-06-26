@@ -3215,18 +3215,20 @@ function exportarGraficosAPDF(doc, yPosition) {
     doc.text('Gráficos del Reporte', 20, yPosition);
     yPosition += 15;
     
-    // Exportar gráfico de barras
+    // Exportar gráfico de barras con mejor calidad
     const chartBarras = document.getElementById('chart-reporte');
     if (chartBarras && currentChart) {
-      const imgBarras = currentChart.toBase64Image();
+      // Configurar opciones de exportación para mejor calidad
+      const imgBarras = currentChart.toBase64Image('image/png', 1.0);
       doc.addImage(imgBarras, 'PNG', 20, yPosition, 80, 60);
       doc.text('Gráfico de Barras', 20, yPosition - 5);
     }
     
-    // Exportar gráfico de pastel
+    // Exportar gráfico de pastel con mejor calidad
     const chartPastel = document.getElementById('chart-reporte-pastel');
     if (chartPastel && currentChartPastel) {
-      const imgPastel = currentChartPastel.toBase64Image();
+      // Configurar opciones de exportación para mejor calidad
+      const imgPastel = currentChartPastel.toBase64Image('image/png', 1.0);
       doc.addImage(imgPastel, 'PNG', 110, yPosition, 80, 60);
       doc.text('Gráfico de Distribución', 110, yPosition - 5);
     }
@@ -3527,14 +3529,9 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
       afterDatasetsDraw: function(chart) {
         const ctx = chart.ctx;
         ctx.save();
-        ctx.font = 'bold 10px Arial';
-        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,0.8)';
-        ctx.shadowBlur = 3;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
         
         chart.data.datasets.forEach((dataset, i) => {
           const meta = chart.getDatasetMeta(i);
@@ -3544,8 +3541,15 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
             const x = bar.x + 8; // Más separado del borde
             const y = bar.y;
             
-            // Asegurar que el texto sea visible
+            // Asegurar que el texto sea visible con borde negro
             if (bar.width > 40) { // Solo mostrar si hay espacio suficiente
+              // Borde negro para mejor contraste
+              ctx.strokeStyle = '#000000';
+              ctx.lineWidth = 3;
+              ctx.strokeText(`${data} (${percentage}%)`, x, y);
+              
+              // Texto blanco encima
+              ctx.fillStyle = '#ffffff';
               ctx.fillText(`${data} (${percentage}%)`, x, y);
             }
           });
@@ -3608,7 +3612,7 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
           position: 'bottom',
           labels: {
             color: '#ffffff',
-            font: { size: 10 },
+            font: { size: 11, weight: 'bold' },
             boxWidth: 15,
             generateLabels: function(chart) {
               const data = chart.data;
@@ -3656,13 +3660,14 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
             const position = element.tooltipPosition();
             
             ctx.save();
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 12px Arial';
+            // Texto con borde negro más grueso para mejor visibilidad en PDF
+            ctx.font = 'bold 14px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 4;
             ctx.strokeText(`${percentage}%`, position.x, position.y);
+            ctx.fillStyle = '#ffffff';
             ctx.fillText(`${percentage}%`, position.x, position.y);
             ctx.restore();
           });

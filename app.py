@@ -629,6 +629,9 @@ def reporte_prestamos():
         })
         
     except Exception as e:
+        print(f"[ERROR] Error en reporte_prestamos: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': f'Error generando reporte de préstamos: {str(e)}'}), 500
 
 @app.route('/api/reportes/estudiantes', methods=['GET'])

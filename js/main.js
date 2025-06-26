@@ -3465,6 +3465,10 @@ function crearGraficoLineas(titulo, etiquetas, datos, color) {
 function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
   destruirGraficoAnterior();
   
+  // Calcular porcentajes
+  const total = datos.reduce((sum, value) => sum + value, 0);
+  const porcentajes = datos.map(value => ((value / total) * 100).toFixed(1));
+  
   const ctx = document.getElementById('chart-reporte').getContext('2d');
   currentChart = new Chart(ctx, {
     type: 'bar',
@@ -3492,6 +3496,16 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
           labels: {
             color: '#ffffff'
           }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const index = context.dataIndex;
+              const value = context.parsed.x;
+              const percentage = porcentajes[index];
+              return `${context.dataset.label}: ${value} (${percentage}%)`;
+            }
+          }
         }
       },
       scales: {
@@ -3505,6 +3519,26 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
             font: { size: 11 }
           },
           grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        }
+      },
+      animation: {
+        onComplete: function() {
+          const ctx = this.chart.ctx;
+          ctx.font = '12px Arial';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          
+          this.data.datasets.forEach((dataset, i) => {
+            const meta = this.getDatasetMeta(i);
+            meta.data.forEach((bar, index) => {
+              const data = dataset.data[index];
+              const percentage = porcentajes[index];
+              const x = bar.x + 5;
+              const y = bar.y;
+              ctx.fillText(`${data} (${percentage}%)`, x, y);
+            });
+          });
         }
       }
     }
@@ -3520,6 +3554,10 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
     currentChartPastel.destroy();
     currentChartPastel = null;
   }
+  
+  // Calcular porcentajes
+  const total = datos.reduce((sum, value) => sum + value, 0);
+  const porcentajes = datos.map(value => ((value / total) * 100).toFixed(1));
   
   const colores = [
     'rgba(255, 99, 132, 0.8)',
@@ -3560,11 +3598,71 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
           labels: {
             color: '#ffffff',
             font: { size: 10 },
-            boxWidth: 15
+            boxWidth: 15,
+            generateLabels: function(chart) {
+              const data = chart.data;
+              if (data.labels.length && data.datasets.length) {
+                return data.labels.map((label, i) => {
+                  const value = data.datasets[0].data[i];
+                  const percentage = porcentajes[i];
+                  return {
+                    text: `${label}: ${value} (${percentage}%)`,
+                    fillStyle: data.datasets[0].backgroundColor[i],
+                    strokeStyle: data.datasets[0].borderColor[i],
+                    lineWidth: data.datasets[0].borderWidth,
+                    hidden: false,
+                    index: i
+                  };
+                });
+              }
+              return [];
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const index = context.dataIndex;
+              const value = context.parsed;
+              const percentage = porcentajes[index];
+              const label = context.label || '';
+              return `${label}: ${value} (${percentage}%)`;
+            }
+          }
+        },
+        datalabels: {
+          display: true,
+          color: '#ffffff',
+          font: {
+            weight: 'bold',
+            size: 12
+          },
+          formatter: function(value, context) {
+            const percentage = porcentajes[context.dataIndex];
+            return `${percentage}%`;
           }
         }
       }
-    }
+    },
+    plugins: [{
+      afterDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          meta.data.forEach((element, index) => {
+            // Dibujar porcentaje en el centro de cada segmento
+            const percentage = porcentajes[index];
+            const position = element.tooltipPosition();
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${percentage}%`, position.x, position.y);
+          });
+        });
+      }
+    }]
   });
 }
 

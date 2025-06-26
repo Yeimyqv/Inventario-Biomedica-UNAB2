@@ -2476,15 +2476,22 @@ function mostrarModuloReportes() {
               <div class="row mb-3">
                 <div class="col-12">
                   <div class="btn-group" role="group" aria-label="Vista de reportes">
-                    <button type="button" class="btn btn-outline-primary active" id="btn-vista-tabla" onclick="cambiarVistaReporte('tabla')">
-                      <i class="fas fa-table me-2"></i>Tabla
+                    <button type="button" class="btn btn-outline-light me-2" id="btn-vista-tabla" onclick="cambiarVistaReporte('tabla')">
+                      <i class="fas fa-table"></i> Tabla
                     </button>
-                    <button type="button" class="btn btn-outline-primary" id="btn-vista-grafico" onclick="cambiarVistaReporte('grafico')">
-                      <i class="fas fa-chart-bar me-2"></i>Gráfico
-                    </button>
-                    <button type="button" class="btn btn-outline-primary" id="btn-vista-ambos" onclick="cambiarVistaReporte('ambos')">
-                      <i class="fas fa-columns me-2"></i>Ambos
-                    </button>
+                    
+                    <!-- Controles de tipo de gráfico para otros reportes -->
+                    <div class="btn-group" id="controles-tipo-grafico" style="display: none;">
+                      <button type="button" class="btn btn-outline-light me-2" id="btn-vista-grafico-barras" onclick="cambiarVistaReporte('grafico-barras')">
+                        <i class="fas fa-chart-bar"></i> Barras
+                      </button>
+                      <button type="button" class="btn btn-outline-light me-2" id="btn-vista-grafico-circular" onclick="cambiarVistaReporte('grafico-circular')">
+                        <i class="fas fa-chart-pie"></i> Circular
+                      </button>
+                      <button type="button" class="btn btn-outline-light" id="btn-vista-ambos-graficos" onclick="cambiarVistaReporte('ambos-graficos')">
+                        <i class="fas fa-columns"></i> Ambos
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2496,10 +2503,8 @@ function mostrarModuloReportes() {
                   </div>
                 </div>
                 <div class="col-12" id="contenido-reporte-grafico" style="display: none;">
-                  <div class="card bg-dark">
-                    <div class="card-body">
-                      <canvas id="chart-reporte" width="400" height="200"></canvas>
-                    </div>
+                  <div class="chart-container mt-4" id="chart-container" style="display: none; max-width: 300px; max-height: 200px; margin: 0 auto;">
+                    <canvas id="chart-reporte" style="max-width: 100%; max-height: 100%;"></canvas>
                   </div>
                 </div>
               </div>
@@ -2576,6 +2581,7 @@ function mostrarModuloReportes() {
 async function generarReportePrestamos() {
   try {
     mostrarCargandoReporte();
+    tipoReporteActual = 'prestamos';
     actualizarTituloReporte("Reporte de Préstamos Realizados");
     activarBotonReporte(0);
     
@@ -2589,7 +2595,15 @@ async function generarReportePrestamos() {
       throw new Error(data.error);
     }
     
+    ultimosDataReporte = data;
     mostrarReportePrestamos(data);
+    
+    // Ocultar controles de gráfico para préstamos
+    const controlesGrafico = document.getElementById('controles-tipo-grafico');
+    if (controlesGrafico) controlesGrafico.style.display = 'none';
+    
+    // Mostrar solo vista de tabla para préstamos
+    cambiarVistaReporte('tabla');
     
   } catch (error) {
     console.error("Error generando reporte de préstamos:", error);
@@ -2600,6 +2614,7 @@ async function generarReportePrestamos() {
 async function generarReporteEstudiantes() {
   try {
     mostrarCargandoReporte();
+    tipoReporteActual = 'estudiantes';
     actualizarTituloReporte("Ranking de Estudiantes por Número de Préstamos");
     activarBotonReporte(1);
     
@@ -2613,7 +2628,15 @@ async function generarReporteEstudiantes() {
       throw new Error(data.error);
     }
     
+    ultimosDataReporte = data;
     mostrarReporteEstudiantes(data);
+    
+    // Mostrar controles de gráfico
+    const controlesGrafico = document.getElementById('controles-tipo-grafico');
+    if (controlesGrafico) controlesGrafico.style.display = 'inline-flex';
+    
+    // Mostrar vista de tabla por defecto
+    cambiarVistaReporte('tabla');
     
   } catch (error) {
     console.error("Error generando reporte de estudiantes:", error);
@@ -2624,6 +2647,7 @@ async function generarReporteEstudiantes() {
 async function generarReporteDocentes() {
   try {
     mostrarCargandoReporte();
+    tipoReporteActual = 'docentes';
     actualizarTituloReporte("Ranking de Docentes por Uso de Insumos");
     activarBotonReporte(2);
     
@@ -2637,7 +2661,15 @@ async function generarReporteDocentes() {
       throw new Error(data.error);
     }
     
+    ultimosDataReporte = data;
     mostrarReporteDocentes(data);
+    
+    // Mostrar controles de gráfico
+    const controlesGrafico = document.getElementById('controles-tipo-grafico');
+    if (controlesGrafico) controlesGrafico.style.display = 'inline-flex';
+    
+    // Mostrar vista de tabla por defecto
+    cambiarVistaReporte('tabla');
     
   } catch (error) {
     console.error("Error generando reporte de docentes:", error);
@@ -2648,6 +2680,7 @@ async function generarReporteDocentes() {
 async function generarReporteMaterias() {
   try {
     mostrarCargandoReporte();
+    tipoReporteActual = 'materias';
     actualizarTituloReporte("Ranking de Materias por Uso de Insumos");
     activarBotonReporte(3);
     
@@ -2661,7 +2694,15 @@ async function generarReporteMaterias() {
       throw new Error(data.error);
     }
     
+    ultimosDataReporte = data;
     mostrarReporteMaterias(data);
+    
+    // Mostrar controles de gráfico
+    const controlesGrafico = document.getElementById('controles-tipo-grafico');
+    if (controlesGrafico) controlesGrafico.style.display = 'inline-flex';
+    
+    // Mostrar vista de tabla por defecto
+    cambiarVistaReporte('tabla');
     
   } catch (error) {
     console.error("Error generando reporte de materias:", error);
@@ -2772,8 +2813,7 @@ function mostrarReportePrestamos(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para préstamos
-  generarGraficoPrestamos(data);
+  // No generar gráfico para préstamos
 }
 
 function mostrarReporteEstudiantes(data) {
@@ -2823,8 +2863,7 @@ function mostrarReporteEstudiantes(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para estudiantes
-  generarGraficoEstudiantes(data);
+  // Los gráficos se generan bajo demanda
 }
 
 function mostrarReporteDocentes(data) {
@@ -2872,8 +2911,7 @@ function mostrarReporteDocentes(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para docentes
-  generarGraficoDocentes(data);
+  // Los gráficos se generan bajo demanda
 }
 
 function mostrarReporteMaterias(data) {
@@ -2925,8 +2963,7 @@ function mostrarReporteMaterias(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para materias
-  generarGraficoMaterias(data);
+  // Los gráficos se generan bajo demanda
 }
 
 function mostrarReporteProductos(data) {
@@ -2971,8 +3008,7 @@ function mostrarReporteProductos(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para productos
-  generarGraficoProductos(data);
+  // Los gráficos se generan bajo demanda
 }
 
 // Variable global para gráficos (declarada más abajo)

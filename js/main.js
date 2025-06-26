@@ -3520,28 +3520,33 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
           },
           grid: { color: 'rgba(255, 255, 255, 0.1)' }
         }
-      },
-      animation: {
-        onComplete: function() {
-          const ctx = this.chart.ctx;
-          ctx.font = '12px Arial';
-          ctx.fillStyle = '#ffffff';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          
-          this.data.datasets.forEach((dataset, i) => {
-            const meta = this.getDatasetMeta(i);
-            meta.data.forEach((bar, index) => {
-              const data = dataset.data[index];
-              const percentage = porcentajes[index];
-              const x = bar.x + 5;
-              const y = bar.y;
-              ctx.fillText(`${data} (${percentage}%)`, x, y);
-            });
-          });
-        }
       }
-    }
+    },
+    plugins: [{
+      id: 'barPercentageLabels',
+      afterDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.font = 'bold 11px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,0.7)';
+        ctx.shadowBlur = 2;
+        
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          meta.data.forEach((bar, index) => {
+            const data = dataset.data[index];
+            const percentage = porcentajes[index];
+            const x = bar.x + 5;
+            const y = bar.y;
+            ctx.fillText(`${data} (${percentage}%)`, x, y);
+          });
+        });
+        ctx.restore();
+      }
+    }]
   });
 }
 
@@ -3630,21 +3635,10 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
             }
           }
         },
-        datalabels: {
-          display: true,
-          color: '#ffffff',
-          font: {
-            weight: 'bold',
-            size: 12
-          },
-          formatter: function(value, context) {
-            const percentage = porcentajes[context.dataIndex];
-            return `${percentage}%`;
-          }
-        }
       }
     },
     plugins: [{
+      id: 'percentageLabels',
       afterDatasetsDraw: function(chart) {
         const ctx = chart.ctx;
         chart.data.datasets.forEach((dataset, i) => {
@@ -3654,11 +3648,15 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
             const percentage = porcentajes[index];
             const position = element.tooltipPosition();
             
+            ctx.save();
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 11px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 2;
             ctx.fillText(`${percentage}%`, position.x, position.y);
+            ctx.restore();
           });
         });
       }

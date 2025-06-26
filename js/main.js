@@ -820,7 +820,13 @@ async function generarReportePrestamos() {
     
   } catch (error) {
     console.error("Error generando reporte de préstamos:", error);
-    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+    mostrarErrorReporte(`Error generando reporte: ${error.message || 'Error desconocido'}`);
+  } finally {
+    // Ocultar indicador de carga
+    const spinner = document.querySelector('.spinner-border');
+    if (spinner && spinner.parentElement) {
+      spinner.parentElement.style.display = 'none';
+    }
   }
 }
 
@@ -1297,22 +1303,28 @@ function cambiarVistaReporte(vista) {
 }
 
 function mostrarCargandoReporte() {
-  document.getElementById("contenido-reporte-tabla").innerHTML = `
-    <div class="text-center p-5">
-      <div class="spinner-border text-success" role="status">
-        <span class="visually-hidden">Generando reporte...</span>
+  const contenedor = document.getElementById("contenido-reporte-tabla");
+  if (contenedor) {
+    contenedor.innerHTML = `
+      <div class="text-center p-5">
+        <div class="spinner-border text-success" role="status">
+          <span class="visually-hidden">Generando reporte...</span>
+        </div>
+        <p class="mt-3">Generando reporte...</p>
       </div>
-      <p class="mt-3">Generando reporte...</p>
-    </div>
-  `;
+    `;
+  }
 }
 
 function mostrarErrorReporte(mensaje) {
-  document.getElementById("contenido-reporte-tabla").innerHTML = `
-    <div class="alert alert-danger">
-      <strong>Error:</strong> ${mensaje}
-    </div>
-  `;
+  const contenedor = document.getElementById("contenido-reporte-tabla");
+  if (contenedor) {
+    contenedor.innerHTML = `
+      <div class="alert alert-danger">
+        <strong>Error:</strong> ${mensaje}
+      </div>
+    `;
+  }
 }
 
 function actualizarTituloReporte(titulo) {

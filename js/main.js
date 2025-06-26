@@ -534,119 +534,256 @@ function administrarInventario() {
 }
 
 function mostrarModuloReportes() {
-  // Ocultar interfaz principal
-  document.getElementById('interface').style.display = 'none';
+  // Ocultar la interfaz principal
+  document.getElementById("interface").style.display = "none";
   
-  // Mostrar sección de reportes
-  const reportesSection = document.getElementById('reportes-section');
-  if (reportesSection) {
-    reportesSection.style.display = 'block';
-  } else {
-    // Crear sección de reportes dinámicamente
-    const container = document.querySelector('.container');
-    const reportesHTML = `
-      <section id="reportes-section" class="my-5">
-        <div class="panel-container">
-          <div class="panel-header d-flex justify-content-between align-items-center">
-            <h2 class="panel-title">MÓDULO DE REPORTES</h2>
-            <button class="btn btn-sm btn-outline-light" onclick="volverAInterfazPrincipal()">Volver al menú</button>
+  // Crear o mostrar la sección de reportes
+  let reportesSection = document.getElementById("reportes-section");
+  
+  if (!reportesSection) {
+    reportesSection = document.createElement("div");
+    reportesSection.id = "reportes-section";
+    reportesSection.className = "container-fluid p-4";
+    reportesSection.style.display = "none";
+    
+    // Configurar fechas por defecto para incluir todos los datos de prueba
+    const fechaInicio = "2025-05-01";
+    const fechaFin = "2025-06-30";
+    
+    reportesSection.innerHTML = `
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="text-light">MÓDULO DE REPORTES Y ESTADÍSTICAS</h2>
+            <button class="btn btn-outline-light" onclick="volverAInterfazPrincipal()">
+              Volver al panel principal
+            </button>
           </div>
-          <div class="panel-content">
-            <div class="row mb-4">
-              <div class="col-md-12">
-                <h4 class="text-success mb-3">Filtros de Reportes</h4>
-                <form id="filtros-reporte">
-                  <div class="row">
-                    <div class="col-md-3">
-                      <label for="fecha-inicio-reporte" class="form-label">Fecha Inicio:</label>
-                      <input type="date" class="form-control" id="fecha-inicio-reporte">
-                    </div>
-                    <div class="col-md-3">
-                      <label for="fecha-fin-reporte" class="form-label">Fecha Fin:</label>
-                      <input type="date" class="form-control" id="fecha-fin-reporte">
-                    </div>
-                    <div class="col-md-3">
-                      <label for="tipo-usuario-reporte" class="form-label">Tipo Usuario:</label>
-                      <select class="form-select" id="tipo-usuario-reporte">
-                        <option value="">Todos</option>
-                        <option value="estudiante">Estudiantes</option>
-                        <option value="docente">Docentes</option>
-                        <option value="laboratorista">Laboratoristas</option>
-                      </select>
-                    </div>
-                    <div class="col-md-3">
-                      <label for="materia-reporte" class="form-label">Materia:</label>
-                      <input type="text" class="form-control" id="materia-reporte" placeholder="Nombre de materia">
-                    </div>
-                  </div>
-                </form>
-              </div>
+        </div>
+      </div>
+      
+      <!-- Panel de filtros -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card bg-dark border-secondary">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Filtros de Consulta</h5>
             </div>
-
-            <div class="row mb-4">
-              <div class="col-md-12">
-                <h4 class="text-success mb-3">Tipos de Reportes</h4>
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-outline-success reporte-btn active" data-reporte="0" onclick="activarBotonReporte(0); generarReportePrestamos()">Préstamos Realizados</button>
-                  <button type="button" class="btn btn-outline-success reporte-btn" data-reporte="1" onclick="activarBotonReporte(1); generarReporteEstudiantes()">Estudiantes</button>
-                  <button type="button" class="btn btn-outline-success reporte-btn" data-reporte="2" onclick="activarBotonReporte(2); generarReporteDocentes()">Docentes</button>
-                  <button type="button" class="btn btn-outline-success reporte-btn" data-reporte="3" onclick="activarBotonReporte(3); generarReporteMaterias()">Materias</button>
-                  <button type="button" class="btn btn-outline-success reporte-btn" data-reporte="4" onclick="activarBotonReporte(4); generarReporteProductos()">Productos</button>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-3 mb-3">
+                  <label for="fecha-inicio-reporte" class="form-label">Fecha Inicio:</label>
+                  <input type="date" class="form-control" id="fecha-inicio-reporte" value="${fechaInicio}">
                 </div>
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-md-12">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-sm btn-outline-info" onclick="cambiarVistaReporte('tabla')">Ver Tabla</button>
-                  <button type="button" class="btn btn-sm btn-outline-info" onclick="cambiarVistaReporte('grafico')">Ver Gráfico</button>
-                  <button type="button" class="btn btn-sm btn-outline-info" onclick="cambiarVistaReporte('ambos')">Ver Ambos</button>
+                <div class="col-md-3 mb-3">
+                  <label for="fecha-fin-reporte" class="form-label">Fecha Fin:</label>
+                  <input type="date" class="form-control" id="fecha-fin-reporte" value="${fechaFin}">
                 </div>
-                <div class="btn-group ms-3" role="group">
-                  <button type="button" class="btn btn-sm btn-outline-warning" onclick="exportarReportePDF()">Exportar PDF</button>
-                  <button type="button" class="btn btn-sm btn-outline-warning" onclick="exportarReporteExcel()">Exportar Excel</button>
+                <div class="col-md-3 mb-3">
+                  <label for="tipo-usuario-filtro" class="form-label">Tipo de Usuario:</label>
+                  <select class="form-select" id="tipo-usuario-filtro">
+                    <option value="">Todos</option>
+                    <option value="estudiante">Estudiantes</option>
+                    <option value="docente">Docentes</option>
+                  </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="materia-filtro" class="form-label">Materia:</label>
+                  <select class="form-select" id="materia-filtro">
+                    <option value="">Todas las materias</option>
+                    <option value="Tele-Robótica">Tele-Robótica</option>
+                    <option value="Instrumentación">Instrumentación</option>
+                    <option value="Electrónica análoga">Electrónica análoga</option>
+                    <option value="Electrónica de potencia">Electrónica de potencia</option>
+                    <option value="Sistemas embebidos">Sistemas embebidos</option>
+                    <option value="Sistemas digitales">Sistemas digitales</option>
+                    <option value="Proyecto Integrador">Proyecto Integrador</option>
+                    <option value="Proyecto de grado">Proyecto de grado</option>
+                    <option value="Circuitos eléctricos">Circuitos eléctricos</option>
+                    <option value="Biomecánica clínica">Biomecánica clínica</option>
+                    <option value="Procesamiento de señales">Procesamiento de señales</option>
+                  </select>
                 </div>
               </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-12">
-                <div id="reporte-titulo">
-                  <h5 class="text-success">Reporte de Préstamos Realizados</h5>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="buscar-estudiante" class="form-label">Buscar Estudiante:</label>
+                  <input type="text" class="form-control" id="buscar-estudiante" placeholder="Nombre o identificación">
                 </div>
-                <div id="reporte-resultado">
-                  <div id="cargando-reporte" style="display: none;" class="text-center">
-                    <div class="spinner-border text-success" role="status">
-                      <span class="visually-hidden">Cargando...</span>
-                    </div>
-                    <p class="text-light mt-2">Generando reporte...</p>
-                  </div>
-                  <div id="contenido-reporte">
-                    <p class="text-light">Selecciona un tipo de reporte para comenzar</p>
-                  </div>
+                <div class="col-md-4 mb-3">
+                  <label for="docente-filtro" class="form-label">Filtrar por Docente:</label>
+                  <select class="form-select" id="docente-filtro">
+                    <option value="">Todos los docentes</option>
+                    <option value="Alejandro Arboleda Carvajal">Alejandro Arboleda Carvajal</option>
+                    <option value="Carlos Julio Arizmendi Pereira">Carlos Julio Arizmendi Pereira</option>
+                    <option value="Leidy Rocío Pico Martínez">Leidy Rocío Pico Martínez</option>
+                    <option value="Luis Felipe Buitrago Castro">Luis Felipe Buitrago Castro</option>
+                    <option value="Lusvin Javier Amado Forero">Lusvin Javier Amado Forero</option>
+                    <option value="Mario Fernando Morales Cordero">Mario Fernando Morales Cordero</option>
+                    <option value="Mateo Escobar Jaramillo">Mateo Escobar Jaramillo</option>
+                    <option value="Nayibe Chio Cho">Nayibe Chio Cho</option>
+                    <option value="Víctor Alfonso Solarte David">Víctor Alfonso Solarte David</option>
+                    <option value="William Alexander Salamanca Becerra">William Alexander Salamanca Becerra</option>
+                    <option value="Yeimy Liseth Quintana Villamizar">Yeimy Liseth Quintana Villamizar</option>
+                  </select>
                 </div>
-                <div id="reporte-grafico" style="display: none;">
-                  <canvas id="chart-canvas" width="800" height="400"></canvas>
+                <div class="col-md-4 mb-3">
+                  <label for="limite-productos" class="form-label">Límite de Productos:</label>
+                  <select class="form-select" id="limite-productos">
+                    <option value="5">Top 5</option>
+                    <option value="10" selected>Top 10</option>
+                    <option value="20">Top 20</option>
+                    <option value="50">Top 50</option>
+                  </select>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+      
+      <!-- Botones de tipos de reporte -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="btn-group w-100" role="group">
+            <button type="button" class="btn btn-success active" onclick="generarReportePrestamos()">
+              Préstamos Realizados
+            </button>
+            <button type="button" class="btn btn-outline-success" onclick="generarReporteEstudiantes()">
+              Ranking Estudiantes
+            </button>
+            <button type="button" class="btn btn-outline-success" onclick="generarReporteDocentes()">
+              Ranking Docentes
+            </button>
+            <button type="button" class="btn btn-outline-success" onclick="generarReporteMaterias()">
+              Ranking Materias
+            </button>
+            <button type="button" class="btn btn-outline-success" onclick="generarReporteProductos()">
+              Productos Más Solicitados
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Contenido del reporte -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card bg-dark border-secondary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0" id="titulo-reporte">Reporte de Préstamos Realizados</h5>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-outline-success" onclick="exportarReportePDF()">
+                  PDF
+                </button>
+                <button class="btn btn-sm btn-outline-success" onclick="exportarReporteExcel()">
+                  Excel
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-12">
+                  <div class="btn-group" role="group" aria-label="Vista de reportes">
+                    <button type="button" class="btn btn-outline-light me-2" id="btn-vista-tabla" onclick="cambiarVistaReporte('tabla')">
+                      <i class="fas fa-table"></i> Tabla
+                    </button>
+                    
+                    <!-- Controles de tipo de gráfico para otros reportes -->
+                    <div class="btn-group" id="controles-tipo-grafico" style="display: none;">
+                      <button type="button" class="btn btn-outline-light me-2" id="btn-vista-grafico-barras" onclick="cambiarVistaReporte('grafico-barras')">
+                        <i class="fas fa-chart-bar"></i> Barras
+                      </button>
+                      <button type="button" class="btn btn-outline-light me-2" id="btn-vista-grafico-circular" onclick="cambiarVistaReporte('grafico-circular')">
+                        <i class="fas fa-chart-pie"></i> Circular
+                      </button>
+                      <button type="button" class="btn btn-outline-light" id="btn-vista-ambos-graficos" onclick="cambiarVistaReporte('ambos-graficos')">
+                        <i class="fas fa-columns"></i> Ambos
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-12" id="contenido-reporte-tabla">
+                  <div class="text-center p-4">
+                    <p class="text-muted">Seleccione un tipo de reporte para comenzar</p>
+                  </div>
+                </div>
+                <div class="col-12" id="contenido-reporte-grafico" style="display: none;">
+                  <div class="chart-container mt-4" id="chart-container" style="display: none; max-width: 300px; max-height: 200px; margin: 0 auto;">
+                    <canvas id="chart-reporte" style="max-width: 100%; max-height: 100%;"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     `;
-    container.insertAdjacentHTML('beforeend', reportesHTML);
+    
+    document.body.appendChild(reportesSection);
   }
   
-  // Configurar fechas por defecto
-  const fechaInicio = document.getElementById('fecha-inicio-reporte');
-  const fechaFin = document.getElementById('fecha-fin-reporte');
+  // Mostrar la sección
+  reportesSection.style.display = "block";
   
-  if (fechaInicio && !fechaInicio.value) fechaInicio.value = '2025-05-01';
-  if (fechaFin && !fechaFin.value) fechaFin.value = '2025-06-30';
-  
-  // Cargar reporte por defecto
-  generarReportePrestamos();
+  // Configurar aplicación automática de filtros
+  setTimeout(() => {
+    // Agregar eventos para aplicar filtros automáticamente
+    const filtros = ['fecha-inicio-reporte', 'fecha-fin-reporte', 'tipo-usuario-filtro', 'materia-filtro', 'docente-filtro', 'limite-productos'];
+    filtros.forEach(filtroId => {
+      const elemento = document.getElementById(filtroId);
+      if (elemento) {
+        elemento.addEventListener('change', () => {
+          // Aplicar filtros automáticamente cuando cambie cualquier valor
+          setTimeout(() => {
+            const botones = document.querySelectorAll('#reportes-section .btn-group .btn');
+            botones.forEach((btn, index) => {
+              if (btn.classList.contains('active')) {
+                // Regenerar el reporte activo
+                switch(index) {
+                  case 0: generarReportePrestamos(); break;
+                  case 1: generarReporteEstudiantes(); break;
+                  case 2: generarReporteDocentes(); break;
+                  case 3: generarReporteMaterias(); break;
+                  case 4: generarReporteProductos(); break;
+                }
+              }
+            });
+          }, 100);
+        });
+      }
+    });
+    
+    // Agregar evento especial para el campo de búsqueda de estudiante (con debounce)
+    const buscarEstudianteInput = document.getElementById('buscar-estudiante');
+    if (buscarEstudianteInput) {
+      let timeoutId;
+      buscarEstudianteInput.addEventListener('input', () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          // Aplicar filtros automáticamente cuando cambie el texto de búsqueda
+          const botones = document.querySelectorAll('#reportes-section .btn-group .btn');
+          botones.forEach((btn, index) => {
+            if (btn.classList.contains('active')) {
+              // Regenerar el reporte activo
+              switch(index) {
+                case 0: generarReportePrestamos(); break;
+                case 1: generarReporteEstudiantes(); break;
+                case 2: generarReporteDocentes(); break;
+                case 3: generarReporteMaterias(); break;
+                case 4: generarReporteProductos(); break;
+              }
+            }
+          });
+        }, 500); // Esperar 500ms después de que el usuario deje de escribir
+      });
+    }
+    
+    // Cargar reporte de préstamos por defecto
+    generarReportePrestamos();
+  }, 200);
 }
 
 // Función para cargar categorías en préstamo

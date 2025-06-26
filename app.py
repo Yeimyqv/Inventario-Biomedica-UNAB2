@@ -564,27 +564,31 @@ def reporte_prestamos():
         
         print(f"[DEBUG] Reporte préstamos - buscar_estudiante: '{buscar_estudiante}'")
         
-        # Construir consulta base
-        query = db.session.query(Prestamo).join(Usuario).join(Elemento)
+        # Construir consulta base con joins
+        query = db.session.query(Prestamo).join(Usuario).join(Elemento).join(Categoria)
         
         # Aplicar filtros de fecha
         if fecha_inicio:
-            query = query.filter(Prestamo.fecha_prestamo >= datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+            fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+            query = query.filter(Prestamo.fecha_prestamo >= fecha_inicio_dt)
+            
         if fecha_fin:
-            query = query.filter(Prestamo.fecha_prestamo <= datetime.strptime(fecha_fin, '%Y-%m-%d'))
+            fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d') + timedelta(days=1)
+            query = query.filter(Prestamo.fecha_prestamo < fecha_fin_dt)
         
         # Aplicar filtros adicionales
         if tipo_usuario:
             query = query.filter(Usuario.tipo == tipo_usuario)
-        if materia:
+            
+        if materia and materia.strip():
             query = query.filter(Usuario.materia.ilike(f'%{materia}%'))
+            
         if elemento_id:
             query = query.filter(Prestamo.elemento_id == elemento_id)
         
         # Filtro de búsqueda de estudiante
         if buscar_estudiante and buscar_estudiante.strip():
             buscar_term = buscar_estudiante.strip()
-            print(f"[DEBUG] Aplicando filtro de búsqueda en préstamos: '{buscar_term}'")
             query = query.filter(
                 db.or_(
                     Usuario.nombre.ilike(f'%{buscar_term}%'),
@@ -592,22 +596,37 @@ def reporte_prestamos():
                 )
             )
         
+        # Ordenar por fecha descendente
+        query = query.order_by(Prestamo.fecha_prestamo.desc())
+        
         prestamos = query.all()
         
-        # Preparar respuesta
-        resultado = {
-            'total_prestamos': len(prestamos),
-            'prestamos': [prestamo.to_dict() for prestamo in prestamos],
-            'filtros_aplicados': {
-                'fecha_inicio': fecha_inicio,
-                'fecha_fin': fecha_fin,
-                'tipo_usuario': tipo_usuario,
-                'materia': materia,
-                'elemento_id': elemento_id
-            }
-        }
+        # Convertir a formato JSON detallado
+        prestamos_json = []
+        for prestamo in prestamos:
+            prestamos_json.append({
+                'id': prestamo.id,
+                'fecha_prestamo': prestamo.fecha_prestamo.isoformat(),
+                'fecha_devolucion_real': prestamo.fecha_devolucion_real.isoformat() if prestamo.fecha_devolucion_real else None,
+                'cantidad': prestamo.cantidad,
+                'estado': prestamo.estado,
+                'observaciones': prestamo.observaciones or '',
+                'usuario_nombre': prestamo.usuario.nombre,
+                'usuario_identificacion': prestamo.usuario.identificacion,
+                'usuario_tipo': prestamo.usuario.tipo,
+                'usuario_correo': prestamo.usuario.correo or '',
+                'usuario_materia': prestamo.usuario.materia or '',
+                'usuario_docente': prestamo.usuario.docente or '',
+                'elemento_nombre': prestamo.elemento.nombre,
+                'elemento_codigo': prestamo.elemento.codigo,
+                'elemento_categoria': prestamo.elemento.categoria.nombre
+            })
         
-        return jsonify(resultado)
+        return jsonify({
+            'success': True,
+            'total_prestamos': len(prestamos_json),
+            'prestamos': prestamos_json
+        })
         
     except Exception as e:
         return jsonify({'error': f'Error generando reporte de préstamos: {str(e)}'}), 500

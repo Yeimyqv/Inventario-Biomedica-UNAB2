@@ -673,6 +673,343 @@ function exportarReporteExcel() {
   alert('Función de exportación Excel en desarrollo');
 }
 
+let currentChart = null;
+
 function generarGraficoSegunTipo(tipo) {
-  alert('Función de gráficos en desarrollo');
+  if (!ultimosDataReporte) {
+    console.error('No hay datos para generar gráfico');
+    return;
+  }
+
+  const canvas = document.getElementById('reportChart');
+  if (!canvas) {
+    console.error('Canvas no encontrado');
+    return;
+  }
+
+  // Destruir gráfico anterior si existe
+  if (currentChart) {
+    currentChart.destroy();
+  }
+
+  const ctx = canvas.getContext('2d');
+
+  switch(tipoReporteActual) {
+    case 'prestamos':
+      generarGraficoPrestamos(ctx, ultimosDataReporte, tipo);
+      break;
+    case 'estudiantes':
+      generarGraficoEstudiantes(ctx, ultimosDataReporte, tipo);
+      break;
+    case 'docentes':
+      generarGraficoDocentes(ctx, ultimosDataReporte, tipo);
+      break;
+    case 'materias':
+      generarGraficoMaterias(ctx, ultimosDataReporte, tipo);
+      break;
+    case 'productos':
+      generarGraficoProductos(ctx, ultimosDataReporte, tipo);
+      break;
+  }
+}
+
+function generarGraficoPrestamos(ctx, data, tipo) {
+  // Agrupar préstamos por mes
+  const prestamosPorMes = {};
+  data.prestamos.forEach(prestamo => {
+    const fecha = new Date(prestamo.fecha_prestamo);
+    const mes = fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' });
+    prestamosPorMes[mes] = (prestamosPorMes[mes] || 0) + 1;
+  });
+
+  const etiquetas = Object.keys(prestamosPorMes);
+  const valores = Object.values(prestamosPorMes);
+
+  if (tipo === 'barras') {
+    currentChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          label: 'Préstamos por mes',
+          data: valores,
+          backgroundColor: 'rgba(54, 162, 235, 0.8)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribución de Préstamos por Mes'
+          }
+        }
+      }
+    });
+  } else {
+    currentChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          data: valores,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 205, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribución de Préstamos'
+          }
+        }
+      }
+    });
+  }
+}
+
+function generarGraficoEstudiantes(ctx, data, tipo) {
+  const etiquetas = data.estudiantes.slice(0, 10).map(e => e.nombre);
+  const valores = data.estudiantes.slice(0, 10).map(e => e.total_prestamos);
+
+  if (tipo === 'barras') {
+    currentChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          label: 'Préstamos',
+          data: valores,
+          backgroundColor: 'rgba(75, 192, 192, 0.8)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Top 10 Estudiantes por Préstamos'
+          }
+        }
+      }
+    });
+  } else {
+    currentChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          data: valores,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 205, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(199, 199, 199, 0.8)',
+            'rgba(83, 102, 255, 0.8)',
+            'rgba(255, 99, 255, 0.8)',
+            'rgba(99, 255, 132, 0.8)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribución de Préstamos por Estudiante'
+          }
+        }
+      }
+    });
+  }
+}
+
+function generarGraficoDocentes(ctx, data, tipo) {
+  const etiquetas = data.docentes.slice(0, 10).map(d => d.nombre);
+  const valores = data.docentes.slice(0, 10).map(d => d.total_prestamos);
+
+  if (tipo === 'barras') {
+    currentChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          label: 'Préstamos',
+          data: valores,
+          backgroundColor: 'rgba(255, 159, 64, 0.8)',
+          borderColor: 'rgba(255, 159, 64, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Préstamos por Docente'
+          }
+        }
+      }
+    });
+  } else {
+    currentChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          data: valores,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 205, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribución por Docente'
+          }
+        }
+      }
+    });
+  }
+}
+
+function generarGraficoMaterias(ctx, data, tipo) {
+  const etiquetas = data.materias.slice(0, 10).map(m => m.materia);
+  const valores = data.materias.slice(0, 10).map(m => m.total_prestamos);
+
+  if (tipo === 'barras') {
+    currentChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          label: 'Préstamos',
+          data: valores,
+          backgroundColor: 'rgba(153, 102, 255, 0.8)',
+          borderColor: 'rgba(153, 102, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Préstamos por Materia'
+          }
+        }
+      }
+    });
+  } else {
+    currentChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          data: valores,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 205, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(199, 199, 199, 0.8)',
+            'rgba(83, 102, 255, 0.8)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribución por Materia'
+          }
+        }
+      }
+    });
+  }
+}
+
+function generarGraficoProductos(ctx, data, tipo) {
+  const etiquetas = data.productos.slice(0, 10).map(p => p.nombre);
+  const valores = data.productos.slice(0, 10).map(p => p.total_prestamos);
+
+  if (tipo === 'barras') {
+    currentChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          label: 'Préstamos',
+          data: valores,
+          backgroundColor: 'rgba(255, 206, 86, 0.8)',
+          borderColor: 'rgba(255, 206, 86, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Productos Más Solicitados'
+          }
+        }
+      }
+    });
+  } else {
+    currentChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          data: valores,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 205, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(199, 199, 199, 0.8)',
+            'rgba(83, 102, 255, 0.8)',
+            'rgba(255, 99, 255, 0.8)',
+            'rgba(99, 255, 132, 0.8)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribución de Productos Solicitados'
+          }
+        }
+      }
+    });
+  }
 }

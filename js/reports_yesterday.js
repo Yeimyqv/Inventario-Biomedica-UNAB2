@@ -673,7 +673,7 @@ function exportarReporteExcel() {
   alert('Función de exportación Excel en desarrollo');
 }
 
-// Chart variable is defined in main.js
+// Chart variable is defined in main.js - no need to declare here
 
 function generarGraficoSegunTipo(tipo) {
   if (!ultimosDataReporte) {

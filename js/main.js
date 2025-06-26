@@ -792,7 +792,7 @@ function mostrarModuloReportes() {
 // Variables globales para reportes (ya declaradas arriba)
 // let ultimosDataReporte = null; - ya existe
 // let tipoReporteActual = null; - ya existe como tipoReporteActual
-// let currentChart = null; - se declara más abajo
+// currentChart variable declared at top of file
 
 async function generarReportePrestamos() {
   try {

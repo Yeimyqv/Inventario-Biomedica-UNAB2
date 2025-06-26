@@ -2772,8 +2772,8 @@ function mostrarReportePrestamos(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para préstamos
-  generarGraficoPrestamos(data);
+  // Ocultar controles de vista para préstamos realizados (solo tabla)
+  document.getElementById("controles-vista-reporte").style.display = 'none';
 }
 
 function mostrarReporteEstudiantes(data) {
@@ -2823,7 +2823,10 @@ function mostrarReporteEstudiantes(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para estudiantes
+  // Mostrar controles de vista para ranking de estudiantes
+  document.getElementById("controles-vista-reporte").style.display = 'block';
+  
+  // Generar gráfico para ranking de estudiantes
   generarGraficoEstudiantes(data);
 }
 
@@ -2872,7 +2875,10 @@ function mostrarReporteDocentes(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para docentes
+  // Mostrar controles de vista para ranking de docentes
+  document.getElementById("controles-vista-reporte").style.display = 'block';
+  
+  // Generar gráfico para ranking de docentes
   generarGraficoDocentes(data);
 }
 
@@ -2925,7 +2931,10 @@ function mostrarReporteMaterias(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para materias
+  // Mostrar controles de vista para ranking de materias
+  document.getElementById("controles-vista-reporte").style.display = 'block';
+  
+  // Generar gráfico para ranking de materias
   generarGraficoMaterias(data);
 }
 
@@ -2971,8 +2980,8 @@ function mostrarReporteProductos(data) {
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;
   
-  // Generar gráfico para productos
-  generarGraficoProductos(data);
+  // Ocultar controles de vista para productos más solicitados (solo tabla)
+  document.getElementById("controles-vista-reporte").style.display = 'none';
 }
 
 // Variable global para gráficos (declarada más abajo)

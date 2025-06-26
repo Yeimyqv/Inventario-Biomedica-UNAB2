@@ -541,14 +541,112 @@ function mostrarModuloReportes() {
   const reportesSection = document.getElementById('reportes-section');
   if (reportesSection) {
     reportesSection.style.display = 'block';
-    
-    // Inicializar módulo de reportes si existe
-    if (typeof inicializarReportes === 'function') {
-      inicializarReportes();
-    }
   } else {
-    mostrarNotificacion('Error', 'Sección de reportes no encontrada', 'error');
+    // Crear sección de reportes dinámicamente
+    const container = document.querySelector('.container');
+    const reportesHTML = `
+      <section id="reportes-section" class="my-5">
+        <div class="panel-container">
+          <div class="panel-header d-flex justify-content-between align-items-center">
+            <h2 class="panel-title">MÓDULO DE REPORTES</h2>
+            <button class="btn btn-sm btn-outline-light" onclick="volverAInterfazPrincipal()">Volver al menú</button>
+          </div>
+          <div class="panel-content">
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <h4 class="text-success mb-3">Filtros de Reportes</h4>
+                <form id="filtros-reporte">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <label for="fecha-inicio-reporte" class="form-label">Fecha Inicio:</label>
+                      <input type="date" class="form-control" id="fecha-inicio-reporte">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="fecha-fin-reporte" class="form-label">Fecha Fin:</label>
+                      <input type="date" class="form-control" id="fecha-fin-reporte">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="tipo-usuario-reporte" class="form-label">Tipo Usuario:</label>
+                      <select class="form-select" id="tipo-usuario-reporte">
+                        <option value="">Todos</option>
+                        <option value="estudiante">Estudiantes</option>
+                        <option value="docente">Docentes</option>
+                        <option value="laboratorista">Laboratoristas</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label for="materia-reporte" class="form-label">Materia:</label>
+                      <input type="text" class="form-control" id="materia-reporte" placeholder="Nombre de materia">
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <h4 class="text-success mb-3">Tipos de Reportes</h4>
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-outline-success reporte-btn active" data-reporte="0" onclick="activarBotonReporte(0); generarReportePrestamos()">Préstamos Realizados</button>
+                  <button type="button" class="btn btn-outline-success reporte-btn" data-reporte="1" onclick="activarBotonReporte(1); generarReporteEstudiantes()">Estudiantes</button>
+                  <button type="button" class="btn btn-outline-success reporte-btn" data-reporte="2" onclick="activarBotonReporte(2); generarReporteDocentes()">Docentes</button>
+                  <button type="button" class="btn btn-outline-success reporte-btn" data-reporte="3" onclick="activarBotonReporte(3); generarReporteMaterias()">Materias</button>
+                  <button type="button" class="btn btn-outline-success reporte-btn" data-reporte="4" onclick="activarBotonReporte(4); generarReporteProductos()">Productos</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-sm btn-outline-info" onclick="cambiarVistaReporte('tabla')">Ver Tabla</button>
+                  <button type="button" class="btn btn-sm btn-outline-info" onclick="cambiarVistaReporte('grafico')">Ver Gráfico</button>
+                  <button type="button" class="btn btn-sm btn-outline-info" onclick="cambiarVistaReporte('ambos')">Ver Ambos</button>
+                </div>
+                <div class="btn-group ms-3" role="group">
+                  <button type="button" class="btn btn-sm btn-outline-warning" onclick="exportarReportePDF()">Exportar PDF</button>
+                  <button type="button" class="btn btn-sm btn-outline-warning" onclick="exportarReporteExcel()">Exportar Excel</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div id="reporte-titulo">
+                  <h5 class="text-success">Reporte de Préstamos Realizados</h5>
+                </div>
+                <div id="reporte-resultado">
+                  <div id="cargando-reporte" style="display: none;" class="text-center">
+                    <div class="spinner-border text-success" role="status">
+                      <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="text-light mt-2">Generando reporte...</p>
+                  </div>
+                  <div id="contenido-reporte">
+                    <p class="text-light">Selecciona un tipo de reporte para comenzar</p>
+                  </div>
+                </div>
+                <div id="reporte-grafico" style="display: none;">
+                  <canvas id="chart-canvas" width="800" height="400"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+    container.insertAdjacentHTML('beforeend', reportesHTML);
   }
+  
+  // Configurar fechas por defecto
+  const fechaInicio = document.getElementById('fecha-inicio-reporte');
+  const fechaFin = document.getElementById('fecha-fin-reporte');
+  
+  if (fechaInicio && !fechaInicio.value) fechaInicio.value = '2025-05-01';
+  if (fechaFin && !fechaFin.value) fechaFin.value = '2025-06-30';
+  
+  // Cargar reporte por defecto
+  generarReportePrestamos();
 }
 
 // Función para cargar categorías en préstamo
@@ -742,6 +840,619 @@ async function realizarPrestamo() {
     console.error('Error realizando préstamo:', error);
     mostrarNotificacion('Error', 'Error al procesar préstamo', 'error');
   }
+}
+
+// ===== FUNCIONES DE REPORTES =====
+
+async function generarReportePrestamos() {
+  try {
+    mostrarCargandoReporte();
+    
+    const filtros = obtenerFiltrosReporte();
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/prestamos?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReportePrestamos(data);
+    
+  } catch (error) {
+    console.error('Error generando reporte de préstamos:', error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+async function generarReporteEstudiantes() {
+  try {
+    mostrarCargandoReporte();
+    
+    const filtros = obtenerFiltrosReporte();
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/estudiantes?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReporteEstudiantes(data);
+    
+  } catch (error) {
+    console.error('Error generando reporte de estudiantes:', error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+async function generarReporteDocentes() {
+  try {
+    mostrarCargandoReporte();
+    
+    const filtros = obtenerFiltrosReporte();
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/docentes?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReporteDocentes(data);
+    
+  } catch (error) {
+    console.error('Error generando reporte de docentes:', error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+async function generarReporteMaterias() {
+  try {
+    mostrarCargandoReporte();
+    
+    const filtros = obtenerFiltrosReporte();
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/materias?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReporteMaterias(data);
+    
+  } catch (error) {
+    console.error('Error generando reporte de materias:', error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+async function generarReporteProductos() {
+  try {
+    mostrarCargandoReporte();
+    
+    const filtros = obtenerFiltrosReporte();
+    const params = new URLSearchParams(filtros);
+    
+    const response = await fetch(`/api/reportes/productos?${params}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    mostrarReporteProductos(data);
+    
+  } catch (error) {
+    console.error('Error generando reporte de productos:', error);
+    mostrarErrorReporte(`Error generando reporte: ${error.message}`);
+  }
+}
+
+function obtenerFiltrosReporte() {
+  return {
+    fecha_inicio: document.getElementById('fecha-inicio-reporte')?.value || '',
+    fecha_fin: document.getElementById('fecha-fin-reporte')?.value || '',
+    tipo_usuario: document.getElementById('tipo-usuario-reporte')?.value || '',
+    materia: document.getElementById('materia-reporte')?.value || ''
+  };
+}
+
+function mostrarReportePrestamos(data) {
+  ocultarCargandoReporte();
+  actualizarTituloReporte('Reporte de Préstamos Realizados');
+  
+  let html = `
+    <div class="table-responsive">
+      <table class="table table-dark table-striped">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Elemento</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+  
+  if (data.prestamos && data.prestamos.length > 0) {
+    data.prestamos.forEach(prestamo => {
+      html += `
+        <tr>
+          <td>${formatearFechaReporte(prestamo.fecha_prestamo)}</td>
+          <td>
+            <div><strong>${prestamo.usuario_nombre}</strong></div>
+            <small class="text-muted">${prestamo.usuario_email || 'Sin email'}</small>
+          </td>
+          <td>
+            <div><strong>${prestamo.elemento_nombre}</strong></div>
+            <small class="text-muted">${prestamo.elemento_codigo}</small>
+          </td>
+          <td>${prestamo.cantidad}</td>
+          <td><span class="badge ${obtenerClaseEstadoReporte(prestamo.estado)}">${prestamo.estado}</span></td>
+          <td><span class="${obtenerClaseObservacionReporte(prestamo.observaciones)}">${prestamo.observaciones || 'N/A'}</span></td>
+        </tr>
+      `;
+    });
+  } else {
+    html += '<tr><td colspan="6" class="text-center">No hay préstamos en el período seleccionado</td></tr>';
+  }
+  
+  html += `
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-3">
+      <p class="text-light"><strong>Total de préstamos:</strong> ${data.prestamos?.length || 0}</p>
+    </div>
+  `;
+  
+  document.getElementById('contenido-reporte').innerHTML = html;
+  
+  // Generar gráfico
+  if (data.prestamos && data.prestamos.length > 0) {
+    generarGraficoPrestamos(data);
+  }
+}
+
+function mostrarReporteEstudiantes(data) {
+  ocultarCargandoReporte();
+  actualizarTituloReporte('Reporte de Estudiantes');
+  
+  let html = `
+    <div class="table-responsive">
+      <table class="table table-dark table-striped">
+        <thead>
+          <tr>
+            <th>Estudiante</th>
+            <th>Email</th>
+            <th>Docente</th>
+            <th>Materia</th>
+            <th>Total Préstamos</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+  
+  if (data.estudiantes && data.estudiantes.length > 0) {
+    data.estudiantes.forEach(estudiante => {
+      html += `
+        <tr>
+          <td><strong>${estudiante.nombre}</strong></td>
+          <td>${estudiante.correo || 'Sin email'}</td>
+          <td>${estudiante.docente || 'N/A'}</td>
+          <td>${estudiante.materia || 'N/A'}</td>
+          <td><span class="badge bg-success">${estudiante.total_prestamos}</span></td>
+        </tr>
+      `;
+    });
+  } else {
+    html += '<tr><td colspan="5" class="text-center">No hay estudiantes en el período seleccionado</td></tr>';
+  }
+  
+  html += `
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  document.getElementById('contenido-reporte').innerHTML = html;
+  
+  // Generar gráficos
+  if (data.estudiantes && data.estudiantes.length > 0) {
+    generarGraficoEstudiantesBarras(data);
+  }
+}
+
+function mostrarReporteDocentes(data) {
+  ocultarCargandoReporte();
+  actualizarTituloReporte('Reporte de Docentes');
+  
+  let html = `
+    <div class="table-responsive">
+      <table class="table table-dark table-striped">
+        <thead>
+          <tr>
+            <th>Docente</th>
+            <th>Email</th>
+            <th>Tipo</th>
+            <th>Total Préstamos</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+  
+  if (data.docentes && data.docentes.length > 0) {
+    data.docentes.forEach(docente => {
+      html += `
+        <tr>
+          <td><strong>${docente.nombre}</strong></td>
+          <td>${docente.correo || 'Sin email'}</td>
+          <td><span class="badge ${obtenerClaseTipoDocente(docente.tipo)}">${docente.tipo}</span></td>
+          <td><span class="badge bg-success">${docente.total_prestamos}</span></td>
+        </tr>
+      `;
+    });
+  } else {
+    html += '<tr><td colspan="4" class="text-center">No hay docentes en el período seleccionado</td></tr>';
+  }
+  
+  html += `
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  document.getElementById('contenido-reporte').innerHTML = html;
+  
+  // Generar gráficos
+  if (data.docentes && data.docentes.length > 0) {
+    generarGraficoDocentesBarras(data);
+  }
+}
+
+function mostrarReporteMaterias(data) {
+  ocultarCargandoReporte();
+  actualizarTituloReporte('Reporte de Materias');
+  
+  let html = `
+    <div class="table-responsive">
+      <table class="table table-dark table-striped">
+        <thead>
+          <tr>
+            <th>Materia</th>
+            <th>Total Préstamos</th>
+            <th>Estudiantes Activos</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+  
+  if (data.materias && data.materias.length > 0) {
+    data.materias.forEach(materia => {
+      html += `
+        <tr>
+          <td><strong>${materia.nombre}</strong></td>
+          <td><span class="badge bg-success">${materia.total_prestamos}</span></td>
+          <td><span class="badge bg-info">${materia.estudiantes_unicos}</span></td>
+        </tr>
+      `;
+    });
+  } else {
+    html += '<tr><td colspan="3" class="text-center">No hay materias en el período seleccionado</td></tr>';
+  }
+  
+  html += `
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  document.getElementById('contenido-reporte').innerHTML = html;
+  
+  // Generar gráficos
+  if (data.materias && data.materias.length > 0) {
+    generarGraficoMateriasBarras(data);
+  }
+}
+
+function mostrarReporteProductos(data) {
+  ocultarCargandoReporte();
+  actualizarTituloReporte('Reporte de Productos Más Solicitados');
+  
+  let html = `
+    <div class="table-responsive">
+      <table class="table table-dark table-striped">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Código</th>
+            <th>Categoría</th>
+            <th>Total Préstamos</th>
+            <th>Cantidad Total Prestada</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+  
+  if (data.productos && data.productos.length > 0) {
+    data.productos.forEach(producto => {
+      html += `
+        <tr>
+          <td><strong>${producto.nombre}</strong></td>
+          <td>${producto.codigo}</td>
+          <td><span class="badge bg-secondary">${producto.categoria}</span></td>
+          <td><span class="badge bg-success">${producto.total_prestamos}</span></td>
+          <td><span class="badge bg-warning">${producto.cantidad_total}</span></td>
+        </tr>
+      `;
+    });
+  } else {
+    html += '<tr><td colspan="5" class="text-center">No hay productos en el período seleccionado</td></tr>';
+  }
+  
+  html += `
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  document.getElementById('contenido-reporte').innerHTML = html;
+  
+  // Generar gráficos
+  if (data.productos && data.productos.length > 0) {
+    generarGraficoProductosBarras(data);
+  }
+}
+
+// Funciones auxiliares para reportes
+function cambiarVistaReporte(vista) {
+  const tablaDiv = document.getElementById('contenido-reporte');
+  const graficoDiv = document.getElementById('reporte-grafico');
+  
+  switch(vista) {
+    case 'tabla':
+      tablaDiv.style.display = 'block';
+      graficoDiv.style.display = 'none';
+      break;
+    case 'grafico':
+      tablaDiv.style.display = 'none';
+      graficoDiv.style.display = 'block';
+      break;
+    case 'ambos':
+      tablaDiv.style.display = 'block';
+      graficoDiv.style.display = 'block';
+      break;
+  }
+}
+
+function activarBotonReporte(indice) {
+  document.querySelectorAll('.reporte-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`[data-reporte="${indice}"]`).classList.add('active');
+}
+
+function mostrarCargandoReporte() {
+  document.getElementById('cargando-reporte').style.display = 'block';
+  document.getElementById('contenido-reporte').style.display = 'none';
+}
+
+function ocultarCargandoReporte() {
+  document.getElementById('cargando-reporte').style.display = 'none';
+  document.getElementById('contenido-reporte').style.display = 'block';
+}
+
+function mostrarErrorReporte(mensaje) {
+  ocultarCargandoReporte();
+  document.getElementById('contenido-reporte').innerHTML = `
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle"></i> ${mensaje}
+    </div>
+  `;
+}
+
+function actualizarTituloReporte(titulo) {
+  document.getElementById('reporte-titulo').innerHTML = `<h5 class="text-success">${titulo}</h5>`;
+}
+
+function formatearFechaReporte(fecha) {
+  return new Date(fecha).toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function obtenerClaseEstadoReporte(estado) {
+  switch(estado?.toLowerCase()) {
+    case 'prestado': return 'bg-warning';
+    case 'devuelto': return 'bg-success';
+    case 'vencido': return 'bg-danger';
+    default: return 'bg-secondary';
+  }
+}
+
+function obtenerClaseTipoDocente(tipo) {
+  switch(tipo?.toLowerCase()) {
+    case 'docente': return 'bg-primary';
+    case 'laboratorista': return 'bg-info';
+    default: return 'bg-secondary';
+  }
+}
+
+function obtenerClaseObservacionReporte(observacion) {
+  if (!observacion || observacion === 'N/A') return 'text-muted';
+  if (observacion.toLowerCase().includes('buen estado')) return 'text-success';
+  if (observacion.toLowerCase().includes('mal estado') || observacion.toLowerCase().includes('dañado')) return 'text-danger';
+  return 'text-warning';
+}
+
+function exportarReportePDF() {
+  mostrarNotificacion('Exportar', 'Función de exportar a PDF disponible próximamente', 'info');
+}
+
+function exportarReporteExcel() {
+  mostrarNotificacion('Exportar', 'Función de exportar a Excel disponible próximamente', 'info');
+}
+
+// Variables globales para gráficos
+let currentChart = null;
+
+function destruirGraficoAnterior() {
+  if (currentChart) {
+    currentChart.destroy();
+    currentChart = null;
+  }
+}
+
+function generarGraficoPrestamos(data) {
+  destruirGraficoAnterior();
+  
+  // Agrupar préstamos por fecha
+  const prestamosPorFecha = {};
+  data.prestamos.forEach(prestamo => {
+    const fecha = prestamo.fecha_prestamo.split('T')[0];
+    prestamosPorFecha[fecha] = (prestamosPorFecha[fecha] || 0) + 1;
+  });
+  
+  const fechas = Object.keys(prestamosPorFecha).sort();
+  const cantidades = fechas.map(fecha => prestamosPorFecha[fecha]);
+  
+  crearGraficoLineas('Préstamos por Fecha', fechas, cantidades, '#45d509');
+}
+
+function generarGraficoEstudiantesBarras(data) {
+  destruirGraficoAnterior();
+  
+  const estudiantes = data.estudiantes.slice(0, 10); // Top 10
+  const nombres = estudiantes.map(e => e.nombre.split(' ')[0] + ' ' + e.nombre.split(' ')[1]);
+  const prestamos = estudiantes.map(e => e.total_prestamos);
+  
+  crearGraficoBarras('Top 10 Estudiantes por Préstamos', nombres, prestamos, '#45d509');
+}
+
+function generarGraficoDocentesBarras(data) {
+  destruirGraficoAnterior();
+  
+  const nombres = data.docentes.map(d => d.nombre);
+  const prestamos = data.docentes.map(d => d.total_prestamos);
+  
+  crearGraficoBarras('Préstamos por Docente', nombres, prestamos, '#FF6600');
+}
+
+function generarGraficoMateriasBarras(data) {
+  destruirGraficoAnterior();
+  
+  const nombres = data.materias.map(m => m.nombre);
+  const prestamos = data.materias.map(m => m.total_prestamos);
+  
+  crearGraficoBarras('Préstamos por Materia', nombres, prestamos, '#17a2b8');
+}
+
+function generarGraficoProductosBarras(data) {
+  destruirGraficoAnterior();
+  
+  const productos = data.productos.slice(0, 10); // Top 10
+  const nombres = productos.map(p => p.nombre.length > 20 ? p.nombre.substring(0, 20) + '...' : p.nombre);
+  const prestamos = productos.map(p => p.total_prestamos);
+  
+  crearGraficoBarras('Top 10 Productos Más Solicitados', nombres, prestamos, '#6f42c1');
+}
+
+function crearGraficoLineas(titulo, etiquetas, datos, color) {
+  const ctx = document.getElementById('chart-canvas').getContext('2d');
+  currentChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: titulo,
+        data: datos,
+        borderColor: color,
+        backgroundColor: color + '20',
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: titulo,
+          color: '#ffffff'
+        },
+        legend: {
+          labels: {
+            color: '#ffffff'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#ffffff' },
+          grid: { color: '#444444' }
+        },
+        y: {
+          ticks: { color: '#ffffff' },
+          grid: { color: '#444444' }
+        }
+      }
+    }
+  });
+}
+
+function crearGraficoBarras(titulo, etiquetas, datos, color) {
+  const ctx = document.getElementById('chart-canvas').getContext('2d');
+  currentChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: titulo,
+        data: datos,
+        backgroundColor: color,
+        borderColor: color,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: titulo,
+          color: '#ffffff'
+        },
+        legend: {
+          labels: {
+            color: '#ffffff'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { 
+            color: '#ffffff',
+            maxRotation: 45
+          },
+          grid: { color: '#444444' }
+        },
+        y: {
+          ticks: { color: '#ffffff' },
+          grid: { color: '#444444' }
+        }
+      }
+    }
+  });
 }
 
 // Función básica para mostrar inventario

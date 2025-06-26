@@ -279,20 +279,11 @@
               </div>
               
               <div class="mb-3">
-                <label for="cantidad-input" class="form-label">Cantidad a prestar:</label>
-                <input type="number" class="form-control" id="cantidad-input" min="1" placeholder="Cantidad">
-              </div>
-              
-              <button type="button" class="btn btn-success" id="btn-realizar-prestamo" onclick="realizarPrestamo()" disabled>
-                <i class="fas fa-plus-circle me-2"></i>Realizar Préstamo
-              </button>
-              
-              <div class="mb-3">
                 <label for="cantidad-input" class="form-label">Cantidad:</label>
                 <input type="number" class="form-control" id="cantidad-input" min="1" value="1" disabled>
               </div>
               
-              <button class="btn btn-green w-100" id="prestamo-btn" disabled>REALIZAR PRÉSTAMO</button>
+              <button class="btn btn-green w-100" id="prestamo-btn" onclick="realizarPrestamo()" disabled>REALIZAR PRÉSTAMO</button>
             </div>
             
             <div class="col-md-6">

@@ -615,16 +615,19 @@ async function cargarElementosPorCategoria(categoriaId) {
         // Agregar evento de cambio para mostrar detalles del elemento
         elementoSelect.addEventListener('change', function() {
           const elementoId = this.value;
-          const btnPrestamo = document.getElementById('btn-realizar-prestamo');
+          const btnPrestamo = document.getElementById('prestamo-btn');
+          const cantidadInput = document.getElementById('cantidad-input');
           
           if (elementoId) {
             const elementoSeleccionado = data.find(e => e.id == elementoId);
             if (elementoSeleccionado) {
               mostrarDetallesElemento(elementoSeleccionado);
               btnPrestamo.disabled = false;
+              cantidadInput.disabled = false;
             }
           } else {
             btnPrestamo.disabled = true;
+            cantidadInput.disabled = true;
           }
         });
         
@@ -646,13 +649,13 @@ function mostrarDetallesElemento(elemento) {
   const detallesDiv = document.getElementById('elemento-detalles');
   if (detallesDiv) {
     detallesDiv.innerHTML = `
-      <div class="card bg-dark border-success">
-        <div class="card-body">
-          <h5 class="card-title text-success">${elemento.nombre}</h5>
-          <p class="card-text">${elemento.descripcion || 'Sin descripción'}</p>
-          <p class="text-light"><strong>Código:</strong> ${elemento.codigo}</p>
-          <p class="text-light"><strong>Cantidad disponible:</strong> ${elemento.disponibles || elemento.cantidad}</p>
-          <p class="text-light"><strong>Ubicación:</strong> ${elemento.ubicacion || 'No especificada'}</p>
+      <div class="detail-card">
+        <h5 class="detail-title">${elemento.nombre}</h5>
+        <p class="detail-description">${elemento.descripcion || 'Sin descripción disponible'}</p>
+        <div class="detail-info">
+          <p><strong>Código:</strong> ${elemento.codigo}</p>
+          <p><strong>Cantidad disponible:</strong> <span class="available-count">${elemento.disponibles || elemento.cantidad}</span></p>
+          <p><strong>Ubicación:</strong> ${elemento.ubicacion || 'No especificada'}</p>
         </div>
       </div>
     `;
@@ -708,9 +711,10 @@ async function realizarPrestamo() {
       mostrarNotificacion('Éxito', result.mensaje, 'success');
       
       // Limpiar formulario
-      cantidadInput.value = '';
+      cantidadInput.value = '1';
+      cantidadInput.disabled = true;
       elementoSelect.selectedIndex = 0;
-      document.getElementById('btn-realizar-prestamo').disabled = true;
+      document.getElementById('prestamo-btn').disabled = true;
       
       // Recargar elementos para actualizar disponibilidad
       const categoriaSelect = document.getElementById('categoria-select');

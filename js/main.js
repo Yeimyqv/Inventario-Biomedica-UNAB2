@@ -10,7 +10,11 @@ let elementoSeleccionado = null;
 let categoriaSeleccionada = null;
 let currentLaboratory = null;
 let INVENTARIO = [];
-// Variables de reportes movidas a reports_working.js para evitar conflictos
+
+// Variables de reportes
+let tipoReporteActual = null;
+let ultimosDataReporte = null;
+let currentChart = null;
 
 // Objeto para almacenar los PINes de docentes y laboratoristas
 const PINES = {
@@ -815,6 +819,7 @@ async function generarReportePrestamos() {
     }
     
     ultimosDataReporte = data;
+    console.log("Datos recibidos correctamente:", data);
     mostrarReportePrestamos(data);
     
     // Ocultar controles de gráfico para préstamos

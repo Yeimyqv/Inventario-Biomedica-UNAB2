@@ -614,23 +614,41 @@ function configurarEventosAutocompletado() {
     if (!id || id.length < 3) return;
     
     try {
+      console.log(`Buscando estudiante con ID: ${id}`);
       const response = await fetch(`/api/buscar_estudiante/${id}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('Respuesta del servidor:', data);
       
       if (data.estudiante) {
         if (userEmailInput) {
-          userEmailInput.value = data.estudiante.correo || '';
+          userEmailInput.value = data.estudiante.correo || `${id.toLowerCase()}@unab.edu.co`;
         }
-        mostrarNotificacion('Estudiante encontrado', `${data.estudiante.nombre}`, 'success', 2000);
+        
+        // También actualizar el campo de nombre si existe
+        const nombreInput = document.getElementById('user-name');
+        if (nombreInput) {
+          nombreInput.value = data.estudiante.nombre;
+        }
+        
+        mostrarNotificacion('Estudiante encontrado', `${data.estudiante.nombre}`, 'success', 3000);
       } else {
         if (userEmailInput) {
           userEmailInput.value = '';
         }
-        mostrarNotificacion('No encontrado', 'Estudiante no encontrado', 'warning', 2000);
+        const nombreInput = document.getElementById('user-name');
+        if (nombreInput) {
+          nombreInput.value = '';
+        }
+        mostrarNotificacion('No encontrado', data.message || 'Estudiante no encontrado', 'warning', 3000);
       }
     } catch (error) {
       console.error('Error buscando estudiante:', error);
-      mostrarNotificacion('Error', 'Error al buscar estudiante', 'error', 2000);
+      mostrarNotificacion('Error', `Error al buscar estudiante: ${error.message}`, 'error', 3000);
     }
   }
   

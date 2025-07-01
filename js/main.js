@@ -3228,8 +3228,8 @@ function exportarGraficosAPDF(doc, yPosition) {
           doc.text('Gráfico de Barras', 20, yPosition);
           yPosition += 10;
           
-          // Imagen del gráfico de barras (más grande, ocupando todo el ancho)
-          doc.addImage(imgBarras, 'PNG', 20, yPosition, 170, 80);
+          // Imagen del gráfico de barras (5.6" ancho x 5" alto)
+          doc.addImage(imgBarras, 'PNG', 20, yPosition, 134.4, 120);
           yPosition += 90;
           
           graficosExportados = true;
@@ -3240,7 +3240,7 @@ function exportarGraficosAPDF(doc, yPosition) {
     }
     
     // Verificar si necesitamos una nueva página para el segundo gráfico
-    if (yPosition > 180) {
+    if (yPosition > 100) {
       doc.addPage();
       yPosition = 20;
     }
@@ -3256,8 +3256,8 @@ function exportarGraficosAPDF(doc, yPosition) {
           doc.text('Gráfico de Distribución', 20, yPosition);
           yPosition += 10;
           
-          // Imagen del gráfico de pastel (más grande, ocupando todo el ancho)
-          doc.addImage(imgPastel, 'PNG', 20, yPosition, 170, 80);
+          // Imagen del gráfico de pastel (6.86" ancho x 7.18" alto)
+          doc.addImage(imgPastel, 'PNG', 20, yPosition, 164.64, 172.32);
           yPosition += 90;
           
           graficosExportados = true;

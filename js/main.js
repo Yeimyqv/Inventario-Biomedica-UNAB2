@@ -2500,7 +2500,7 @@ function mostrarModuloReportes() {
                     <div class="col-md-6 mb-3">
                       <div class="card" style="background-color: #ffffff; border: 1px solid #dee2e6;">
                         <div class="card-header" style="background-color: #f8f9fa; color: #000000;">
-                          <h6 class="card-title mb-0">Gráfico de Barras</h6>
+                          <h6 class="card-title mb-0" style="color: #000000;">Gráfico de Barras</h6>
                         </div>
                         <div class="card-body" style="background-color: #ffffff;">
                           <canvas id="chart-reporte" width="400" height="300"></canvas>
@@ -2510,7 +2510,7 @@ function mostrarModuloReportes() {
                     <div class="col-md-6 mb-3">
                       <div class="card" style="background-color: #ffffff; border: 1px solid #dee2e6;">
                         <div class="card-header" style="background-color: #f8f9fa; color: #000000;">
-                          <h6 class="card-title mb-0">Gráfico de Pastel</h6>
+                          <h6 class="card-title mb-0" style="color: #000000;">Gráfico de Pastel</h6>
                         </div>
                         <div class="card-body" style="background-color: #ffffff;">
                           <canvas id="chart-reporte-pastel" width="400" height="300"></canvas>

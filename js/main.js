@@ -3389,12 +3389,17 @@ function generarGraficoEstudiantes(data) {
   // Tomar top 10 estudiantes
   const top10 = data.estudiantes.slice(0, 10);
   const nombres = top10.map(est => {
-    const nombres = est.nombre.split(' ');
-    if (nombres.length >= 2) {
-      // Mostrar primer nombre y primer apellido
-      return `${nombres[0]} ${nombres[nombres.length - 1]}`;
+    const partes = est.nombre.split(' ');
+    if (partes.length >= 3) {
+      // Mostrar dos apellidos arriba y nombre abajo
+      const apellidos = partes.slice(-2).join(' '); // Últimas dos palabras (apellidos)
+      const nombre = partes[0]; // Primera palabra (nombre)
+      return `${apellidos}\n${nombre}`;
+    } else if (partes.length === 2) {
+      // Solo apellido y nombre
+      return `${partes[1]}\n${partes[0]}`;
     }
-    return est.nombre.length > 15 ? est.nombre.substring(0, 15) + '...' : est.nombre;
+    return est.nombre;
   });
   const prestamos = top10.map(est => est.total_prestamos);
   
@@ -3411,12 +3416,17 @@ function generarGraficoDocentes(data) {
   // Tomar top 10 docentes
   const top10 = data.docentes.slice(0, 10);
   const nombres = top10.map(doc => {
-    const nombres = doc.nombre.split(' ');
-    if (nombres.length >= 2) {
-      // Mostrar primer nombre y primer apellido
-      return `${nombres[0]} ${nombres[nombres.length - 1]}`;
+    const partes = doc.nombre.split(' ');
+    if (partes.length >= 3) {
+      // Mostrar dos apellidos arriba y nombre abajo
+      const apellidos = partes.slice(-2).join(' '); // Últimas dos palabras (apellidos)
+      const nombre = partes[0]; // Primera palabra (nombre)
+      return `${apellidos}\n${nombre}`;
+    } else if (partes.length === 2) {
+      // Solo apellido y nombre
+      return `${partes[1]}\n${partes[0]}`;
     }
-    return doc.nombre.length > 15 ? doc.nombre.substring(0, 15) + '...' : doc.nombre;
+    return doc.nombre;
   });
   const productos = top10.map(doc => doc.total_productos);
   
@@ -3568,7 +3578,7 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
         y: {
           ticks: { 
             color: '#000000',
-            font: { size: 10 },
+            font: { size: 9 },
             maxRotation: 0,
             minRotation: 0
           },

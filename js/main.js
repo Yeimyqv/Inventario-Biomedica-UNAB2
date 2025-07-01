@@ -2498,21 +2498,21 @@ function mostrarModuloReportes() {
                 <div class="col-12" id="contenido-reporte-grafico" style="display: none;">
                   <div class="row">
                     <div class="col-md-6 mb-3">
-                      <div class="card bg-dark">
-                        <div class="card-header">
+                      <div class="card" style="background-color: #ffffff; border: 1px solid #dee2e6;">
+                        <div class="card-header" style="background-color: #f8f9fa; color: #000000;">
                           <h6 class="card-title mb-0">Gráfico de Barras</h6>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="background-color: #ffffff;">
                           <canvas id="chart-reporte" width="400" height="300"></canvas>
                         </div>
                       </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                      <div class="card bg-dark">
-                        <div class="card-header">
+                      <div class="card" style="background-color: #ffffff; border: 1px solid #dee2e6;">
+                        <div class="card-header" style="background-color: #f8f9fa; color: #000000;">
                           <h6 class="card-title mb-0">Gráfico de Pastel</h6>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="background-color: #ffffff;">
                           <canvas id="chart-reporte-pastel" width="400" height="300"></canvas>
                         </div>
                       </div>
@@ -3658,17 +3658,18 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
     },
     options: {
       responsive: true,
+      backgroundColor: '#ffffff',
       plugins: {
         title: {
           display: true,
           text: titulo,
-          color: '#ffffff',
+          color: '#000000',
           font: { size: 14 }
         },
         legend: {
           position: 'bottom',
           labels: {
-            color: '#ffffff',
+            color: '#000000',
             font: { size: 11, weight: 'bold' },
             boxWidth: 15,
             generateLabels: function(chart) {
@@ -3684,7 +3685,7 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
                     lineWidth: data.datasets[0].borderWidth,
                     hidden: false,
                     index: i,
-                    fontColor: '#ffffff' // Forzar color blanco
+                    fontColor: '#000000' // Color negro para fondo blanco
                   };
                 });
               }
@@ -3717,14 +3718,11 @@ function crearGraficoPastel(titulo, etiquetas, datos) {
             const position = element.tooltipPosition();
             
             ctx.save();
-            // Texto con borde negro más grueso para mejor visibilidad en PDF
+            // Texto negro sobre fondo blanco
             ctx.font = 'bold 14px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 4;
-            ctx.strokeText(`${percentage}%`, position.x, position.y);
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#000000';
             ctx.fillText(`${percentage}%`, position.x, position.y);
             ctx.restore();
           });

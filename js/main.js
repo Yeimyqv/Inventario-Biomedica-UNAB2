@@ -3388,7 +3388,14 @@ function generarGraficoEstudiantes(data) {
   
   // Tomar top 10 estudiantes
   const top10 = data.estudiantes.slice(0, 10);
-  const nombres = top10.map(est => est.nombre.length > 20 ? est.nombre.substring(0, 20) + '...' : est.nombre);
+  const nombres = top10.map(est => {
+    const nombres = est.nombre.split(' ');
+    if (nombres.length >= 2) {
+      // Mostrar primer nombre y primer apellido
+      return `${nombres[0]} ${nombres[nombres.length - 1]}`;
+    }
+    return est.nombre.length > 15 ? est.nombre.substring(0, 15) + '...' : est.nombre;
+  });
   const prestamos = top10.map(est => est.total_prestamos);
   
   // Crear ambos gráficos: barras horizontales y pastel
@@ -3403,7 +3410,14 @@ function generarGraficoDocentes(data) {
   
   // Tomar top 10 docentes
   const top10 = data.docentes.slice(0, 10);
-  const nombres = top10.map(doc => doc.nombre.length > 20 ? doc.nombre.substring(0, 20) + '...' : doc.nombre);
+  const nombres = top10.map(doc => {
+    const nombres = doc.nombre.split(' ');
+    if (nombres.length >= 2) {
+      // Mostrar primer nombre y primer apellido
+      return `${nombres[0]} ${nombres[nombres.length - 1]}`;
+    }
+    return doc.nombre.length > 15 ? doc.nombre.substring(0, 15) + '...' : doc.nombre;
+  });
   const productos = top10.map(doc => doc.total_productos);
   
   // Crear ambos gráficos: barras horizontales y pastel
@@ -3418,7 +3432,18 @@ function generarGraficoMaterias(data) {
   
   // Tomar top 10 materias
   const top10 = data.materias.slice(0, 10);
-  const materias = top10.map(mat => mat.materia.length > 25 ? mat.materia.substring(0, 25) + '...' : mat.materia);
+  const materias = top10.map(mat => {
+    // Acortar nombres de materias de forma inteligente
+    let nombre = mat.materia;
+    if (nombre.length > 20) {
+      // Intentar dividir por palabras comunes
+      nombre = nombre.replace(/\b(de|del|la|el|en|con|para|por)\b/gi, '');
+      if (nombre.length > 20) {
+        nombre = nombre.substring(0, 18) + '...';
+      }
+    }
+    return nombre.trim();
+  });
   const productos = top10.map(mat => mat.total_productos);
   
   // Crear ambos gráficos: barras horizontales y pastel
@@ -3543,7 +3568,9 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
         y: {
           ticks: { 
             color: '#000000',
-            font: { size: 11 }
+            font: { size: 10 },
+            maxRotation: 0,
+            minRotation: 0
           },
           grid: { color: 'rgba(0, 0, 0, 0.1)' }
         }

@@ -3538,7 +3538,7 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
       afterDatasetsDraw: function(chart) {
         const ctx = chart.ctx;
         ctx.save();
-        ctx.font = 'bold 10px Arial';
+        ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         
@@ -3548,40 +3548,46 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
             const data = dataset.data[index];
             const percentage = porcentajes[index];
             
-            // Para barras horizontales, usar la posición correcta
-            const barWidth = Math.abs(bar.width);
-            const barRight = bar.x; // Extremo derecho de la barra
-            const textToShow = `${data} (${percentage}%)`;
-            const textWidth = ctx.measureText(textToShow).width;
+            // Calcular posición del texto dentro de la barra
+            const barWidth = bar.width;
+            const barX = bar.x;
+            const textWidth = ctx.measureText(`${data} (${percentage}%)`).width;
             
-            let textX, textToDisplay;
-            
-            if (textWidth + 15 < barWidth) {
-              // El texto completo cabe dentro de la barra
-              textX = barRight - barWidth + 10;
-              textToDisplay = textToShow;
-            } else {
-              // Mostrar solo el porcentaje si el texto completo no cabe
+            // Determinar posición X del texto
+            let textX;
+            if (textWidth + 10 < barWidth) {
+              // Si el texto cabe dentro de la barra, centrarlo
+              textX = barX - (barWidth / 2) + (textWidth / 2) + 5;
+            } else if (barWidth > 30) {
+              // Si la barra es pequeña, mostrar solo el porcentaje
               const shortText = `${percentage}%`;
               const shortTextWidth = ctx.measureText(shortText).width;
-              
-              if (shortTextWidth + 8 < barWidth && barWidth > 25) {
-                textX = barRight - barWidth + 5;
-                textToDisplay = shortText;
-              } else {
-                return; // No mostrar nada si es muy pequeño
+              if (shortTextWidth + 6 < barWidth) {
+                textX = barX - (barWidth / 2) + (shortTextWidth / 2) + 3;
+                
+                // Borde negro para mejor contraste
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.strokeText(shortText, textX, bar.y);
+                
+                // Texto blanco encima
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(shortText, textX, bar.y);
               }
+              return; // Salir sin mostrar texto completo
+            } else {
+              return; // No mostrar texto si la barra es muy pequeña
             }
             
-            // Dibujar el texto
-            // Borde negro para contraste
+            // Mostrar texto completo
+            // Borde negro para mejor contraste
             ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 3;
-            ctx.strokeText(textToDisplay, textX, bar.y);
+            ctx.lineWidth = 2;
+            ctx.strokeText(`${data} (${percentage}%)`, textX, bar.y);
             
             // Texto blanco encima
             ctx.fillStyle = '#ffffff';
-            ctx.fillText(textToDisplay, textX, bar.y);
+            ctx.fillText(`${data} (${percentage}%)`, textX, bar.y);
           });
         });
         ctx.restore();

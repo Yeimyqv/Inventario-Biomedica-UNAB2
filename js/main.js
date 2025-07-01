@@ -3512,12 +3512,12 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
         title: {
           display: true,
           text: titulo,
-          color: '#ffffff',
+          color: '#000000',
           font: { size: 16 }
         },
         legend: {
           labels: {
-            color: '#ffffff'
+            color: '#000000'
           }
         },
         tooltip: {

@@ -3220,8 +3220,11 @@ function exportarGraficosAPDF(doc, yPosition) {
     // Exportar gráfico de barras
     try {
       const chartBarras = document.getElementById('chart-reporte');
+      console.log('Chart barras element:', chartBarras);
+      console.log('Current chart:', currentChart);
       if (chartBarras && currentChart && typeof currentChart.toBase64Image === 'function') {
         const imgBarras = currentChart.toBase64Image('image/png', 2.0);
+        console.log('Image barras length:', imgBarras ? imgBarras.length : 'null');
         if (imgBarras && imgBarras.length > 100) {
           // Título del gráfico de barras
           doc.setFontSize(12);
@@ -3230,7 +3233,7 @@ function exportarGraficosAPDF(doc, yPosition) {
           
           // Imagen del gráfico de barras (5.6" ancho x 5" alto)
           doc.addImage(imgBarras, 'PNG', 20, yPosition, 134.4, 120);
-          yPosition += 90;
+          yPosition += 130;
           
           graficosExportados = true;
         }
@@ -3248,8 +3251,11 @@ function exportarGraficosAPDF(doc, yPosition) {
     // Exportar gráfico de pastel
     try {
       const chartPastel = document.getElementById('chart-reporte-pastel');
+      console.log('Chart pastel element:', chartPastel);
+      console.log('Current chart pastel:', currentChartPastel);
       if (chartPastel && currentChartPastel && typeof currentChartPastel.toBase64Image === 'function') {
         const imgPastel = currentChartPastel.toBase64Image('image/png', 2.0);
+        console.log('Image pastel length:', imgPastel ? imgPastel.length : 'null');
         if (imgPastel && imgPastel.length > 100) {
           // Título del gráfico de pastel
           doc.setFontSize(12);
@@ -3258,7 +3264,7 @@ function exportarGraficosAPDF(doc, yPosition) {
           
           // Imagen del gráfico de pastel (6.86" ancho x 7.18" alto)
           doc.addImage(imgPastel, 'PNG', 20, yPosition, 164.64, 172.32);
-          yPosition += 90;
+          yPosition += 182;
           
           graficosExportados = true;
         }

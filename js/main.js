@@ -3473,12 +3473,12 @@ function crearGraficoLineas(titulo, etiquetas, datos, color) {
       },
       scales: {
         x: {
-          ticks: { color: '#ffffff' },
-          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+          ticks: { color: '#000000' },
+          grid: { color: 'rgba(0, 0, 0, 0.1)' }
         },
         y: {
-          ticks: { color: '#ffffff' },
-          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+          ticks: { color: '#000000' },
+          grid: { color: 'rgba(0, 0, 0, 0.1)' }
         }
       }
     }
@@ -3596,13 +3596,8 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
             }
             
             // Mostrar texto completo
-            // Borde negro para mejor contraste
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 2;
-            ctx.strokeText(`${data} (${percentage}%)`, textX, bar.y);
-            
-            // Texto blanco encima
-            ctx.fillStyle = '#ffffff';
+            // Texto negro sobre fondo blanco
+            ctx.fillStyle = '#000000';
             ctx.fillText(`${data} (${percentage}%)`, textX, bar.y);
           });
         });

@@ -3221,7 +3221,7 @@ function exportarGraficosAPDF(doc, yPosition) {
     try {
       const chartBarras = document.getElementById('chart-reporte');
       if (chartBarras && currentChart && typeof currentChart.toBase64Image === 'function') {
-        const imgBarras = currentChart.toBase64Image('image/png', 1.0);
+        const imgBarras = currentChart.toBase64Image('image/png', 2.0);
         if (imgBarras && imgBarras.length > 100) {
           // Título del gráfico de barras
           doc.setFontSize(12);
@@ -3249,7 +3249,7 @@ function exportarGraficosAPDF(doc, yPosition) {
     try {
       const chartPastel = document.getElementById('chart-reporte-pastel');
       if (chartPastel && currentChartPastel && typeof currentChartPastel.toBase64Image === 'function') {
-        const imgPastel = currentChartPastel.toBase64Image('image/png', 1.0);
+        const imgPastel = currentChartPastel.toBase64Image('image/png', 2.0);
         if (imgPastel && imgPastel.length > 100) {
           // Título del gráfico de pastel
           doc.setFontSize(12);

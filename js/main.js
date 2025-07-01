@@ -3211,9 +3211,9 @@ function exportarGraficosAPDF(doc, yPosition) {
       yPosition = 20;
     }
     
-    doc.setFontSize(12);
+    doc.setFontSize(14);
     doc.text('Gráficos del Reporte', 20, yPosition);
-    yPosition += 15;
+    yPosition += 20;
     
     let graficosExportados = false;
     
@@ -3222,9 +3222,16 @@ function exportarGraficosAPDF(doc, yPosition) {
       const chartBarras = document.getElementById('chart-reporte');
       if (chartBarras && currentChart && typeof currentChart.toBase64Image === 'function') {
         const imgBarras = currentChart.toBase64Image('image/png', 1.0);
-        if (imgBarras && imgBarras.length > 100) { // Verificar que la imagen sea válida
-          doc.addImage(imgBarras, 'PNG', 20, yPosition, 80, 60);
-          doc.text('Gráfico de Barras', 20, yPosition - 5);
+        if (imgBarras && imgBarras.length > 100) {
+          // Título del gráfico de barras
+          doc.setFontSize(12);
+          doc.text('Gráfico de Barras', 20, yPosition);
+          yPosition += 10;
+          
+          // Imagen del gráfico de barras (más grande, ocupando todo el ancho)
+          doc.addImage(imgBarras, 'PNG', 20, yPosition, 170, 80);
+          yPosition += 90;
+          
           graficosExportados = true;
         }
       }
@@ -3232,14 +3239,27 @@ function exportarGraficosAPDF(doc, yPosition) {
       console.warn("Error exportando gráfico de barras:", e);
     }
     
+    // Verificar si necesitamos una nueva página para el segundo gráfico
+    if (yPosition > 180) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
     // Exportar gráfico de pastel
     try {
       const chartPastel = document.getElementById('chart-reporte-pastel');
       if (chartPastel && currentChartPastel && typeof currentChartPastel.toBase64Image === 'function') {
         const imgPastel = currentChartPastel.toBase64Image('image/png', 1.0);
-        if (imgPastel && imgPastel.length > 100) { // Verificar que la imagen sea válida
-          doc.addImage(imgPastel, 'PNG', 110, yPosition, 80, 60);
-          doc.text('Gráfico de Distribución', 110, yPosition - 5);
+        if (imgPastel && imgPastel.length > 100) {
+          // Título del gráfico de pastel
+          doc.setFontSize(12);
+          doc.text('Gráfico de Distribución', 20, yPosition);
+          yPosition += 10;
+          
+          // Imagen del gráfico de pastel (más grande, ocupando todo el ancho)
+          doc.addImage(imgPastel, 'PNG', 20, yPosition, 170, 80);
+          yPosition += 90;
+          
           graficosExportados = true;
         }
       }
@@ -3254,7 +3274,7 @@ function exportarGraficosAPDF(doc, yPosition) {
       return yPosition + 30;
     }
     
-    return yPosition + 70;
+    return yPosition;
     
   } catch (error) {
     console.error("Error exportando gráficos:", error);

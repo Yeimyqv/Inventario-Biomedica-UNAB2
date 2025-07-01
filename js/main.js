@@ -3220,11 +3220,10 @@ function exportarGraficosAPDF(doc, yPosition) {
     // Exportar gráfico de barras
     try {
       const chartBarras = document.getElementById('chart-reporte');
-      console.log('Chart barras element:', chartBarras);
-      console.log('Current chart:', currentChart);
+
       if (chartBarras && currentChart && typeof currentChart.toBase64Image === 'function') {
         const imgBarras = currentChart.toBase64Image('image/png', 2.0);
-        console.log('Image barras length:', imgBarras ? imgBarras.length : 'null');
+
         if (imgBarras && imgBarras.length > 100) {
           // Título del gráfico de barras
           doc.setFontSize(12);
@@ -3251,11 +3250,10 @@ function exportarGraficosAPDF(doc, yPosition) {
     // Exportar gráfico de pastel
     try {
       const chartPastel = document.getElementById('chart-reporte-pastel');
-      console.log('Chart pastel element:', chartPastel);
-      console.log('Current chart pastel:', currentChartPastel);
+
       if (chartPastel && currentChartPastel && typeof currentChartPastel.toBase64Image === 'function') {
         const imgPastel = currentChartPastel.toBase64Image('image/png', 2.0);
-        console.log('Image pastel length:', imgPastel ? imgPastel.length : 'null');
+
         if (imgPastel && imgPastel.length > 100) {
           // Título del gráfico de pastel
           doc.setFontSize(12);

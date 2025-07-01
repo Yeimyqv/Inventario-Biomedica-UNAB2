@@ -3215,22 +3215,24 @@ function exportarGraficosAPDF(doc, yPosition) {
     doc.text('Gráficos del Reporte', 20, yPosition);
     yPosition += 15;
     
-    // Exportar gráfico de barras con mejor calidad
-    const chartBarras = document.getElementById('chart-reporte');
-    if (chartBarras && currentChart) {
-      // Configurar opciones de exportación para mejor calidad
-      const imgBarras = currentChart.toBase64Image('image/png', 1.0);
-      doc.addImage(imgBarras, 'PNG', 20, yPosition, 80, 60);
-      doc.text('Gráfico de Barras', 20, yPosition - 5);
-    }
-    
-    // Exportar gráfico de pastel con mejor calidad
-    const chartPastel = document.getElementById('chart-reporte-pastel');
-    if (chartPastel && currentChartPastel) {
-      // Configurar opciones de exportación para mejor calidad
-      const imgPastel = currentChartPastel.toBase64Image('image/png', 1.0);
-      doc.addImage(imgPastel, 'PNG', 110, yPosition, 80, 60);
-      doc.text('Gráfico de Distribución', 110, yPosition - 5);
+    // Crear gráficos optimizados para PDF (con texto negro)
+    const chartData = obtenerDatosGraficoActual();
+    if (chartData) {
+      // Crear canvas temporal para gráfico de barras PDF
+      const canvasBarras = crearGraficoBarrasPDF(chartData);
+      if (canvasBarras) {
+        const imgBarras = canvasBarras.toDataURL('image/png', 1.0);
+        doc.addImage(imgBarras, 'PNG', 20, yPosition, 80, 60);
+        doc.text('Gráfico de Barras', 20, yPosition - 5);
+      }
+      
+      // Crear canvas temporal para gráfico de pastel PDF
+      const canvasPastel = crearGraficoPastelPDF(chartData);
+      if (canvasPastel) {
+        const imgPastel = canvasPastel.toDataURL('image/png', 1.0);
+        doc.addImage(imgPastel, 'PNG', 110, yPosition, 80, 60);
+        doc.text('Gráfico de Distribución', 110, yPosition - 5);
+      }
     }
     
     return yPosition + 70;

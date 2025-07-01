@@ -3463,7 +3463,7 @@ function crearGraficoLineas(titulo, etiquetas, datos, color) {
         title: {
           display: true,
           text: titulo,
-          color: '#ffffff'
+          color: '#000000'
         },
         legend: {
           labels: {

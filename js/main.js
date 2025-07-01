@@ -3533,8 +3533,8 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
       },
       scales: {
         x: {
-          ticks: { color: '#ffffff' },
-          grid: { color: 'rgba(255, 255, 255, 0.1)' },
+          ticks: { color: '#000000' },
+          grid: { color: 'rgba(0, 0, 0, 0.1)' },
           // Agregar espacio adicional para las etiquetas
           afterFit: function(scale) {
             scale.paddingRight = 20;
@@ -3542,10 +3542,10 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
         },
         y: {
           ticks: { 
-            color: '#ffffff',
+            color: '#000000',
             font: { size: 11 }
           },
-          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+          grid: { color: 'rgba(0, 0, 0, 0.1)' }
         }
       },
       layout: {
@@ -3586,13 +3586,8 @@ function crearGraficoBarrasHorizontales(titulo, etiquetas, datos, color) {
               if (shortTextWidth + 6 < barWidth) {
                 textX = barX - (barWidth / 2) + (shortTextWidth / 2) + 3;
                 
-                // Borde negro para mejor contraste
-                ctx.strokeStyle = '#000000';
-                ctx.lineWidth = 2;
-                ctx.strokeText(shortText, textX, bar.y);
-                
-                // Texto blanco encima
-                ctx.fillStyle = '#ffffff';
+                // Texto negro sobre fondo blanco
+                ctx.fillStyle = '#000000';
                 ctx.fillText(shortText, textX, bar.y);
               }
               return; // Salir sin mostrar texto completo

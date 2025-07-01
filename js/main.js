@@ -3215,29 +3215,50 @@ function exportarGraficosAPDF(doc, yPosition) {
     doc.text('Gráficos del Reporte', 20, yPosition);
     yPosition += 15;
     
-    // Exportar gráfico de barras con mejor calidad
-    const chartBarras = document.getElementById('chart-reporte');
-    if (chartBarras && currentChart) {
-      // Configurar opciones de exportación para mejor calidad
-      const imgBarras = currentChart.toBase64Image('image/png', 1.0);
-      doc.addImage(imgBarras, 'PNG', 20, yPosition, 80, 60);
-      doc.text('Gráfico de Barras', 20, yPosition - 5);
+    let graficosExportados = false;
+    
+    // Exportar gráfico de barras
+    try {
+      const chartBarras = document.getElementById('chart-reporte');
+      if (chartBarras && currentChart && typeof currentChart.toBase64Image === 'function') {
+        const imgBarras = currentChart.toBase64Image('image/png', 1.0);
+        if (imgBarras && imgBarras.length > 100) { // Verificar que la imagen sea válida
+          doc.addImage(imgBarras, 'PNG', 20, yPosition, 80, 60);
+          doc.text('Gráfico de Barras', 20, yPosition - 5);
+          graficosExportados = true;
+        }
+      }
+    } catch (e) {
+      console.warn("Error exportando gráfico de barras:", e);
     }
     
-    // Exportar gráfico de pastel con mejor calidad
-    const chartPastel = document.getElementById('chart-reporte-pastel');
-    if (chartPastel && currentChartPastel) {
-      // Configurar opciones de exportación para mejor calidad
-      const imgPastel = currentChartPastel.toBase64Image('image/png', 1.0);
-      doc.addImage(imgPastel, 'PNG', 110, yPosition, 80, 60);
-      doc.text('Gráfico de Distribución', 110, yPosition - 5);
+    // Exportar gráfico de pastel
+    try {
+      const chartPastel = document.getElementById('chart-reporte-pastel');
+      if (chartPastel && currentChartPastel && typeof currentChartPastel.toBase64Image === 'function') {
+        const imgPastel = currentChartPastel.toBase64Image('image/png', 1.0);
+        if (imgPastel && imgPastel.length > 100) { // Verificar que la imagen sea válida
+          doc.addImage(imgPastel, 'PNG', 110, yPosition, 80, 60);
+          doc.text('Gráfico de Distribución', 110, yPosition - 5);
+          graficosExportados = true;
+        }
+      }
+    } catch (e) {
+      console.warn("Error exportando gráfico de pastel:", e);
+    }
+    
+    if (!graficosExportados) {
+      // Si no se pudieron exportar gráficos, agregar mensaje informativo
+      doc.text('Los gráficos no están disponibles para exportar en este momento.', 20, yPosition);
+      doc.text('Consulte la vista web para ver los gráficos interactivos.', 20, yPosition + 10);
+      return yPosition + 30;
     }
     
     return yPosition + 70;
     
   } catch (error) {
     console.error("Error exportando gráficos:", error);
-    doc.text('Error al exportar gráficos', 20, yPosition);
+    doc.text('Los gráficos se encuentran disponibles en la vista web del reporte.', 20, yPosition);
     return yPosition + 20;
   }
 }

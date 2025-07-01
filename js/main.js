@@ -3215,24 +3215,22 @@ function exportarGraficosAPDF(doc, yPosition) {
     doc.text('Gráficos del Reporte', 20, yPosition);
     yPosition += 15;
     
-    // Crear gráficos optimizados para PDF (con texto negro)
-    const chartData = obtenerDatosGraficoActual();
-    if (chartData) {
-      // Crear canvas temporal para gráfico de barras PDF
-      const canvasBarras = crearGraficoBarrasPDF(chartData);
-      if (canvasBarras) {
-        const imgBarras = canvasBarras.toDataURL('image/png', 1.0);
-        doc.addImage(imgBarras, 'PNG', 20, yPosition, 80, 60);
-        doc.text('Gráfico de Barras', 20, yPosition - 5);
-      }
-      
-      // Crear canvas temporal para gráfico de pastel PDF
-      const canvasPastel = crearGraficoPastelPDF(chartData);
-      if (canvasPastel) {
-        const imgPastel = canvasPastel.toDataURL('image/png', 1.0);
-        doc.addImage(imgPastel, 'PNG', 110, yPosition, 80, 60);
-        doc.text('Gráfico de Distribución', 110, yPosition - 5);
-      }
+    // Exportar gráfico de barras con mejor calidad
+    const chartBarras = document.getElementById('chart-reporte');
+    if (chartBarras && currentChart) {
+      // Configurar opciones de exportación para mejor calidad
+      const imgBarras = currentChart.toBase64Image('image/png', 1.0);
+      doc.addImage(imgBarras, 'PNG', 20, yPosition, 80, 60);
+      doc.text('Gráfico de Barras', 20, yPosition - 5);
+    }
+    
+    // Exportar gráfico de pastel con mejor calidad
+    const chartPastel = document.getElementById('chart-reporte-pastel');
+    if (chartPastel && currentChartPastel) {
+      // Configurar opciones de exportación para mejor calidad
+      const imgPastel = currentChartPastel.toBase64Image('image/png', 1.0);
+      doc.addImage(imgPastel, 'PNG', 110, yPosition, 80, 60);
+      doc.text('Gráfico de Distribución', 110, yPosition - 5);
     }
     
     return yPosition + 70;
@@ -3717,226 +3715,5 @@ function destruirGraficoAnterior() {
   if (currentChartPastel) {
     currentChartPastel.destroy();
     currentChartPastel = null;
-  }
-}
-
-// Función para crear gráficos con texto negro para PDF
-async function crearGraficosPDF() {
-  // Crear canvas temporales ocultos
-  const containerPDF = document.createElement('div');
-  containerPDF.style.position = 'absolute';
-  containerPDF.style.left = '-9999px';
-  containerPDF.style.top = '-9999px';
-  containerPDF.innerHTML = `
-    <canvas id="chart-pdf-barras" width="400" height="300"></canvas>
-    <canvas id="chart-pdf-pastel" width="400" height="300"></canvas>
-  `;
-  document.body.appendChild(containerPDF);
-  
-  // Obtener datos del reporte actual
-  const tabla = document.querySelector('#resultado-reportes table tbody');
-  if (!tabla) return;
-  
-  const filas = Array.from(tabla.querySelectorAll('tr'));
-  const etiquetas = [];
-  const datos = [];
-  
-  filas.forEach(fila => {
-    const celdas = fila.querySelectorAll('td');
-    if (celdas.length >= 2) {
-      etiquetas.push(celdas[0].textContent.trim());
-      datos.push(parseInt(celdas[1].textContent.trim()) || 0);
-    }
-  });
-  
-  if (datos.length === 0) return;
-  
-  // Calcular porcentajes
-  const total = datos.reduce((sum, val) => sum + val, 0);
-  const porcentajes = datos.map(val => Math.round((val / total) * 100));
-  
-  // Crear gráfico de barras para PDF
-  const ctxBarras = document.getElementById('chart-pdf-barras').getContext('2d');
-  new Chart(ctxBarras, {
-    type: 'bar',
-    data: {
-      labels: etiquetas,
-      datasets: [{
-        data: datos,
-        backgroundColor: 'rgba(54, 162, 235, 0.8)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: false,
-      animation: false,
-      plugins: {
-        legend: { display: false },
-        title: { display: false },
-        barPercentageLabels: {
-          afterDatasetsDraw: function(chart) {
-            const ctx = chart.ctx;
-            ctx.save();
-            ctx.font = 'bold 10px Arial';
-            ctx.fillStyle = '#000000'; // Texto negro para PDF
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            
-            chart.data.datasets.forEach((dataset, i) => {
-              const meta = chart.getDatasetMeta(i);
-              meta.data.forEach((bar, index) => {
-                const data = dataset.data[index];
-                const percentage = porcentajes[index];
-                const barWidth = Math.abs(bar.width);
-                const textToShow = `${data} (${percentage}%)`;
-                const textWidth = ctx.measureText(textToShow).width;
-                
-                if (textWidth + 15 < barWidth) {
-                  const textX = bar.x - barWidth + 10;
-                  ctx.fillText(textToShow, textX, bar.y);
-                } else if (barWidth > 25) {
-                  const shortText = `${percentage}%`;
-                  const textX = bar.x - barWidth + 5;
-                  ctx.fillText(shortText, textX, bar.y);
-                }
-              });
-            });
-            ctx.restore();
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: '#000000' }, // Texto negro
-          grid: { color: 'rgba(0, 0, 0, 0.1)' }
-        },
-        y: {
-          ticks: { color: '#000000' }, // Texto negro
-          grid: { color: 'rgba(0, 0, 0, 0.1)' }
-        }
-      }
-    },
-    plugins: [{
-      id: 'barPercentageLabels',
-      afterDatasetsDraw: function(chart) {
-        const ctx = chart.ctx;
-        ctx.save();
-        ctx.font = 'bold 10px Arial';
-        ctx.fillStyle = '#000000'; // Texto negro para PDF
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        
-        chart.data.datasets.forEach((dataset, i) => {
-          const meta = chart.getDatasetMeta(i);
-          meta.data.forEach((bar, index) => {
-            const data = dataset.data[index];
-            const percentage = porcentajes[index];
-            const barWidth = Math.abs(bar.width);
-            const textToShow = `${data} (${percentage}%)`;
-            const textWidth = ctx.measureText(textToShow).width;
-            
-            if (textWidth + 15 < barWidth) {
-              const textX = bar.x - barWidth + 10;
-              ctx.fillText(textToShow, textX, bar.y);
-            } else if (barWidth > 25) {
-              const shortText = `${percentage}%`;
-              const textX = bar.x - barWidth + 5;
-              ctx.fillText(shortText, textX, bar.y);
-            }
-          });
-        });
-        ctx.restore();
-      }
-    }]
-  });
-  
-  // Crear gráfico de pastel para PDF
-  const ctxPastel = document.getElementById('chart-pdf-pastel').getContext('2d');
-  new Chart(ctxPastel, {
-    type: 'pie',
-    data: {
-      labels: etiquetas,
-      datasets: [{
-        data: datos,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.8)',
-          'rgba(54, 162, 235, 0.8)',
-          'rgba(255, 205, 86, 0.8)',
-          'rgba(75, 192, 192, 0.8)',
-          'rgba(153, 102, 255, 0.8)',
-          'rgba(255, 159, 64, 0.8)',
-          'rgba(199, 199, 199, 0.8)',
-          'rgba(83, 102, 255, 0.8)'
-        ],
-        borderColor: '#000000',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: false,
-      animation: false,
-      plugins: {
-        title: { display: false },
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: '#000000', // Texto negro para PDF
-            font: { size: 10 },
-            generateLabels: function(chart) {
-              const data = chart.data;
-              if (data.labels.length && data.datasets.length) {
-                return data.labels.map((label, i) => {
-                  const value = data.datasets[0].data[i];
-                  const percentage = porcentajes[i];
-                  return {
-                    text: `${label}: ${value} (${percentage}%)`,
-                    fillStyle: data.datasets[0].backgroundColor[i],
-                    strokeStyle: data.datasets[0].borderColor,
-                    lineWidth: 1,
-                    hidden: false,
-                    index: i,
-                    fontColor: '#000000'
-                  };
-                });
-              }
-              return [];
-            }
-          }
-        }
-      }
-    },
-    plugins: [{
-      id: 'percentageLabels',
-      afterDatasetsDraw: function(chart) {
-        const ctx = chart.ctx;
-        chart.data.datasets.forEach((dataset, i) => {
-          const meta = chart.getDatasetMeta(i);
-          meta.data.forEach((element, index) => {
-            const percentage = porcentajes[index];
-            const position = element.tooltipPosition();
-            
-            ctx.save();
-            ctx.font = 'bold 12px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#000000'; // Texto negro para PDF
-            ctx.fillText(`${percentage}%`, position.x, position.y);
-            ctx.restore();
-          });
-        });
-      }
-    }]
-  });
-  
-  // Esperar un momento para que se rendericen
-  await new Promise(resolve => setTimeout(resolve, 500));
-}
-
-function limpiarGraficosPDF() {
-  const containerPDF = document.querySelector('div');
-  if (containerPDF && containerPDF.querySelector('#chart-pdf-barras')) {
-    containerPDF.remove();
   }
 }

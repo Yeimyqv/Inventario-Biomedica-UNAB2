@@ -158,8 +158,8 @@ with app.app_context():
             # Verificar si ya hay préstamos en la base de datos
             prestamos_count = Prestamo.query.count()
             
-            # Only create if we have less than 100 loans (to preserve test data)
-            if prestamos_count < 100:
+            # Skip auto-creation entirely - preserve test data
+            if False:  # Disabled to preserve test data
                 print("Creando préstamos de prueba...")
                 
                 # Obtener usuarios de estudiantes reales que existen

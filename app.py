@@ -35,11 +35,11 @@ with app.app_context():
     def cargar_inventario_inicial():
         """Cargar inventario inicial desde CSV si la base de datos está vacía."""
         try:
-            # Limpiar datos existentes de elementos y categorías
+            # Limpiar datos existentes de elementos y categorías (preservar préstamos)
             print("Actualizando base de datos con nuevo inventario...")
-            Prestamo.query.delete()  # Primero eliminamos préstamos (dependencia de FK)
-            Elemento.query.delete()  # Luego elementos
-            Categoria.query.delete() # Finalmente categorías
+            # Solo eliminamos elementos y categorías, preservamos préstamos
+            Elemento.query.delete()  # Elementos
+            Categoria.query.delete() # Categorías
             db.session.commit()
             print("Base de datos limpiada. Cargando inventario actualizado...")
             

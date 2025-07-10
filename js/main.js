@@ -1982,7 +1982,7 @@ function mostrarDetallesElemento(elemento) {
 }
 
 // Realizar préstamo del elemento
-function realizarPrestamo() {
+async function realizarPrestamo() {
   const cantidadInput = document.getElementById('cantidad-input');
   const cantidad = parseInt(cantidadInput.value);
   
@@ -2016,8 +2016,15 @@ function realizarPrestamo() {
         return;
       }
       
+      // Buscar el ID numérico del estudiante en la base de datos
+      const estudianteData = await buscarEstudiante(estudianteId);
+      if (!estudianteData) {
+        mostrarNotificacion('Error', 'Estudiante no encontrado en la base de datos', 'error');
+        return;
+      }
+      
       usuarioNombre = estudianteNombre;
-      usuarioId = 'est_' + estudianteId; // Prefijo para distinguir
+      usuarioId = estudianteData.id; // ID numérico del estudiante
       usuarioTipo = 'estudiante';
       mensajeAdicional = `\n\nEl préstamo se registrará a nombre del estudiante: ${estudianteNombre}`;
     } 
@@ -2037,8 +2044,9 @@ function realizarPrestamo() {
         return;
       }
       
+      // Para docentes, usar el ID del laboratorista como responsable del préstamo
       usuarioNombre = docenteNombre;
-      usuarioId = 'doc_' + Date.now(); // ID temporal
+      usuarioId = currentUser.id; // Usar ID del laboratorista
       usuarioTipo = 'docente';
       mensajeAdicional = `\n\nEl préstamo se registrará a nombre del docente: ${docenteNombre}`;
     }
@@ -2049,33 +2057,19 @@ function realizarPrestamo() {
     'Confirmar préstamo',
     `¿Confirma el préstamo de ${cantidad} unidad(es) de ${categoriaSeleccionada.categoria} - ${elementoSeleccionado.nombre}?${mensajeAdicional}`,
     () => {
-      // Simular préstamo (en un sistema real, se usaría la API)
-      // Actualizar cantidad disponible en tiempo real
-      elementoSeleccionado.cantidad -= cantidad;
-      
-      // Registrar el préstamo (en un sistema real, se almacenaría en la BD)
-      const prestamo = {
-        id: Date.now(),
-        elemento_id: elementoSeleccionado.id,
-        elemento_nombre: elementoSeleccionado.nombre,
-        categoria: categoriaSeleccionada.categoria,
-        cantidad: cantidad,
-        fecha: new Date().toLocaleString(),
-        usuario_id: usuarioId,
-        usuario_nombre: usuarioNombre,
-        usuario_tipo: usuarioTipo,
-        prestado_por: currentUser.tipo === 'laboratorista' ? currentUser.nombre : null,
-        estado: 'prestado'
-      };
-      
-      // Almacenar préstamo en localStorage para simular persistencia
-      // En un sistema real, esto se enviaría al servidor
-      let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
-      prestamos.push(prestamo);
-      localStorage.setItem('prestamos', JSON.stringify(prestamos));
-      
-      // Mostrar opciones post-préstamo
-      mostrarOpcionesPostPrestamo(prestamo);
+      // Realizar préstamo usando la API del backend
+      prestarElemento(elementoSeleccionado.id, usuarioId, cantidad)
+        .then(prestamo => {
+          // Actualizar cantidad disponible en tiempo real
+          elementoSeleccionado.cantidad -= cantidad;
+          
+          // Mostrar opciones post-préstamo
+          mostrarOpcionesPostPrestamo(prestamo);
+        })
+        .catch(error => {
+          console.error('Error al crear préstamo:', error);
+          mostrarNotificacion('Error', 'Error al crear el préstamo: ' + error.message, 'error');
+        });
     }
   );
 }

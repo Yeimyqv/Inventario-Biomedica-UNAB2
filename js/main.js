@@ -2741,7 +2741,7 @@ function mostrarReportePrestamos(data) {
       <div class="col-12">
         <div class="alert alert-info">
           <strong>Total de préstamos encontrados:</strong> ${data.total_prestamos}
-          ${data.total_prestamos > 0 ? `<br><small>Mostrando todos los préstamos con scroll vertical</small>` : ''}
+          ${data.total_prestamos > 50 ? `<br><small>Mostrando todos los préstamos con scroll vertical</small>` : ''}
         </div>
       </div>
     </div>

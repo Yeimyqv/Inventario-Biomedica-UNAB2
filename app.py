@@ -158,9 +158,15 @@ with app.app_context():
             # Verificar si ya hay préstamos en la base de datos
             prestamos_count = Prestamo.query.count()
             
+            # Check if we already have our target of 125 loans or more
+            if prestamos_count >= 125:
+                print(f"Ya existen {prestamos_count} préstamos (125+), no se crearán más.")
+                return
+            
             # Only create if we have no loans (to preserve test data)
             if prestamos_count == 0:
-                print("Creando préstamos de prueba...")
+                print("No hay préstamos en la base de datos. Use el comando SQL manual para crear los 125 préstamos de prueba.")
+                return
                 
                 # Obtener usuarios de estudiantes reales que existen
                 estudiantes_reales = [
@@ -241,8 +247,7 @@ with app.app_context():
                     print(f"Creados {len(prestamos_data)} préstamos de prueba")
                 else:
                     print(f"Datos insuficientes: {len(estudiantes_ids)} estudiantes, {len(docentes_ids)} docentes, {len(elementos_disponibles)} elementos")
-            else:
-                print(f"Ya existen {prestamos_count} préstamos en la base de datos")
+            print(f"Préstamos actuales: {prestamos_count} (objetivo: 125)")
         
         except Exception as e:
             print(f"Error creando préstamos de prueba: {e}")

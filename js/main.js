@@ -2590,7 +2590,7 @@ function mostrarModuloReportes() {
   }, 200);
 }
 
-async function generarReportePrestamos(pagina = 1) {
+async function generarReportePrestamos() {
   try {
     mostrarCargandoReporte();
     actualizarTituloReporte("Reporte de Préstamos Realizados");
@@ -2598,10 +2598,6 @@ async function generarReportePrestamos(pagina = 1) {
     
     const filtros = obtenerFiltrosReporte();
     const params = new URLSearchParams(filtros);
-    
-    // Agregar parámetros de paginación
-    params.append('pagina', pagina);
-    params.append('por_pagina', 30);
     
     const response = await fetch(`/api/reportes/prestamos?${params}`);
     const data = await response.json();
@@ -2745,66 +2741,14 @@ function mostrarReportePrestamos(data) {
       <div class="col-12">
         <div class="alert alert-info">
           <strong>Total de préstamos encontrados:</strong> ${data.total_prestamos}
-          ${data.paginacion ? `<br><small>Mostrando ${data.paginacion.prestamos_en_pagina} de ${data.total_prestamos} préstamos (Página ${data.paginacion.pagina_actual} de ${data.paginacion.total_paginas})</small>` : ''}
+          ${data.total_prestamos > 0 ? `<br><small>Mostrando todos los préstamos con scroll vertical</small>` : ''}
         </div>
       </div>
     </div>
     
-    ${data.paginacion && data.paginacion.total_paginas > 1 ? `
-    <div class="row mb-3">
-      <div class="col-12">
-        <nav>
-          <ul class="pagination justify-content-center">
-            <li class="page-item ${!data.paginacion.tiene_anterior ? 'disabled' : ''}">
-              <a class="page-link" href="#" onclick="generarReportePrestamos(${data.paginacion.pagina_actual - 1}); return false;">
-                <i class="fas fa-chevron-left"></i> Anterior
-              </a>
-            </li>
-            ${(() => {
-              let paginasHtml = '';
-              const paginaActual = data.paginacion.pagina_actual;
-              const totalPaginas = data.paginacion.total_paginas;
-              
-              // Mostrar páginas cercanas a la actual
-              let inicio = Math.max(1, paginaActual - 2);
-              let fin = Math.min(totalPaginas, paginaActual + 2);
-              
-              if (inicio > 1) {
-                paginasHtml += `<li class="page-item"><a class="page-link" href="#" onclick="generarReportePrestamos(1); return false;">1</a></li>`;
-                if (inicio > 2) {
-                  paginasHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-                }
-              }
-              
-              for (let i = inicio; i <= fin; i++) {
-                paginasHtml += `<li class="page-item ${i === paginaActual ? 'active' : ''}">
-                  <a class="page-link" href="#" onclick="generarReportePrestamos(${i}); return false;">${i}</a>
-                </li>`;
-              }
-              
-              if (fin < totalPaginas) {
-                if (fin < totalPaginas - 1) {
-                  paginasHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-                }
-                paginasHtml += `<li class="page-item"><a class="page-link" href="#" onclick="generarReportePrestamos(${totalPaginas}); return false;">${totalPaginas}</a></li>`;
-              }
-              
-              return paginasHtml;
-            })()}
-            <li class="page-item ${!data.paginacion.tiene_siguiente ? 'disabled' : ''}">
-              <a class="page-link" href="#" onclick="generarReportePrestamos(${data.paginacion.pagina_actual + 1}); return false;">
-                Siguiente <i class="fas fa-chevron-right"></i>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-    ` : ''}
-    
-    <div class="table-responsive">
+    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
       <table class="table table-striped table-dark">
-        <thead>
+        <thead class="sticky-top">
           <tr>
             <th>Fecha</th>
             <th>Usuario</th>
@@ -2842,44 +2786,6 @@ function mostrarReportePrestamos(data) {
         </tbody>
       </table>
     </div>
-    
-    ${data.paginacion && data.paginacion.total_paginas > 1 ? `
-    <div class="row mt-3">
-      <div class="col-12">
-        <nav>
-          <ul class="pagination justify-content-center">
-            <li class="page-item ${!data.paginacion.tiene_anterior ? 'disabled' : ''}">
-              <a class="page-link" href="#" onclick="generarReportePrestamos(${data.paginacion.pagina_actual - 1}); return false;">
-                <i class="fas fa-chevron-left"></i> Anterior
-              </a>
-            </li>
-            ${(() => {
-              let paginasHtml = '';
-              const paginaActual = data.paginacion.pagina_actual;
-              const totalPaginas = data.paginacion.total_paginas;
-              
-              // Mostrar páginas cercanas a la actual
-              let inicio = Math.max(1, paginaActual - 2);
-              let fin = Math.min(totalPaginas, paginaActual + 2);
-              
-              for (let i = inicio; i <= fin; i++) {
-                paginasHtml += `<li class="page-item ${i === paginaActual ? 'active' : ''}">
-                  <a class="page-link" href="#" onclick="generarReportePrestamos(${i}); return false;">${i}</a>
-                </li>`;
-              }
-              
-              return paginasHtml;
-            })()}
-            <li class="page-item ${!data.paginacion.tiene_siguiente ? 'disabled' : ''}">
-              <a class="page-link" href="#" onclick="generarReportePrestamos(${data.paginacion.pagina_actual + 1}); return false;">
-                Siguiente <i class="fas fa-chevron-right"></i>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-    ` : ''}
   `;
   
   document.getElementById("contenido-reporte-tabla").innerHTML = contenido;

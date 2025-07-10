@@ -551,37 +551,18 @@ def reporte_prestamos():
                 )
             )
         
-        # Parámetros de paginación
-        pagina = int(request.args.get('pagina', 1))
-        por_pagina = int(request.args.get('por_pagina', 30))
-        
         # Ordenar por fecha de préstamo (más recientes primero)
         query = query.order_by(Prestamo.fecha_prestamo.desc())
         
-        # Obtener total de resultados antes de la paginación
-        total_prestamos = query.count()
-        
-        # Aplicar paginación
-        offset = (pagina - 1) * por_pagina
-        prestamos = query.offset(offset).limit(por_pagina).all()
-        
-        # Calcular información de paginación
-        total_paginas = (total_prestamos + por_pagina - 1) // por_pagina
-        tiene_siguiente = pagina < total_paginas
-        tiene_anterior = pagina > 1
+        # Obtener todos los préstamos (sin paginación)
+        prestamos = query.all()
+        total_prestamos = len(prestamos)
         
         # Preparar respuesta
         resultado = {
             'total_prestamos': total_prestamos,
             'prestamos': [prestamo.to_dict() for prestamo in prestamos],
-            'paginacion': {
-                'pagina_actual': pagina,
-                'por_pagina': por_pagina,
-                'total_paginas': total_paginas,
-                'tiene_siguiente': tiene_siguiente,
-                'tiene_anterior': tiene_anterior,
-                'prestamos_en_pagina': len(prestamos)
-            },
+            'paginacion': None,  # No pagination - show all with scroll
             'filtros_aplicados': {
                 'fecha_inicio': fecha_inicio,
                 'fecha_fin': fecha_fin,

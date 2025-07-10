@@ -158,15 +158,9 @@ with app.app_context():
             # Verificar si ya hay préstamos en la base de datos
             prestamos_count = Prestamo.query.count()
             
-            # Check if we already have our target of 125 loans or more
-            if prestamos_count >= 125:
-                print(f"Ya existen {prestamos_count} préstamos (125+), no se crearán más.")
-                return
-            
-            # Only create if we have no loans (to preserve test data)
-            if prestamos_count == 0:
-                print("No hay préstamos en la base de datos. Use el comando SQL manual para crear los 125 préstamos de prueba.")
-                return
+            # Only create if we have less than 100 loans (to preserve test data)
+            if prestamos_count < 100:
+                print("Creando préstamos de prueba...")
                 
                 # Obtener usuarios de estudiantes reales que existen
                 estudiantes_reales = [
@@ -247,7 +241,8 @@ with app.app_context():
                     print(f"Creados {len(prestamos_data)} préstamos de prueba")
                 else:
                     print(f"Datos insuficientes: {len(estudiantes_ids)} estudiantes, {len(docentes_ids)} docentes, {len(elementos_disponibles)} elementos")
-            print(f"Préstamos actuales: {prestamos_count} (objetivo: 125)")
+            else:
+                print(f"Ya existen {prestamos_count} préstamos en la base de datos")
         
         except Exception as e:
             print(f"Error creando préstamos de prueba: {e}")
@@ -556,18 +551,12 @@ def reporte_prestamos():
                 )
             )
         
-        # Ordenar por fecha de préstamo (más recientes primero)
-        query = query.order_by(Prestamo.fecha_prestamo.desc())
-        
-        # Obtener todos los préstamos (sin paginación)
         prestamos = query.all()
-        total_prestamos = len(prestamos)
         
         # Preparar respuesta
         resultado = {
-            'total_prestamos': total_prestamos,
+            'total_prestamos': len(prestamos),
             'prestamos': [prestamo.to_dict() for prestamo in prestamos],
-            'paginacion': None,  # No pagination - show all with scroll
             'filtros_aplicados': {
                 'fecha_inicio': fecha_inicio,
                 'fecha_fin': fecha_fin,

@@ -2741,14 +2741,13 @@ function mostrarReportePrestamos(data) {
       <div class="col-12">
         <div class="alert alert-info">
           <strong>Total de préstamos encontrados:</strong> ${data.total_prestamos}
-          ${data.total_prestamos > 50 ? `<br><small>Mostrando todos los préstamos con scroll vertical</small>` : ''}
         </div>
       </div>
     </div>
     
-    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+    <div class="table-responsive">
       <table class="table table-striped table-dark">
-        <thead class="sticky-top">
+        <thead>
           <tr>
             <th>Fecha</th>
             <th>Usuario</th>

@@ -451,6 +451,13 @@ def eliminar_elemento(elemento_id):
         'mensaje': f'Elemento {elemento.nombre} eliminado correctamente'
     })
 
+# Nueva ruta para obtener información de un préstamo específico
+@app.route('/api/prestamo/<int:prestamo_id>', methods=['GET'])
+def obtener_prestamo(prestamo_id):
+    """Obtener información de un préstamo específico."""
+    prestamo = Prestamo.query.get_or_404(prestamo_id)
+    return jsonify(prestamo.to_dict())
+
 # Nueva ruta para buscar información de estudiante por ID
 @app.route('/api/estudiante/<identificacion>', methods=['GET'])
 def buscar_estudiante(identificacion):

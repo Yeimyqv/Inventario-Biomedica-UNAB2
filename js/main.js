@@ -1643,17 +1643,16 @@ function filtrarPrestamos() {
 }
 
 // Registrar devolución de un elemento
-function registrarDevolucion(prestamoId) {
-  // Obtener información del préstamo para mostrarla en el formulario de devolución
-  let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
-  const index = prestamos.findIndex(p => p.id === prestamoId);
-  
-  if (index === -1) {
-    mostrarNotificacion('Error', 'No se pudo encontrar el préstamo', 'error');
-    return;
-  }
-  
-  const prestamo = prestamos[index];
+async function registrarDevolucion(prestamoId) {
+  try {
+    // Hacer una llamada a la API para obtener información del préstamo
+    const response = await fetch(`/api/prestamo/${prestamoId}`);
+    
+    if (!response.ok) {
+      throw new Error('Préstamo no encontrado');
+    }
+    
+    const prestamo = await response.json();
   
   // Crear modal personalizado para devolución con observaciones
   const modalOverlay = document.createElement('div');
@@ -1668,9 +1667,9 @@ function registrarDevolucion(prestamoId) {
     </div>
     <div class="custom-modal-body">
       <div class="mb-3">
-        <p><strong>Préstamo a devolver:</strong> ${prestamo.elemento_nombre}</p>
+        <p><strong>Préstamo a devolver:</strong> ${prestamo.elemento?.nombre || 'Elemento'}</p>
         <p><strong>Cantidad:</strong> ${prestamo.cantidad} unidad(es)</p>
-        <p><strong>Usuario:</strong> ${prestamo.usuario_nombre}</p>
+        <p><strong>Usuario:</strong> ${prestamo.usuario?.nombre || 'Usuario'}</p>
       </div>
       <div class="mb-3">
         <label for="devolucion-observacion" class="form-label">Observaciones sobre el estado:</label>

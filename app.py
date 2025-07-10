@@ -35,11 +35,11 @@ with app.app_context():
     def cargar_inventario_inicial():
         """Cargar inventario inicial desde CSV si la base de datos está vacía."""
         try:
-            # Limpiar datos existentes de elementos y categorías (preservar préstamos)
+            # Limpiar datos existentes de elementos y categorías
             print("Actualizando base de datos con nuevo inventario...")
-            # Solo eliminamos elementos y categorías, preservamos préstamos
-            Elemento.query.delete()  # Elementos
-            Categoria.query.delete() # Categorías
+            Prestamo.query.delete()  # Primero eliminamos préstamos (dependencia de FK)
+            Elemento.query.delete()  # Luego elementos
+            Categoria.query.delete() # Finalmente categorías
             db.session.commit()
             print("Base de datos limpiada. Cargando inventario actualizado...")
             
@@ -158,8 +158,8 @@ with app.app_context():
             # Verificar si ya hay préstamos en la base de datos
             prestamos_count = Prestamo.query.count()
             
-            # Skip auto-creation entirely - preserve test data
-            if False:  # Disabled to preserve test data
+            # Only create if we have less than 100 loans (to preserve test data)
+            if prestamos_count < 100:
                 print("Creando préstamos de prueba...")
                 
                 # Obtener usuarios de estudiantes reales que existen

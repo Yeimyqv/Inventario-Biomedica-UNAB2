@@ -1721,56 +1721,59 @@ async function registrarDevolucion(prestamoId) {
   });
   
   // Manejar confirmación
-  document.getElementById('confirmar-devolucion-btn').addEventListener('click', () => {
-    // Obtener la observación seleccionada
-    const observacionSelect = document.getElementById('devolucion-observacion');
-    let observacion = observacionSelect.value;
-    
-    // Si se seleccionó "Otro", obtener el texto especificado
-    if (observacion === 'Otro') {
-      const otraObservacion = document.getElementById('otra-observacion').value.trim();
-      if (!otraObservacion) {
-        mostrarNotificacion('Error', 'Por favor especifique la observación', 'error');
-        return;
-      }
-      observacion = otraObservacion;
-    }
-    
-    // Cerrar el modal
-    modalOverlay.classList.remove('active');
-    modal.classList.remove('active');
-    
-    setTimeout(() => {
-      modalOverlay.remove();
+  document.getElementById('confirmar-devolucion-btn').addEventListener('click', async () => {
+    try {
+      // Obtener la observación seleccionada
+      const observacionSelect = document.getElementById('devolucion-observacion');
+      let observacion = observacionSelect.value;
       
-      // Realizar retorno usando la API
-      retornarElemento(prestamoId, observacion).then(response => {
-        if (response && response.success) {
-          // Actualizar inventario local si es necesario
-          INVENTARIO.forEach(categoria => {
-            const elemento = categoria.elementos.find(e => e.id === prestamo.elemento_id);
-            if (elemento) {
-              elemento.cantidad += prestamo.cantidad;
-            }
-          });
+      // Si se seleccionó "Otro", obtener el texto especificado
+      if (observacion === 'Otro') {
+        const otraObservacion = document.getElementById('otra-observacion').value.trim();
+        if (!otraObservacion) {
+          mostrarNotificacion('Error', 'Por favor especifique la observación', 'error');
+          return;
         }
+        observacion = otraObservacion;
+      }
+      
+      // Hacer llamada a la API para registrar la devolución
+      const response = await fetch('/api/retornar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prestamo_id: prestamoId,
+          observaciones: observacion
+        })
       });
       
-      // Mostrar confirmación
-      mostrarNotificacion('Éxito', 'Elemento devuelto correctamente', 'success');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Error al procesar la devolución');
+      }
       
-      // Actualizar solo la fila correspondiente al préstamo devuelto
-      // Primero verificamos si estamos en la vista de préstamos o retornos
+      const result = await response.json();
+      
+      // Cerrar modal
+      modalOverlay.classList.remove('active');
+      modal.classList.remove('active');
+      setTimeout(() => modalOverlay.remove(), 300);
+      
+      // Mostrar confirmación
+      mostrarNotificacion('Éxito', result.mensaje || 'Elemento devuelto correctamente', 'success');
+      
+      // Actualizar la vista
       const esVistaRetornos = document.getElementById('tabla-retornos') !== null;
       
       if (esVistaRetornos) {
-        // Estamos en la sección de retorno, actualizar la tabla de retornos
+        // Estamos en la sección de retorno, eliminar la fila
         const filaElement = document.querySelector(`button[onclick="registrarDevolucion(${prestamoId})"]`).closest('tr');
         if (filaElement) {
-          // Eliminar la fila de la tabla de retornos (porque ya no está prestado)
           filaElement.remove();
           
-          // Verificar si no quedan más préstamos y mostrar mensaje si es necesario
+          // Verificar si no quedan más préstamos
           const tbody = document.querySelector('#tabla-retornos tbody');
           if (tbody && tbody.children.length === 0) {
             const tabla = document.querySelector('#tabla-retornos').closest('.table-responsive');
@@ -1784,19 +1787,14 @@ async function registrarDevolucion(prestamoId) {
           }
         }
       } else {
-        // Estamos en la sección de consulta de préstamos, actualizar solo esa fila
+        // Actualizar el estado en la tabla de consulta
         const filaElement = document.querySelector(`button[onclick="registrarDevolucion(${prestamoId})"]`).closest('tr');
         if (filaElement) {
-          // Actualizar el estado y el botón
           const celdaEstado = filaElement.querySelector('td:nth-child(6)');
           const celdaAcciones = filaElement.querySelector('td:nth-child(7)');
           
           if (celdaEstado) {
-            celdaEstado.innerHTML = `
-              <span class="badge bg-green">
-                devuelto
-              </span>
-            `;
+            celdaEstado.innerHTML = `<span class="badge bg-success">devuelto</span>`;
           }
           
           if (celdaAcciones) {
@@ -1804,8 +1802,17 @@ async function registrarDevolucion(prestamoId) {
           }
         }
       }
-    });
+      
+    } catch (error) {
+      console.error('Error al procesar devolución:', error);
+      mostrarNotificacion('Error', error.message || 'Error al procesar la devolución', 'error');
+    }
   });
+  
+  } catch (error) {
+    console.error('Error al obtener información del préstamo:', error);
+    mostrarNotificacion('Error', 'No se pudo encontrar el préstamo', 'error');
+  }
 }
 
 // Filtrar la tabla de retornos (para laboratoristas)

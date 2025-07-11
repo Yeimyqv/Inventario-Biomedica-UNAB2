@@ -2348,9 +2348,12 @@ function mostrarModuloReportes() {
     reportesSection.className = "container-fluid p-4";
     reportesSection.style.display = "none";
     
-    // Configurar fechas por defecto para incluir todos los datos de prueba
-    const fechaInicio = "2025-05-01";
-    const fechaFin = "2025-06-30";
+    // Configurar fechas por defecto para incluir todos los datos (últimos 6 meses)
+    const hoy = new Date();
+    const seiseMesesAtras = new Date(hoy);
+    seiseMesesAtras.setMonth(hoy.getMonth() - 6);
+    const fechaInicio = seiseMesesAtras.toISOString().split('T')[0];
+    const fechaFin = hoy.toISOString().split('T')[0];
     
     reportesSection.innerHTML = `
       <div class="row mb-4">
@@ -2374,12 +2377,12 @@ function mostrarModuloReportes() {
             <div class="card-body">
               <div class="row">
                 <div class="col-md-3 mb-3">
-                  <label for="fecha-inicio-reporte" class="form-label">Fecha Inicio:</label>
-                  <input type="date" class="form-control" id="fecha-inicio-reporte" value="${fechaInicio}">
+                  <label for="fecha-inicio-filtro" class="form-label">Fecha Inicio:</label>
+                  <input type="date" class="form-control" id="fecha-inicio-filtro" value="${fechaInicio}">
                 </div>
                 <div class="col-md-3 mb-3">
-                  <label for="fecha-fin-reporte" class="form-label">Fecha Fin:</label>
-                  <input type="date" class="form-control" id="fecha-fin-reporte" value="${fechaFin}">
+                  <label for="fecha-fin-filtro" class="form-label">Fecha Fin:</label>
+                  <input type="date" class="form-control" id="fecha-fin-filtro" value="${fechaFin}">
                 </div>
                 <div class="col-md-3 mb-3">
                   <label for="tipo-usuario-filtro" class="form-label">Tipo de Usuario:</label>

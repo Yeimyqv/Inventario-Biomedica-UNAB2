@@ -674,19 +674,36 @@ async function iniciarPrestamo() {
 }
 
 // Iniciar proceso de retorno
-function iniciarRetorno() {
+async function iniciarRetorno() {
   // Ocultar la interfaz principal
   document.getElementById('interface').style.display = 'none';
   
-  // Recuperar todos los préstamos o solo los del usuario actual según tipo de usuario
-  let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
-  
-  // Si es laboratorista, muestra todos los préstamos activos; si no, solo los del usuario
-  if (currentUser.tipo === 'laboratorista') {
-    prestamos = prestamos.filter(p => p.estado === 'prestado');
-  } else {
-    prestamos = prestamos.filter(p => p.usuario_id === currentUser.id && p.estado === 'prestado');
-  }
+  try {
+    // Recuperar todos los préstamos desde la API
+    const response = await fetch('/api/reportes/prestamos');
+    const data = await response.json();
+    let prestamos = data.prestamos || [];
+    
+    // Transformar datos para compatibilidad
+    prestamos = prestamos.map(prestamo => ({
+      id: prestamo.id,
+      codigo: prestamo.elemento_codigo,
+      elemento_nombre: prestamo.elemento_nombre,
+      categoria: prestamo.categoria || 'Sin categoría',
+      cantidad: prestamo.cantidad,
+      usuario_nombre: prestamo.usuario_nombre,
+      usuario_id: prestamo.usuario_id,
+      usuario_tipo: prestamo.usuario_tipo,
+      fecha: prestamo.fecha_prestamo,
+      estado: prestamo.estado
+    }));
+    
+    // Si es laboratorista, muestra todos los préstamos activos; si no, solo los del usuario
+    if (currentUser.tipo === 'laboratorista') {
+      prestamos = prestamos.filter(p => p.estado === 'prestado');
+    } else {
+      prestamos = prestamos.filter(p => p.usuario_id === currentUser.id && p.estado === 'prestado');
+    }
   
   // Crear y mostrar la sección de retorno
   const retornoSection = document.createElement('section');
@@ -1459,7 +1476,7 @@ function confirmarVolverAInterfaz() {
 }
 
 // Consultar préstamos (laboratorista y docente)
-function consultarPrestamos() {
+async function consultarPrestamos() {
   // Ocultar la interfaz principal
   document.getElementById('interface').style.display = 'none';
   
@@ -1468,11 +1485,28 @@ function consultarPrestamos() {
   prestamosSection.id = 'prestamos-section';
   prestamosSection.className = 'my-5';
   
-  // Recuperar todos los préstamos
-  let prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
-  
-  // Si es laboratorista, muestra todos los préstamos; si es docente, solo los suyos
-  const esLaboratorista = currentUser.tipo === 'laboratorista';
+  // Recuperar todos los préstamos desde la API
+  try {
+    const response = await fetch('/api/reportes/prestamos');
+    const data = await response.json();
+    let prestamos = data.prestamos || [];
+    
+    // Transformar datos para compatibilidad con la interfaz existente
+    prestamos = prestamos.map(prestamo => ({
+      id: prestamo.id,
+      elemento_nombre: prestamo.elemento_nombre,
+      cantidad: prestamo.cantidad,
+      usuario_nombre: prestamo.usuario_nombre,
+      usuario_id: prestamo.usuario_id,
+      usuario_tipo: prestamo.usuario_tipo,
+      fecha: prestamo.fecha_prestamo,
+      estado: prestamo.estado,
+      observaciones: prestamo.observaciones,
+      fecha_devolucion: prestamo.fecha_devolucion_real
+    }));
+    
+    // Si es laboratorista, muestra todos los préstamos; si es docente, solo los suyos
+    const esLaboratorista = currentUser.tipo === 'laboratorista';
   const prestamosAMostrar = esLaboratorista ? prestamos : prestamos.filter(p => p.usuario_id === currentUser.id);
   
   // Estructura del contenido
@@ -1545,8 +1579,24 @@ function consultarPrestamos() {
     filtroUsuario.addEventListener('input', filtrarPrestamos);
   }
   
-  // Mostrar la sección
-  prestamosSection.style.display = 'block';
+  } catch (error) {
+    console.error('Error cargando préstamos:', error);
+    // Crear sección con mensaje de error
+    prestamosSection.innerHTML = `
+      <div class="panel-container">
+        <div class="panel-header d-flex justify-content-between align-items-center">
+          <h2 class="panel-title">CONSULTA DE PRÉSTAMOS</h2>
+          <button class="btn btn-sm btn-outline-light" onclick="confirmarVolverAInterfaz()">Volver</button>
+        </div>
+        <div class="panel-content">
+          <div class="alert alert-danger">
+            Error al cargar los préstamos: ${error.message}
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('interface').insertAdjacentElement('afterend', prestamosSection);
+  }
 }
 
 // Generar filas para la tabla de préstamos
@@ -1624,21 +1674,45 @@ function generarFilasPrestamos(prestamos, filtroEstado = '', filtroUsuario = '')
 }
 
 // Filtrar préstamos según los criterios
-function filtrarPrestamos() {
+async function filtrarPrestamos() {
   const filtroEstado = document.getElementById('filtro-estado').value;
   const filtroUsuario = document.getElementById('filtro-usuario').value;
   
-  // Recuperar todos los préstamos
-  const prestamos = JSON.parse(localStorage.getItem('prestamos') || '[]');
-  
-  // Filtrar según el tipo de usuario
-  const esLaboratorista = currentUser.tipo === 'laboratorista';
-  const prestamosAMostrar = esLaboratorista ? prestamos : prestamos.filter(p => p.usuario_id === currentUser.id);
-  
-  const tbody = document.getElementById('prestamos-tbody');
-  
-  if (tbody) {
-    tbody.innerHTML = generarFilasPrestamos(prestamosAMostrar, filtroEstado, filtroUsuario);
+  try {
+    // Recuperar todos los préstamos desde la API
+    const response = await fetch('/api/reportes/prestamos');
+    const data = await response.json();
+    let prestamos = data.prestamos || [];
+    
+    // Transformar datos para compatibilidad
+    prestamos = prestamos.map(prestamo => ({
+      id: prestamo.id,
+      elemento_nombre: prestamo.elemento_nombre,
+      cantidad: prestamo.cantidad,
+      usuario_nombre: prestamo.usuario_nombre,
+      usuario_id: prestamo.usuario_id,
+      usuario_tipo: prestamo.usuario_tipo,
+      fecha: prestamo.fecha_prestamo,
+      estado: prestamo.estado,
+      observaciones: prestamo.observaciones,
+      fecha_devolucion: prestamo.fecha_devolucion_real
+    }));
+    
+    // Filtrar según el tipo de usuario
+    const esLaboratorista = currentUser.tipo === 'laboratorista';
+    const prestamosAMostrar = esLaboratorista ? prestamos : prestamos.filter(p => p.usuario_id === currentUser.id);
+    
+    const tbody = document.getElementById('prestamos-tbody');
+    
+    if (tbody) {
+      tbody.innerHTML = generarFilasPrestamos(prestamosAMostrar, filtroEstado, filtroUsuario);
+    }
+  } catch (error) {
+    console.error('Error cargando préstamos:', error);
+    const tbody = document.getElementById('prestamos-tbody');
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error al cargar préstamos</td></tr>';
+    }
   }
 }
 

@@ -1764,6 +1764,9 @@ async function registrarDevolucion(prestamoId) {
       // Mostrar confirmación
       mostrarNotificacion('Éxito', result.mensaje || 'Elemento devuelto correctamente', 'success');
       
+      // Refrescar los reportes si están abiertos
+      actualizarReportesEnTiempoReal();
+      
       // Actualizar la vista
       const esVistaRetornos = document.getElementById('tabla-retornos') !== null;
       
@@ -2062,6 +2065,9 @@ async function realizarPrestamo() {
         .then(prestamo => {
           // Actualizar cantidad disponible en tiempo real
           elementoSeleccionado.cantidad -= cantidad;
+          
+          // Refrescar los reportes si están abiertos
+          actualizarReportesEnTiempoReal();
           
           // Mostrar opciones post-préstamo
           mostrarOpcionesPostPrestamo(prestamo);
@@ -3792,4 +3798,33 @@ function destruirGraficoAnterior() {
     currentChartPastel.destroy();
     currentChartPastel = null;
   }
+}
+
+// ======= FUNCIONES PARA ACTUALIZACIONES EN TIEMPO REAL =======
+
+// Función para actualizar reportes en tiempo real
+function actualizarReportesEnTiempoReal() {
+  // Verificar si el módulo de reportes está activo
+  const reportesSection = document.getElementById('reportes-section');
+  if (!reportesSection || reportesSection.style.display === 'none') {
+    return; // No hay reportes abiertos
+  }
+  
+  // Encontrar el botón de reporte activo y regenerar
+  const botonesReporte = document.querySelectorAll('#reportes-section .btn-group .btn');
+  botonesReporte.forEach((btn, index) => {
+    if (btn.classList.contains('active')) {
+      console.log(`Actualizando reporte activo: ${index}`);
+      // Regenerar el reporte activo después de un pequeño delay
+      setTimeout(() => {
+        switch(index) {
+          case 0: generarReportePrestamos(); break;
+          case 1: generarReporteEstudiantes(); break;
+          case 2: generarReporteDocentes(); break;
+          case 3: generarReporteMaterias(); break;
+          case 4: generarReporteProductos(); break;
+        }
+      }, 1000); // Esperar 1 segundo para asegurar que la BD se actualice
+    }
+  });
 }

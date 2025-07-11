@@ -805,8 +805,27 @@ async function iniciarRetorno() {
   // Agregar a la página
   document.getElementById('interface').insertAdjacentElement('afterend', retornoSection);
   
-  // Mostrar la sección
-  retornoSection.style.display = 'block';
+  } catch (error) {
+    console.error('Error cargando préstamos para retorno:', error);
+    // Crear sección con mensaje de error
+    const retornoSection = document.createElement('section');
+    retornoSection.id = 'prestamos-section';
+    retornoSection.className = 'my-5';
+    retornoSection.innerHTML = `
+      <div class="panel-container">
+        <div class="panel-header d-flex justify-content-between align-items-center">
+          <h2 class="panel-title">RETORNO DE ELEMENTOS</h2>
+          <button class="btn btn-sm btn-outline-light" onclick="confirmarVolverAInterfaz()">Volver</button>
+        </div>
+        <div class="panel-content">
+          <div class="alert alert-danger">
+            Error al cargar los préstamos: ${error.message}
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('interface').insertAdjacentElement('afterend', retornoSection);
+  }
 }
 
 // Consultar inventario completo

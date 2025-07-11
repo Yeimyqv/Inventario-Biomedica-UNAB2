@@ -2070,7 +2070,7 @@ async function realizarPrestamo() {
           elementoSeleccionado.cantidad -= cantidad;
           
           // Refrescar los reportes si están abiertos - llamar inmediatamente
-          console.log('Llamando a actualizarReportesEnTiempoReal...');
+          console.log('Préstamo creado exitosamente, actualizando reportes...');
           actualizarReportesEnTiempoReal();
           
           // Mostrar opciones post-préstamo

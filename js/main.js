@@ -1765,6 +1765,7 @@ async function registrarDevolucion(prestamoId) {
       mostrarNotificacion('Éxito', result.mensaje || 'Elemento devuelto correctamente', 'success');
       
       // Refrescar los reportes si están abiertos
+      console.log('Llamando a actualizarReportesEnTiempoReal después de devolución...');
       actualizarReportesEnTiempoReal();
       
       // Actualizar la vista
@@ -2068,7 +2069,8 @@ async function realizarPrestamo() {
           // Actualizar cantidad disponible en tiempo real
           elementoSeleccionado.cantidad -= cantidad;
           
-          // Refrescar los reportes si están abiertos
+          // Refrescar los reportes si están abiertos - llamar inmediatamente
+          console.log('Llamando a actualizarReportesEnTiempoReal...');
           actualizarReportesEnTiempoReal();
           
           // Mostrar opciones post-préstamo
@@ -3806,27 +3808,54 @@ function destruirGraficoAnterior() {
 
 // Función para actualizar reportes en tiempo real
 function actualizarReportesEnTiempoReal() {
+  console.log('Actualizando reportes en tiempo real...');
+  
   // Verificar si el módulo de reportes está activo
   const reportesSection = document.getElementById('reportes-section');
   if (!reportesSection || reportesSection.style.display === 'none') {
+    console.log('No hay reportes abiertos para actualizar');
     return; // No hay reportes abiertos
   }
   
   // Encontrar el botón de reporte activo y regenerar
   const botonesReporte = document.querySelectorAll('#reportes-section .btn-group .btn');
+  let reporteActivo = -1;
+  
   botonesReporte.forEach((btn, index) => {
     if (btn.classList.contains('active')) {
-      console.log(`Actualizando reporte activo: ${index}`);
-      // Regenerar el reporte activo después de un pequeño delay
-      setTimeout(() => {
-        switch(index) {
-          case 0: generarReportePrestamos(); break;
-          case 1: generarReporteEstudiantes(); break;
-          case 2: generarReporteDocentes(); break;
-          case 3: generarReporteMaterias(); break;
-          case 4: generarReporteProductos(); break;
-        }
-      }, 1000); // Esperar 1 segundo para asegurar que la BD se actualice
+      reporteActivo = index;
+      console.log(`Reporte activo encontrado: ${index}`);
     }
   });
+  
+  if (reporteActivo !== -1) {
+    console.log(`Actualizando reporte activo: ${reporteActivo}`);
+    // Regenerar el reporte activo después de un pequeño delay
+    setTimeout(() => {
+      switch(reporteActivo) {
+        case 0: 
+          console.log('Actualizando reporte de préstamos...');
+          generarReportePrestamos(); 
+          break;
+        case 1: 
+          console.log('Actualizando reporte de estudiantes...');
+          generarReporteEstudiantes(); 
+          break;
+        case 2: 
+          console.log('Actualizando reporte de docentes...');
+          generarReporteDocentes(); 
+          break;
+        case 3: 
+          console.log('Actualizando reporte de materias...');
+          generarReporteMaterias(); 
+          break;
+        case 4: 
+          console.log('Actualizando reporte de productos...');
+          generarReporteProductos(); 
+          break;
+      }
+    }, 1500); // Esperar 1.5 segundos para asegurar que la BD se actualice
+  } else {
+    console.log('No se encontró reporte activo para actualizar');
+  }
 }

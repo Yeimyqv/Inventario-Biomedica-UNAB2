@@ -2474,6 +2474,9 @@ function mostrarModuloReportes() {
             <div class="card-header d-flex justify-content-between align-items-center">
               <h5 class="card-title mb-0" id="titulo-reporte">Reporte de Préstamos Realizados</h5>
               <div class="btn-group">
+                <button class="btn btn-sm btn-outline-info" onclick="actualizarReportesEnTiempoReal()" title="Actualizar reporte">
+                  <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
                 <button class="btn btn-sm btn-outline-success" onclick="exportarReportePDF()">
                   PDF
                 </button>

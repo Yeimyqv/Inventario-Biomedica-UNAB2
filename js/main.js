@@ -2062,7 +2062,9 @@ async function realizarPrestamo() {
     () => {
       // Realizar préstamo usando la API del backend
       prestarElemento(elementoSeleccionado.id, usuarioId, cantidad)
-        .then(prestamo => {
+        .then(result => {
+          console.log('Préstamo creado exitosamente:', result);
+          
           // Actualizar cantidad disponible en tiempo real
           elementoSeleccionado.cantidad -= cantidad;
           
@@ -2070,7 +2072,7 @@ async function realizarPrestamo() {
           actualizarReportesEnTiempoReal();
           
           // Mostrar opciones post-préstamo
-          mostrarOpcionesPostPrestamo(prestamo);
+          mostrarOpcionesPostPrestamo(result);
         })
         .catch(error => {
           console.error('Error al crear préstamo:', error);
@@ -2098,7 +2100,7 @@ function mostrarOpcionesPostPrestamo(prestamo) {
         <i class="fas fa-check-circle"></i>
       </div>
       <div class="confirmation-text">
-        <p>Se ha registrado el préstamo de ${prestamo.cantidad} unidad(es) de ${prestamo.categoria} - ${prestamo.elemento_nombre} a nombre de ${prestamo.usuario_nombre}.</p>
+        <p>Se ha registrado el préstamo de ${prestamo.cantidad} unidad(es) de ${prestamo.elemento_nombre} a nombre de ${prestamo.usuario_nombre}.</p>
         ${prestamo.prestado_por ? 
           `<p class="mt-2"><small>Préstamo registrado por: ${prestamo.prestado_por} (Laboratorista)</small></p>` : 
           ''}

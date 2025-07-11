@@ -122,6 +122,8 @@ async function getElementoDetalle(elementoId) {
 // Realizar préstamo de elemento
 async function prestarElemento(elementoId, usuarioId, cantidad) {
   try {
+    console.log('API: Creando préstamo con datos:', { elemento_id: elementoId, usuario_id: usuarioId, cantidad: cantidad });
+    
     const response = await fetch('/api/prestar', {
       method: 'POST',
       headers: {
@@ -135,16 +137,17 @@ async function prestarElemento(elementoId, usuarioId, cantidad) {
     });
     
     const data = await response.json();
+    console.log('API: Respuesta del servidor:', data);
     
     if (!response.ok) {
       throw new Error(data.error || 'Error al realizar el préstamo');
     }
     
-    return data;
+    return data.prestamo || data; // Retornar el objeto préstamo
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error al crear préstamo:', error);
     mostrarNotificacion('Error', error.message, 'error');
-    return null;
+    throw error; // Re-lanzar el error para que se maneje en el lugar correcto
   }
 }
 

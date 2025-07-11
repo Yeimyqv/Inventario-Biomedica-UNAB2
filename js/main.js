@@ -2755,9 +2755,8 @@ function mostrarReportePrestamos(data) {
   const contenido = `
     <div class="row mb-4">
       <div class="col-12">
-        <div class="alert ${data.total_prestamos > 0 ? 'alert-info' : 'alert-warning'}">
+        <div class="alert alert-info">
           <strong>Total de préstamos encontrados:</strong> ${data.total_prestamos}
-          ${data.total_prestamos === 0 ? '<br><small><i class="fas fa-info-circle"></i> Los préstamos aparecerán aquí cuando se registren a través del sistema digital. El inventario actual refleja préstamos anteriores al sistema.</small>' : ''}
         </div>
       </div>
     </div>
@@ -2801,9 +2800,7 @@ function mostrarReportePrestamos(data) {
           `).join("") : `<tr><td colspan="7" class="text-center text-muted">
             <div class="py-4">
               <i class="fas fa-info-circle mb-2" style="font-size: 2em; color: #6c757d;"></i><br>
-              <strong>No hay préstamos digitales registrados</strong><br>
-              <small>Los préstamos aparecerán aquí cuando se registren a través del sistema digital.<br>
-              El inventario actual refleja préstamos anteriores al sistema de seguimiento.</small>
+              <strong>No se encontraron préstamos</strong>
             </div>
           </td></tr>`}
         </tbody>

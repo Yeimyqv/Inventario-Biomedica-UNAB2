@@ -74,6 +74,31 @@ async function buscarEstudiante(identificacion) {
   }
 }
 
+// Buscar usuario por tipo y nombre (para laboratoristas y docentes)
+async function buscarUsuarioPorTipoYNombre(tipo, nombre) {
+  try {
+    console.log(`API: Buscando usuario ${tipo} con nombre:`, nombre);
+    const response = await fetch(`/api/usuario/${tipo}/${encodeURIComponent(nombre)}`);
+    
+    if (response.status === 404) {
+      console.log('API: Usuario no encontrado (404)');
+      return null;
+    }
+    
+    if (!response.ok) {
+      console.error('API: Error de respuesta', response.status);
+      throw new Error(`Error al buscar usuario: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('API: Usuario encontrado:', data);
+    return data;
+  } catch (error) {
+    console.error('API: Error en buscarUsuarioPorTipoYNombre:', error);
+    return null;
+  }
+}
+
 // Obtener todas las categorías
 async function getCategorias() {
   try {

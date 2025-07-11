@@ -5,6 +5,7 @@ Aplicación principal para el Sistema de Gestión de Laboratorio de Bioinstrumen
 import os
 import json
 from datetime import datetime, timedelta
+from urllib.parse import unquote
 from flask import Flask, jsonify, request, render_template, send_from_directory, abort, Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
@@ -396,6 +397,26 @@ def buscar_estudiante(identificacion):
     # Log del estudiante encontrado
     print(f"Estudiante encontrado: {estudiante.nombre}, ID: {estudiante.identificacion}")
     return jsonify(estudiante.to_dict())
+
+# Nueva ruta para buscar usuario por tipo y nombre (para laboratoristas y docentes)
+@app.route('/api/usuario/<tipo>/<nombre>', methods=['GET'])
+def buscar_usuario_por_tipo_y_nombre(tipo, nombre):
+    """Buscar usuario por tipo y nombre."""
+    nombre_decoded = unquote(nombre)
+    
+    print(f"Buscando usuario {tipo} con nombre: {nombre_decoded}")
+    
+    usuario = Usuario.query.filter_by(
+        tipo=tipo,
+        nombre=nombre_decoded
+    ).first()
+    
+    if not usuario:
+        print(f"Usuario no encontrado: {tipo} - {nombre_decoded}")
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    
+    print(f"Usuario encontrado: {usuario.nombre}, ID: {usuario.id}")
+    return jsonify(usuario.to_dict())
 
 # API para importar inventario desde CSV (solo admin)
 @app.route('/api/importar-inventario', methods=['POST'])

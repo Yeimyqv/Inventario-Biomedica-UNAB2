@@ -364,11 +364,34 @@ function autenticarUsuario() {
     currentUser.correo = estudianteCorreo;
   }
   
-  // Asignar un ID temporal al usuario (en un sistema real, vendría de la BD)
-  currentUser.id = Date.now();
-  
-  // Cargar la interfaz según el tipo de usuario
-  cargarInterfazPrincipal();
+  // Para laboratoristas y docentes, buscar el ID real de la base de datos
+  if (currentUser.tipo === 'laboratorista' || currentUser.tipo === 'docente') {
+    // Buscar el usuario en la base de datos para obtener su ID real
+    buscarUsuarioPorTipoYNombre(currentUser.tipo, currentUser.nombre)
+      .then(usuarioData => {
+        if (usuarioData) {
+          currentUser.id = usuarioData.id; // Usar el ID real de la base de datos
+          currentUser.identificacion = usuarioData.identificacion;
+          currentUser.correo = usuarioData.correo;
+        } else {
+          // Fallback: usar timestamp si no se encuentra el usuario
+          currentUser.id = Date.now();
+          console.warn('Usuario no encontrado en la base de datos, usando ID temporal');
+        }
+        
+        // Cargar la interfaz según el tipo de usuario
+        cargarInterfazPrincipal();
+      })
+      .catch(error => {
+        console.error('Error buscando usuario:', error);
+        currentUser.id = Date.now();
+        cargarInterfazPrincipal();
+      });
+  } else {
+    // Para estudiantes, usar timestamp temporal (se buscará el ID real al hacer préstamo)
+    currentUser.id = Date.now();
+    cargarInterfazPrincipal();
+  }
 }
 
 // Cargar interfaz principal según el tipo de usuario

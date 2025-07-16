@@ -376,6 +376,8 @@ function autenticarUsuario() {
   
   // Para laboratoristas y docentes, buscar el ID real de la base de datos
   if (currentUser.tipo === 'laboratorista' || currentUser.tipo === 'docente') {
+    console.log(`Autenticando ${currentUser.tipo} con nombre: "${currentUser.nombre}"`);
+    
     // Buscar el usuario en la base de datos para obtener su ID real
     buscarUsuarioPorTipoYNombre(currentUser.tipo, currentUser.nombre)
       .then(usuarioData => {
@@ -383,10 +385,11 @@ function autenticarUsuario() {
           currentUser.id = usuarioData.id; // Usar el ID real de la base de datos
           currentUser.identificacion = usuarioData.identificacion;
           currentUser.correo = usuarioData.correo;
+          console.log(`Usuario ${currentUser.tipo} autenticado exitosamente - ID: ${currentUser.id}`);
         } else {
           // Fallback: usar timestamp si no se encuentra el usuario
           currentUser.id = Date.now();
-          console.warn('Usuario no encontrado en la base de datos, usando ID temporal');
+          console.warn(`Usuario ${currentUser.tipo} "${currentUser.nombre}" no encontrado en la base de datos, usando ID temporal`);
         }
         
         // Cargar la interfaz según el tipo de usuario
@@ -2098,14 +2101,20 @@ async function realizarPrestamo() {
   
   // Si es docente, verificar que tenga un ID válido
   if (currentUser.tipo === 'docente') {
-    if (!currentUser.id || currentUser.id === Date.now()) {
+    console.log('Verificando docente:', currentUser.nombre, 'ID actual:', currentUser.id);
+    
+    if (!currentUser.id || currentUser.id === Date.now() || !Number.isInteger(currentUser.id)) {
       // Si no tiene un ID válido, buscar en la base de datos
+      console.log('Buscando docente en la base de datos:', currentUser.nombre);
       const docenteData = await buscarUsuarioPorTipoYNombre('docente', currentUser.nombre);
+      console.log('Resultado de búsqueda:', docenteData);
+      
       if (!docenteData) {
-        mostrarNotificacion('Error', 'No se pudo encontrar tu información en la base de datos. Verifica que tu nombre esté registrado.', 'error');
+        mostrarNotificacion('Error', `No se pudo encontrar la información del docente "${currentUser.nombre}" en la base de datos. Verifica que tu nombre esté registrado exactamente como aparece en la lista.`, 'error');
         return;
       }
       usuarioId = docenteData.id; // Usar el ID real del docente
+      console.log('ID del docente encontrado:', usuarioId);
     }
     mensajeAdicional = `\n\nEl préstamo se registrará a nombre del docente: ${currentUser.nombre}`;
   }

@@ -25,7 +25,7 @@ class Elemento(db.Model):
     """Modelo para elementos del inventario."""
     id = db.Column(db.Integer, primary_key=True)
     codigo = db.Column(db.String(20), nullable=False, unique=True)
-    nombre = db.Column(db.String(100), nullable=False)
+    nombre = db.Column(db.String(200), nullable=False)
     descripcion = db.Column(db.Text, nullable=True)
     cantidad = db.Column(db.Integer, default=0)
     ubicacion = db.Column(db.String(100), nullable=True)

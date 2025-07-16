@@ -2024,16 +2024,26 @@ function volverAInterfazPrincipal() {
 // Cargar categorías desde la API
 async function cargarCategorias() {
   try {
+    console.log('Intentando cargar categorías...');
     const categoriaSelect = document.getElementById('categoria-select');
+    
+    if (!categoriaSelect) {
+      console.error('Elemento categoria-select no encontrado');
+      return;
+    }
+    
+    console.log('Elemento categoria-select encontrado, limpiando opciones...');
     categoriaSelect.innerHTML = '<option value="">Selecciona una categoría</option>';
     
     // Cargar categorías desde la API
+    console.log('Haciendo petición a /api/categorias...');
     const response = await fetch('/api/categorias');
     if (!response.ok) {
       throw new Error('Error al cargar categorías');
     }
     
     const categorias = await response.json();
+    console.log('Categorías recibidas:', categorias.length);
     
     categorias.forEach(categoria => {
       const option = document.createElement('option');
@@ -2044,6 +2054,7 @@ async function cargarCategorias() {
     
     // Rehabilitar el select
     categoriaSelect.disabled = false;
+    console.log('Categorías cargadas exitosamente');
     
   } catch (error) {
     console.error('Error al cargar categorías:', error);

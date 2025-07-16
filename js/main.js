@@ -2126,10 +2126,20 @@ async function realizarPrestamo() {
   }
   
   // Confirmar el préstamo
+  console.log('Datos finales del préstamo:');
+  console.log('- Elemento ID:', elementoSeleccionado.id);
+  console.log('- Usuario ID:', usuarioId);
+  console.log('- Usuario Nombre:', usuarioNombre);
+  console.log('- Usuario Tipo:', usuarioTipo);
+  console.log('- Cantidad:', cantidad);
+  console.log('- currentUser completo:', currentUser);
+  
   mostrarConfirmacion(
     'Confirmar préstamo',
     `¿Confirma el préstamo de ${cantidad} unidad(es) de ${elementoSeleccionado.nombre}?${mensajeAdicional}`,
     () => {
+      console.log('Iniciando préstamo con usuario ID:', usuarioId);
+      
       // Realizar préstamo usando la API del backend
       prestarElemento(elementoSeleccionado.id, usuarioId, cantidad)
         .then(result => {

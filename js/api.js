@@ -7,11 +7,13 @@ async function cargarInventarioDesdeDB() {
     
     // Obtener todas las categorías
     const categoriasResponse = await fetch('/api/categorias');
-    const categorias = await categoriasResponse.json();
     
     if (!categoriasResponse.ok) {
-      throw new Error('Error al cargar las categorías del inventario');
+      throw new Error(`Error al cargar las categorías del inventario: ${categoriasResponse.status}`);
     }
+    
+    const categorias = await categoriasResponse.json();
+    console.log(`Categorías obtenidas: ${categorias.length}`);
     
     // Crear un array con formato compatible con la estructura anterior de INVENTARIO
     const inventarioFormateado = [];
@@ -20,12 +22,14 @@ async function cargarInventarioDesdeDB() {
     for (const categoria of categorias) {
       // Obtener elementos para esta categoría
       const elementosResponse = await fetch(`/api/elementos/categoria/${categoria.id}`);
-      const elementos = await elementosResponse.json();
       
       if (!elementosResponse.ok) {
-        console.error(`Error al cargar los elementos de la categoría: ${categoria.nombre}`);
+        console.error(`Error al cargar los elementos de la categoría: ${categoria.nombre} (${elementosResponse.status})`);
         continue;
       }
+      
+      const elementos = await elementosResponse.json();
+      console.log(`Categoría ${categoria.nombre}: ${elementos.length} elementos`);
       
       // Añadir esta categoría con sus elementos al inventario formateado
       inventarioFormateado.push({
@@ -35,7 +39,7 @@ async function cargarInventarioDesdeDB() {
       });
     }
     
-    console.log(`Inventario cargado: ${inventarioFormateado.length} categorías`);
+    console.log(`Inventario cargado exitosamente: ${inventarioFormateado.length} categorías`);
     
     // Devolver el inventario formateado
     return inventarioFormateado;

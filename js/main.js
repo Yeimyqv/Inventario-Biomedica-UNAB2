@@ -67,9 +67,19 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   // Cargar el inventario desde la base de datos en segundo plano
   try {
+    console.log('Iniciando carga del inventario...');
     const loadingMsg = mostrarNotificacion('Cargando', 'Cargando datos del sistema...', 'info', 3000);
+    
     INVENTARIO = await cargarInventarioDesdeDB();
-    console.log(`Inventario cargado: ${INVENTARIO.length} categorías`);
+    console.log(`Inventario cargado exitosamente: ${INVENTARIO.length} categorías`);
+    
+    // Verificar que los datos se cargaron correctamente
+    if (INVENTARIO.length === 0) {
+      console.error('INVENTARIO está vacío después de cargar');
+      mostrarNotificacion('Advertencia', 'No se encontraron categorías en el inventario', 'warning', 5000);
+    } else {
+      console.log('Primeras 3 categorías cargadas:', INVENTARIO.slice(0, 3).map(cat => cat.categoria));
+    }
     
     // Cerrar la notificación inmediatamente después de cargar
     if (loadingMsg && loadingMsg.close) {

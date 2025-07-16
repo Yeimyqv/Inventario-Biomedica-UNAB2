@@ -240,6 +240,17 @@ def prestar_elemento():
     if elemento.disponibles() < cantidad:
         return jsonify({'error': 'No hay suficientes unidades disponibles'}), 400
     
+    # Si el usuario es estudiante, actualizar información del docente y materia
+    if usuario.tipo == 'estudiante':
+        docente = data.get('docente')
+        materia = data.get('materia')
+        
+        # Actualizar los datos del estudiante si se proporcionan
+        if docente:
+            usuario.docente = docente
+        if materia:
+            usuario.materia = materia
+    
     # Crear préstamo
     fecha_devolucion = datetime.utcnow() + timedelta(days=7)  # Por defecto: 7 días
     

@@ -185,20 +185,30 @@ async function getElementoDetalle(elementoId) {
 }
 
 // Realizar préstamo de elemento
-async function prestarElemento(elementoId, usuarioId, cantidad) {
+async function prestarElemento(elementoId, usuarioId, cantidad, docente = null, materia = null) {
   try {
-    console.log('API: Creando préstamo con datos:', { elemento_id: elementoId, usuario_id: usuarioId, cantidad: cantidad });
+    const requestData = {
+      elemento_id: elementoId,
+      usuario_id: usuarioId,
+      cantidad: cantidad
+    };
+    
+    // Agregar información del docente y materia si se proporcionan (para estudiantes)
+    if (docente) {
+      requestData.docente = docente;
+    }
+    if (materia) {
+      requestData.materia = materia;
+    }
+    
+    console.log('API: Creando préstamo con datos:', requestData);
     
     const response = await fetch('/api/prestar', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        elemento_id: elementoId,
-        usuario_id: usuarioId,
-        cantidad: cantidad
-      })
+      body: JSON.stringify(requestData)
     });
     
     const data = await response.json();

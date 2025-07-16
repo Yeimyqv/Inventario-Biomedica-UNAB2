@@ -2141,7 +2141,16 @@ async function realizarPrestamo() {
       console.log('Iniciando préstamo con usuario ID:', usuarioId);
       
       // Realizar préstamo usando la API del backend
-      prestarElemento(elementoSeleccionado.id, usuarioId, cantidad)
+      // Para estudiantes, pasar información del docente y materia
+      let docente = null;
+      let materia = null;
+      
+      if (currentUser.tipo === 'estudiante') {
+        docente = currentUser.docente;
+        materia = currentUser.materia;
+      }
+      
+      prestarElemento(elementoSeleccionado.id, usuarioId, cantidad, docente, materia)
         .then(result => {
           console.log('Préstamo creado exitosamente:', result);
           

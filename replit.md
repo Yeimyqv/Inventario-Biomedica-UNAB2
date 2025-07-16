@@ -110,6 +110,7 @@ The application uses four main models:
 - July 16, 2025: Fixed loan system API integration - updated models to include "disponibles" field, resolved category loading issues
 - July 16, 2025: Implemented laboratory staff loan restrictions - removed student/teacher loan options, simplified to self-loans only
 - July 16, 2025: Fixed teacher authentication and loan creation - added proper database ID lookup for teachers during loan process
+- July 16, 2025: Fixed teacher dropdown mismatch - synchronized teacher list with database entries, removed non-existent teachers
 
 ## User Preferences
 

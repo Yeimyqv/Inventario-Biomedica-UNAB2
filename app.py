@@ -452,14 +452,31 @@ def crear_usuario_docente():
     
     nueva_identificacion = f"D{nuevo_num:03d}"
     
-    # Generar correo institucional
-    nombres = nombre.split()
-    if len(nombres) >= 2:
-        primer_nombre = nombres[0].lower()
-        primer_apellido = nombres[-1].lower()
-        correo = f"{primer_nombre[0]}{primer_apellido}@unab.edu.co"
+    # Mapeo de correos específicos para docentes conocidos
+    correos_docentes = {
+        'Yeimy Liseth Quintana Villamizar': 'yquintana@unab.edu.co',
+        'Mario Fernando Morales Cordero': 'mmorales@unab.edu.co',
+        'Víctor Alfonso Solarte David': 'vsolarte@unab.edu.co',
+        'Manuel Hernando Franco Arias': 'mfranco@unab.edu.co',
+        'Alejandro Arboleda Carvajal': 'aarboleda@unab.edu.co',
+        'Leidy Rocío Pico Martínez': 'lpico47@unab.edu.co',
+        'Luis Felipe Buitrago Castro': 'lbuitrago411@unab.edu.co',
+        'Lusvin Javier Amado Forero': 'lamado175@unab.edu.co',
+        'Mateo Escobar Jaramillo': 'mescobar844@unab.edu.co'
+    }
+    
+    # Usar el correo específico si existe, sino generar uno
+    if nombre in correos_docentes:
+        correo = correos_docentes[nombre]
     else:
-        correo = f"{nombre.lower().replace(' ', '')}@unab.edu.co"
+        # Generar correo institucional como fallback
+        nombres = nombre.split()
+        if len(nombres) >= 2:
+            primer_nombre = nombres[0].lower()
+            primer_apellido = nombres[-1].lower()
+            correo = f"{primer_nombre[0]}{primer_apellido}@unab.edu.co"
+        else:
+            correo = f"{nombre.lower().replace(' ', '')}@unab.edu.co"
     
     nuevo_usuario = Usuario(
         tipo='docente',

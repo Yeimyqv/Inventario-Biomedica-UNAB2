@@ -2122,6 +2122,16 @@ async function realizarPrestamo() {
   let usuarioTipo = currentUser.tipo;
   let mensajeAdicional = '';
   
+  // Si es estudiante, buscar el ID real en la base de datos
+  if (currentUser.tipo === 'estudiante') {
+    const estudianteData = await buscarEstudiante(currentUser.id_estudiante);
+    if (!estudianteData) {
+      mostrarNotificacion('Error', 'No se pudo encontrar tu información en la base de datos', 'error');
+      return;
+    }
+    usuarioId = estudianteData.id; // Usar el ID real del estudiante
+  }
+  
   // Si es laboratorista, verificar si está prestando a otro usuario
   if (currentUser.tipo === 'laboratorista') {
     const tipoPrestamo = document.querySelector('#tipo-prestamo-grupo button.active')?.getAttribute('data-tipo');

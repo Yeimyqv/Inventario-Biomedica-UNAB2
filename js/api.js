@@ -86,6 +86,13 @@ async function buscarUsuarioPorTipoYNombre(tipo, nombre) {
     
     if (response.status === 404) {
       console.log('API: Usuario no encontrado (404)');
+      
+      // Si es docente y no existe, intentar crearlo automáticamente
+      if (tipo === 'docente') {
+        console.log('API: Intentando crear docente automáticamente');
+        return await crearDocenteAutomaticamente(nombre);
+      }
+      
       return null;
     }
     
@@ -99,6 +106,35 @@ async function buscarUsuarioPorTipoYNombre(tipo, nombre) {
     return data;
   } catch (error) {
     console.error('API: Error en buscarUsuarioPorTipoYNombre:', error);
+    return null;
+  }
+}
+
+// Crear docente automáticamente si no existe
+async function crearDocenteAutomaticamente(nombre) {
+  try {
+    console.log(`API: Creando docente automáticamente: ${nombre}`);
+    
+    const response = await fetch('/api/usuario/crear-docente', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        nombre: nombre
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Error al crear docente');
+    }
+    
+    const data = await response.json();
+    console.log('API: Docente creado exitosamente:', data);
+    return data;
+  } catch (error) {
+    console.error('API: Error creando docente:', error);
     return null;
   }
 }

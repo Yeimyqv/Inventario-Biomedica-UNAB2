@@ -418,6 +418,67 @@ def buscar_usuario_por_tipo_y_nombre(tipo, nombre):
     print(f"Usuario encontrado: {usuario.nombre}, ID: {usuario.id}")
     return jsonify(usuario.to_dict())
 
+# Nueva ruta para crear usuario docente si no existe
+@app.route('/api/usuario/crear-docente', methods=['POST'])
+def crear_usuario_docente():
+    """Crear usuario docente si no existe."""
+    data = request.json
+    
+    if not data or 'nombre' not in data:
+        return jsonify({'error': 'Nombre requerido'}), 400
+    
+    nombre = data['nombre'].strip()
+    
+    # Verificar si ya existe
+    usuario_existente = Usuario.query.filter_by(
+        tipo='docente',
+        nombre=nombre
+    ).first()
+    
+    if usuario_existente:
+        return jsonify(usuario_existente.to_dict())
+    
+    # Crear nuevo usuario docente
+    # Generar ID único para docente
+    ultimo_docente = Usuario.query.filter_by(tipo='docente').order_by(Usuario.id.desc()).first()
+    if ultimo_docente and ultimo_docente.identificacion.startswith('D'):
+        try:
+            ultimo_num = int(ultimo_docente.identificacion[1:])
+            nuevo_num = ultimo_num + 1
+        except:
+            nuevo_num = 100
+    else:
+        nuevo_num = 100
+    
+    nueva_identificacion = f"D{nuevo_num:03d}"
+    
+    # Generar correo institucional
+    nombres = nombre.split()
+    if len(nombres) >= 2:
+        primer_nombre = nombres[0].lower()
+        primer_apellido = nombres[-1].lower()
+        correo = f"{primer_nombre[0]}{primer_apellido}@unab.edu.co"
+    else:
+        correo = f"{nombre.lower().replace(' ', '')}@unab.edu.co"
+    
+    nuevo_usuario = Usuario(
+        tipo='docente',
+        nombre=nombre,
+        identificacion=nueva_identificacion,
+        correo=correo,
+        pin=None  # Los docentes usan PIN genérico
+    )
+    
+    try:
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+        print(f"Docente creado: {nuevo_usuario.nombre}, ID: {nuevo_usuario.id}")
+        return jsonify(nuevo_usuario.to_dict())
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creando docente: {e}")
+        return jsonify({'error': 'Error al crear docente'}), 500
+
 # API para importar inventario desde CSV (solo admin)
 @app.route('/api/importar-inventario', methods=['POST'])
 def importar_inventario():

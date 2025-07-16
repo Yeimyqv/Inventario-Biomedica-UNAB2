@@ -111,6 +111,7 @@ The application uses four main models:
 - July 16, 2025: Implemented laboratory staff loan restrictions - removed student/teacher loan options, simplified to self-loans only
 - July 16, 2025: Fixed teacher authentication and loan creation - added proper database ID lookup for teachers during loan process
 - July 16, 2025: Fixed teacher dropdown mismatch - synchronized teacher list with database entries, removed non-existent teachers
+- July 16, 2025: Implemented automatic teacher creation - system now creates database entries for any teacher, supports all teachers not just those in database
 
 ## User Preferences
 

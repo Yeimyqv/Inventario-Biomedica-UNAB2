@@ -2024,14 +2024,21 @@ function volverAInterfazPrincipal() {
 // Cargar categorías desde la API
 async function cargarCategorias() {
   try {
-    // Usar datos del archivo data.js por ahora, luego se conectará a la API
     const categoriaSelect = document.getElementById('categoria-select');
     categoriaSelect.innerHTML = '<option value="">Selecciona una categoría</option>';
     
-    INVENTARIO.forEach(categoria => {
+    // Cargar categorías desde la API
+    const response = await fetch('/api/categorias');
+    if (!response.ok) {
+      throw new Error('Error al cargar categorías');
+    }
+    
+    const categorias = await response.json();
+    
+    categorias.forEach(categoria => {
       const option = document.createElement('option');
-      option.value = categoria.categoria;
-      option.textContent = categoria.categoria;
+      option.value = categoria.id;
+      option.textContent = categoria.nombre;
       categoriaSelect.appendChild(option);
     });
     
@@ -2045,10 +2052,10 @@ async function cargarCategorias() {
 }
 
 // Manejar selección de categoría
-function onCategoriaSeleccionada(event) {
-  const categoriaNombre = event.target.value;
+async function onCategoriaSeleccionada(event) {
+  const categoriaId = event.target.value;
   
-  if (!categoriaNombre) {
+  if (!categoriaId) {
     // Limpiar y deshabilitar elementos dependientes
     const elementoSelect = document.getElementById('elemento-select');
     elementoSelect.innerHTML = '<option value="">Selecciona un elemento</option>';
@@ -2058,24 +2065,29 @@ function onCategoriaSeleccionada(event) {
     return;
   }
   
-  // Encontrar la categoría seleccionada en los datos locales
-  categoriaSeleccionada = INVENTARIO.find(cat => cat.categoria === categoriaNombre);
-  
-  // Cargar elementos de esa categoría
-  cargarElementosPorCategoria(categoriaSeleccionada);
+  // Cargar elementos de esa categoría desde la API
+  await cargarElementosPorCategoria(categoriaId);
 }
 
 // Cargar elementos por categoría
-function cargarElementosPorCategoria(categoria) {
+async function cargarElementosPorCategoria(categoriaId) {
   try {
     const elementoSelect = document.getElementById('elemento-select');
     elementoSelect.innerHTML = '<option value="">Selecciona un elemento</option>';
     
-    categoria.elementos.forEach(elemento => {
+    // Cargar elementos desde la API
+    const response = await fetch(`/api/elementos/categoria/${categoriaId}`);
+    if (!response.ok) {
+      throw new Error('Error al cargar elementos');
+    }
+    
+    const elementos = await response.json();
+    
+    elementos.forEach(elemento => {
       const option = document.createElement('option');
-      option.value = elemento.nombre;
-      option.textContent = `${elemento.nombre} (Disponible: ${elemento.cantidad})`;
-      option.disabled = elemento.cantidad <= 0;
+      option.value = elemento.id;
+      option.textContent = `${elemento.nombre} (Disponible: ${elemento.disponibles})`;
+      option.disabled = elemento.disponibles <= 0;
       elementoSelect.appendChild(option);
     });
     
@@ -2089,10 +2101,10 @@ function cargarElementosPorCategoria(categoria) {
 }
 
 // Manejar selección de elemento
-function onElementoSeleccionado(event) {
-  const elementoNombre = event.target.value;
+async function onElementoSeleccionado(event) {
+  const elementoId = event.target.value;
   
-  if (!elementoNombre) {
+  if (!elementoId) {
     // Limpiar y deshabilitar elementos dependientes
     document.getElementById('cantidad-input').disabled = true;
     document.getElementById('prestamo-btn').disabled = true;
@@ -2100,31 +2112,45 @@ function onElementoSeleccionado(event) {
     return;
   }
   
-  // Encontrar el elemento seleccionado
-  elementoSeleccionado = categoriaSeleccionada.elementos.find(elem => elem.nombre === elementoNombre);
-  
-  // Mostrar detalles del elemento
-  mostrarDetallesElemento(elementoSeleccionado);
-  
-  // Habilitar campos dependientes
-  const cantidadInput = document.getElementById('cantidad-input');
-  cantidadInput.disabled = false;
-  cantidadInput.max = elementoSeleccionado.cantidad;
-  cantidadInput.value = 1;
-  
-  document.getElementById('prestamo-btn').disabled = false;
+  try {
+    // Cargar detalles del elemento desde la API
+    const response = await fetch(`/api/elemento/${elementoId}`);
+    if (!response.ok) {
+      throw new Error('Error al cargar detalles del elemento');
+    }
+    
+    elementoSeleccionado = await response.json();
+    
+    // Mostrar detalles del elemento
+    mostrarDetallesElemento(elementoSeleccionado);
+    
+    // Habilitar campos dependientes
+    const cantidadInput = document.getElementById('cantidad-input');
+    cantidadInput.disabled = false;
+    cantidadInput.max = elementoSeleccionado.disponibles;
+    cantidadInput.value = 1;
+    
+    document.getElementById('prestamo-btn').disabled = false;
+  } catch (error) {
+    console.error('Error al cargar elemento:', error);
+    mostrarNotificacion('Error', 'No se pudieron cargar los detalles del elemento', 'error');
+  }
 }
 
 // Mostrar detalles del elemento seleccionado
 function mostrarDetallesElemento(elemento) {
   const detallesContainer = document.getElementById('elemento-detalles');
   
-  // En un sistema real, esto podría incluir más información desde la base de datos
   detallesContainer.innerHTML = `
     <div class="row">
       <div class="col-md-6">
         <p><strong>Nombre:</strong> ${elemento.nombre}</p>
-        <p><strong>Disponibles:</strong> ${elemento.cantidad}</p>
+        <p><strong>Código:</strong> ${elemento.codigo}</p>
+        <p><strong>Disponibles:</strong> ${elemento.disponibles}</p>
+        <p><strong>Ubicación:</strong> ${elemento.ubicacion || 'No especificada'}</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>Descripción:</strong> ${elemento.descripcion || 'Sin descripción'}</p>
       </div>
     </div>
   `;

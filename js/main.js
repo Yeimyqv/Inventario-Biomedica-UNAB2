@@ -388,9 +388,32 @@ function autenticarUsuario() {
         cargarInterfazPrincipal();
       });
   } else {
-    // Para estudiantes, usar timestamp temporal (se buscará el ID real al hacer préstamo)
-    currentUser.id = Date.now();
-    cargarInterfazPrincipal();
+    // Para estudiantes, buscar el ID real en la base de datos
+    if (currentUser.tipo === 'estudiante' && currentUser.id_estudiante) {
+      buscarEstudiante(currentUser.id_estudiante)
+        .then(estudianteData => {
+          if (estudianteData) {
+            currentUser.id = estudianteData.id; // Usar el ID real de la base de datos
+            console.log('Estudiante autenticado con ID real:', currentUser.id);
+          } else {
+            // Fallback: usar timestamp si no se encuentra el estudiante
+            currentUser.id = Date.now();
+            console.warn('Estudiante no encontrado en la base de datos, usando ID temporal');
+          }
+          
+          // Cargar la interfaz según el tipo de usuario
+          cargarInterfazPrincipal();
+        })
+        .catch(error => {
+          console.error('Error buscando estudiante:', error);
+          currentUser.id = Date.now();
+          cargarInterfazPrincipal();
+        });
+    } else {
+      // Para otros tipos de usuario, usar timestamp temporal
+      currentUser.id = Date.now();
+      cargarInterfazPrincipal();
+    }
   }
 }
 

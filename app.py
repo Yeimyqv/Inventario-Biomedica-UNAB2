@@ -157,7 +157,7 @@ with app.app_context():
         print("Creación automática de préstamos deshabilitada - modo de pruebas manuales")
     
     # Cargar datos iniciales
-    cargar_inventario_inicial()
+    # cargar_inventario_inicial()  # Deshabilitado para evitar recargas automáticas
     cargar_estudiantes_iniciales()
     inicializar_usuarios_sistema()
     crear_prestamos_de_prueba()

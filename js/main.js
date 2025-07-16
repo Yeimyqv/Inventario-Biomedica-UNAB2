@@ -588,75 +588,24 @@ async function iniciarPrestamo() {
   // Configurar título
   document.getElementById('prestamo-title').textContent = 'Préstamo de elementos';
   
-  // Si el usuario es laboratorista, mostrar opciones adicionales
+  // Si el usuario es laboratorista, mostrar información del préstamo
   if (currentUser.tipo === 'laboratorista') {
     // Verificar si ya existe el contenedor de préstamo por usuario
     let prestamoUsuarioContainer = document.getElementById('prestamo-usuario-container');
     
     if (!prestamoUsuarioContainer) {
-      // Crear contenedor para opciones de préstamo por usuario
+      // Crear contenedor para mostrar información del préstamo
       prestamoUsuarioContainer = document.createElement('div');
       prestamoUsuarioContainer.id = 'prestamo-usuario-container';
       prestamoUsuarioContainer.className = 'row mb-4 border-bottom pb-3';
       
-      // Contenido del contenedor
+      // Contenido del contenedor - solo mostrar información del laboratorista
       prestamoUsuarioContainer.innerHTML = `
         <div class="col-12 mb-3">
-          <h4 class="mb-3">Realizar préstamo en nombre de:</h4>
-          <div class="btn-group w-100" role="group" id="tipo-prestamo-grupo">
-            <button type="button" class="btn btn-outline-light active" data-tipo="propio">Laboratorio (Propio)</button>
-            <button type="button" class="btn btn-outline-light" data-tipo="estudiante">Estudiante</button>
-            <button type="button" class="btn btn-outline-light" data-tipo="docente">Docente</button>
-          </div>
-        </div>
-        
-        <!-- Campos para préstamo a estudiante -->
-        <div class="col-md-12 mt-2 mb-3" id="prestamo-estudiante-container" style="display: none;">
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="prestamo-estudiante-id" class="form-label">ID del Estudiante:</label>
-              <div class="input-group">
-                <input type="text" class="form-control" id="prestamo-estudiante-id" placeholder="Ej: U00123456">
-                <button class="btn btn-outline-light" type="button" id="buscar-estudiante-prestamo">
-                  <i class="bi bi-search"></i> Buscar
-                </button>
-              </div>
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="prestamo-estudiante-nombre" class="form-label">Nombre del Estudiante:</label>
-              <input type="text" class="form-control" id="prestamo-estudiante-nombre" readonly>
-            </div>
-            <div class="col-12">
-              <div class="alert alert-info" role="alert">
-                <small>Ingrese el ID del estudiante y presione "Buscar" para cargar sus datos automáticamente.</small>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Campos para préstamo a docente -->
-        <div class="col-md-12 mt-2 mb-3" id="prestamo-docente-container" style="display: none;">
-          <div class="row">
-            <div class="col-md-12 mb-3">
-              <label for="prestamo-docente-select" class="form-label">Seleccione un Docente:</label>
-              <select class="form-select" id="prestamo-docente-select">
-                <option value="" selected>Seleccione un docente</option>
-                <option value="Luis Felipe Buitrago Castro">Luis Felipe Buitrago Castro</option>
-                <option value="Lusvin Javier Amado Forero">Lusvin Javier Amado Forero</option>
-                <option value="Alejandro Arboleda Carvajal">Alejandro Arboleda Carvajal</option>
-                <option value="Leidy Rocío Pico Martínez">Leidy Rocío Pico Martínez</option>
-                <option value="Mateo Escobar Jaramillo">Mateo Escobar Jaramillo</option>
-                <option value="Yeimy Liseth Quintana Villamizar">Yeimy Liseth Quintana Villamizar</option>
-                <option value="Mario Fernando Morales Cordero">Mario Fernando Morales Cordero</option>
-                <option value="Víctor Alfonso Solarte David">Víctor Alfonso Solarte David</option>
-                <option value="Manuel Hernando Franco Arias">Manuel Hernando Franco Arias</option>
-                <option value="Otro">Otro</option>
-              </select>
-            </div>
-            <div class="col-md-12 mb-3" id="prestamo-otro-docente-container" style="display: none;">
-              <label for="prestamo-otro-docente" class="form-label">Nombre del Docente:</label>
-              <input type="text" class="form-control" id="prestamo-otro-docente" placeholder="Ingrese el nombre completo del docente">
-            </div>
+          <div class="alert alert-info" role="alert">
+            <h5 class="alert-heading">Préstamo de Laboratorio</h5>
+            <p class="mb-0">Este préstamo se registrará a nombre del laboratorio: <strong>${currentUser.nombre}</strong></p>
+            <small class="text-muted">Los laboratoristas solo pueden realizar préstamos a nombre propio.</small>
           </div>
         </div>
       `;
@@ -665,63 +614,8 @@ async function iniciarPrestamo() {
       const prestamoContent = prestamoSection.querySelector('.panel-content');
       prestamoContent.insertBefore(prestamoUsuarioContainer, prestamoContent.firstChild);
       
-      // Configurar eventos de los botones de tipo de préstamo
-      document.querySelectorAll('#tipo-prestamo-grupo button').forEach(button => {
-        button.addEventListener('click', function() {
-          // Eliminar clase activa de todos los botones
-          document.querySelectorAll('#tipo-prestamo-grupo button').forEach(b => {
-            b.classList.remove('active');
-          });
-          
-          // Agregar clase activa al botón seleccionado
-          this.classList.add('active');
-          
-          // Obtener el tipo de préstamo
-          const tipoPrestamo = this.getAttribute('data-tipo');
-          
-          // Mostrar/ocultar contenedores correspondientes
-          document.getElementById('prestamo-estudiante-container').style.display = tipoPrestamo === 'estudiante' ? 'block' : 'none';
-          document.getElementById('prestamo-docente-container').style.display = tipoPrestamo === 'docente' ? 'block' : 'none';
-        });
-      });
-      
-      // Configurar evento para buscar estudiante
-      document.getElementById('buscar-estudiante-prestamo').addEventListener('click', async function() {
-        const estudianteId = document.getElementById('prestamo-estudiante-id').value.trim();
-        
-        if (!estudianteId) {
-          mostrarNotificacion('Error', 'Por favor ingrese el ID del estudiante', 'error');
-          return;
-        }
-        
-        // Mostrar spinner o indicador de carga
-        document.getElementById('buscar-estudiante-prestamo').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Buscando...';
-        document.getElementById('buscar-estudiante-prestamo').disabled = true;
-        
-        try {
-          const respuesta = await buscarEstudiante(estudianteId);
-          
-          if (respuesta && respuesta.nombre) {
-            document.getElementById('prestamo-estudiante-nombre').value = respuesta.nombre;
-          } else {
-            mostrarNotificacion('Error', 'Estudiante no encontrado', 'error');
-            document.getElementById('prestamo-estudiante-nombre').value = '';
-          }
-        } catch (error) {
-          mostrarNotificacion('Error', 'No se pudo buscar el estudiante: ' + error.message, 'error');
-          document.getElementById('prestamo-estudiante-nombre').value = '';
-        } finally {
-          // Restaurar botón de búsqueda
-          document.getElementById('buscar-estudiante-prestamo').innerHTML = '<i class="bi bi-search"></i> Buscar';
-          document.getElementById('buscar-estudiante-prestamo').disabled = false;
-        }
-      });
-      
-      // Configurar evento para selector de docente
-      document.getElementById('prestamo-docente-select').addEventListener('change', function() {
-        document.getElementById('prestamo-otro-docente-container').style.display = 
-          this.value === 'Otro' ? 'block' : 'none';
-      });
+      // No se necesitan eventos adicionales para laboratorista
+      // El préstamo se hará automáticamente a nombre del laboratorista
     }
   }
   
@@ -2202,54 +2096,10 @@ async function realizarPrestamo() {
     usuarioId = estudianteData.id; // Usar el ID real del estudiante
   }
   
-  // Si es laboratorista, verificar si está prestando a otro usuario
+  // Los laboratoristas solo pueden hacer préstamos a nombre propio
   if (currentUser.tipo === 'laboratorista') {
-    const tipoPrestamo = document.querySelector('#tipo-prestamo-grupo button.active')?.getAttribute('data-tipo');
-    
-    if (tipoPrestamo === 'estudiante') {
-      // Verificar que se haya buscado un estudiante
-      const estudianteNombre = document.getElementById('prestamo-estudiante-nombre').value.trim();
-      const estudianteId = document.getElementById('prestamo-estudiante-id').value.trim();
-      
-      if (!estudianteNombre || !estudianteId) {
-        mostrarNotificacion('Error', 'Por favor busque un estudiante válido', 'error');
-        return;
-      }
-      
-      // Buscar el ID numérico del estudiante en la base de datos
-      const estudianteData = await buscarEstudiante(estudianteId);
-      if (!estudianteData) {
-        mostrarNotificacion('Error', 'Estudiante no encontrado en la base de datos', 'error');
-        return;
-      }
-      
-      usuarioNombre = estudianteNombre;
-      usuarioId = estudianteData.id; // ID numérico del estudiante
-      usuarioTipo = 'estudiante';
-      mensajeAdicional = `\n\nEl préstamo se registrará a nombre del estudiante: ${estudianteNombre}`;
-    } 
-    else if (tipoPrestamo === 'docente') {
-      // Verificar que se haya seleccionado un docente
-      const docenteSelect = document.getElementById('prestamo-docente-select');
-      let docenteNombre = docenteSelect.value;
-      
-      if (docenteNombre === 'Otro') {
-        docenteNombre = document.getElementById('prestamo-otro-docente').value.trim();
-        if (!docenteNombre) {
-          mostrarNotificacion('Error', 'Por favor ingrese el nombre del docente', 'error');
-          return;
-        }
-      } else if (!docenteNombre) {
-        mostrarNotificacion('Error', 'Por favor seleccione un docente', 'error');
-        return;
-      }
-      
-      // Para docentes, usar el ID del laboratorista como responsable del préstamo
-      usuarioNombre = docenteNombre;
-      usuarioId = currentUser.id; // Usar ID del laboratorista
-      usuarioTipo = 'docente';
-      mensajeAdicional = `\n\nEl préstamo se registrará a nombre del docente: ${docenteNombre}`;
-    }
+    // Los laboratoristas solo pueden prestar a nombre propio
+    mensajeAdicional = `\n\nEl préstamo se registrará a nombre del laboratorio: ${currentUser.nombre}`;
   }
   
   // Confirmar el préstamo

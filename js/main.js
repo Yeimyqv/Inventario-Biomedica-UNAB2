@@ -2096,6 +2096,20 @@ async function realizarPrestamo() {
     usuarioId = estudianteData.id; // Usar el ID real del estudiante
   }
   
+  // Si es docente, verificar que tenga un ID válido
+  if (currentUser.tipo === 'docente') {
+    if (!currentUser.id || currentUser.id === Date.now()) {
+      // Si no tiene un ID válido, buscar en la base de datos
+      const docenteData = await buscarUsuarioPorTipoYNombre('docente', currentUser.nombre);
+      if (!docenteData) {
+        mostrarNotificacion('Error', 'No se pudo encontrar tu información en la base de datos. Verifica que tu nombre esté registrado.', 'error');
+        return;
+      }
+      usuarioId = docenteData.id; // Usar el ID real del docente
+    }
+    mensajeAdicional = `\n\nEl préstamo se registrará a nombre del docente: ${currentUser.nombre}`;
+  }
+  
   // Los laboratoristas solo pueden hacer préstamos a nombre propio
   if (currentUser.tipo === 'laboratorista') {
     // Los laboratoristas solo pueden prestar a nombre propio

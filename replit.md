@@ -107,6 +107,9 @@ The application uses four main models:
 - June 26, 2025: Added CSV export functionality for Excel compatibility with proper data formatting
 - June 26, 2025: Enhanced charts with percentage calculations and labels for better data visualization in ranking reports
 - July 01, 2025: Implemented comprehensive test data setup for reports module validation with 125 total loans, 30 students, 5 teachers, 85 returns, and 15 observations
+- July 16, 2025: Fixed loan system API integration - updated models to include "disponibles" field, resolved category loading issues
+- July 16, 2025: Implemented laboratory staff loan restrictions - removed student/teacher loan options, simplified to self-loans only
+- July 16, 2025: Fixed teacher authentication and loan creation - added proper database ID lookup for teachers during loan process
 
 ## User Preferences
 

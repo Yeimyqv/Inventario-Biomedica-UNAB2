@@ -44,6 +44,7 @@ class Elemento(db.Model):
             'nombre': self.nombre,
             'descripcion': self.descripcion,
             'cantidad': self.cantidad,
+            'disponibles': self.disponibles(),
             'ubicacion': self.ubicacion,
             'imagen_url': self.imagen_url,
             'categoria_id': self.categoria_id,

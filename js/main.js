@@ -2170,7 +2170,7 @@ async function realizarPrestamo() {
     return;
   }
   
-  if (cantidad > elementoSeleccionado.cantidad) {
+  if (cantidad > elementoSeleccionado.disponibles) {
     mostrarNotificacion('Error', 'No hay suficientes unidades disponibles', 'error');
     return;
   }
@@ -2244,7 +2244,7 @@ async function realizarPrestamo() {
   // Confirmar el préstamo
   mostrarConfirmacion(
     'Confirmar préstamo',
-    `¿Confirma el préstamo de ${cantidad} unidad(es) de ${categoriaSeleccionada.categoria} - ${elementoSeleccionado.nombre}?${mensajeAdicional}`,
+    `¿Confirma el préstamo de ${cantidad} unidad(es) de ${elementoSeleccionado.nombre}?${mensajeAdicional}`,
     () => {
       // Realizar préstamo usando la API del backend
       prestarElemento(elementoSeleccionado.id, usuarioId, cantidad)
@@ -2252,7 +2252,7 @@ async function realizarPrestamo() {
           console.log('Préstamo creado exitosamente:', result);
           
           // Actualizar cantidad disponible en tiempo real
-          elementoSeleccionado.cantidad -= cantidad;
+          elementoSeleccionado.disponibles -= cantidad;
           
           // Refrescar los reportes si están abiertos - llamar inmediatamente
           console.log('Préstamo creado exitosamente, actualizando reportes...');

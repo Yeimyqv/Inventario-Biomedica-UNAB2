@@ -856,9 +856,9 @@ def admin_obtener_usuarios():
         tipo = request.args.get('tipo', 'todos')
         
         if tipo == 'todos':
-            usuarios = Usuario.query.all()
+            usuarios = Usuario.query.order_by(Usuario.identificacion.desc()).all()
         else:
-            usuarios = Usuario.query.filter_by(tipo=tipo).all()
+            usuarios = Usuario.query.filter_by(tipo=tipo).order_by(Usuario.identificacion.desc()).all()
         
         usuarios_data = []
         for usuario in usuarios:

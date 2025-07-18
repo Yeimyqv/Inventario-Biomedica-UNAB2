@@ -4247,12 +4247,12 @@ async function cargarUsuarios(tipo, tablaId) {
         
         if (tipo === 'estudiante') {
           columnasEspecificas = `
-            <td>${usuario.docente || 'N/A'}</td>
-            <td>${usuario.materia || 'N/A'}</td>
+            <td>${usuario.docente || '<span class="text-muted">No asignado</span>'}</td>
+            <td>${usuario.materia || '<span class="text-muted">No asignada</span>'}</td>
           `;
         } else {
           columnasEspecificas = `
-            <td>${usuario.pin || 'N/A'}</td>
+            <td>${usuario.pin || '<span class="text-muted">No definido</span>'}</td>
           `;
         }
         
@@ -4261,7 +4261,7 @@ async function cargarUsuarios(tipo, tablaId) {
             <td>${usuario.id}</td>
             <td>${usuario.nombre}</td>
             <td>${usuario.identificacion}</td>
-            <td>${usuario.correo || 'N/A'}</td>
+            <td>${usuario.correo || '<span class="text-muted">No definido</span>'}</td>
             ${columnasEspecificas}
             <td>
               <button class="btn btn-sm btn-outline-primary" onclick="editarUsuario(${usuario.id})">

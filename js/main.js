@@ -4306,14 +4306,12 @@ async function cargarSeccionEstudiantes(container) {
             <th>Nombre</th>
             <th>Identificación</th>
             <th>Correo</th>
-            <th>Docente</th>
-            <th>Materia</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="tabla-estudiantes">
-          <tr><td colspan="7" class="text-center">Cargando...</td></tr>
+          <tr><td colspan="5" class="text-center">Cargando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -4475,10 +4473,7 @@ async function cargarUsuarios(tipo, tablaId) {
         let columnasEspecificas = '';
         
         if (tipo === 'estudiante') {
-          columnasEspecificas = `
-            <td>${usuario.docente || '<span class="text-muted">No asignado</span>'}</td>
-            <td>${usuario.materia || '<span class="text-muted">No asignada</span>'}</td>
-          `;
+          columnasEspecificas = '';
         } else {
           columnasEspecificas = `
             <td>${usuario.pin || '<span class="text-muted">No definido</span>'}</td>
@@ -4515,14 +4510,14 @@ async function cargarUsuarios(tipo, tablaId) {
       }).join('');
       console.log(`Tabla ${tablaId} actualizada con ${data.usuarios.length} registros`);
     } else {
-      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center">No hay ${tipo}s registrados</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '5' : '6'}" class="text-center">No hay ${tipo}s registrados</td></tr>`;
       console.log(`No se encontraron ${tipo}s`);
     }
   } catch (error) {
     console.error(`Error cargando ${tipo}s:`, error);
     const tbody = document.getElementById(tablaId);
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '5' : '6'}" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
     }
   }
 }
@@ -4656,28 +4651,9 @@ function mostrarFormularioUsuario(tipo) {
             ` : ''}
             
             ${tipo === 'estudiante' ? `
-              <div class="mb-4">
-                <label class="form-label" style="color: white; font-weight: 600;">
-                  <i class="fas fa-chalkboard-teacher"></i> Docente Asignado
-                </label>
-                <input type="text" class="form-control" name="docente" 
-                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
-                       placeholder="Nombre del docente (opcional)">
-                <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
-                  Docente responsable del estudiante
-                </div>
-              </div>
-              
-              <div class="mb-4">
-                <label class="form-label" style="color: white; font-weight: 600;">
-                  <i class="fas fa-book"></i> Materia
-                </label>
-                <input type="text" class="form-control" name="materia" 
-                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
-                       placeholder="Nombre de la materia (opcional)">
-                <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
-                  Materia en la que está inscrito el estudiante
-                </div>
+              <div class="alert" style="background-color: rgba(69, 213, 9, 0.1); border: 1px solid #45d509; color: rgba(255, 255, 255, 0.8);">
+                <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Los estudiantes pueden tener múltiples docentes y materias. 
+                Esta información se registra durante el proceso de préstamos.
               </div>
             ` : ''}
           </form>
@@ -4825,9 +4801,6 @@ async function guardarUsuario(tipo) {
   
   if (tipo !== 'estudiante') {
     data.pin = formData.get('pin')?.trim() || null;
-  } else {
-    data.docente = formData.get('docente')?.trim() || null;
-    data.materia = formData.get('materia')?.trim() || null;
   }
   
   console.log('Datos a enviar:', data);
@@ -5116,22 +5089,9 @@ function mostrarFormularioEdicion(usuario) {
             ` : ''}
             
             ${usuario.tipo === 'estudiante' ? `
-              <div class="mb-4">
-                <label class="form-label" style="color: white; font-weight: 600;">
-                  <i class="fas fa-chalkboard-teacher"></i> Docente Asignado
-                </label>
-                <input type="text" class="form-control" name="docente" 
-                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
-                       value="${usuario.docente || ''}" placeholder="Nombre del docente (opcional)">
-              </div>
-              
-              <div class="mb-4">
-                <label class="form-label" style="color: white; font-weight: 600;">
-                  <i class="fas fa-book"></i> Materia
-                </label>
-                <input type="text" class="form-control" name="materia" 
-                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
-                       value="${usuario.materia || ''}" placeholder="Nombre de la materia (opcional)">
+              <div class="alert" style="background-color: rgba(69, 213, 9, 0.1); border: 1px solid #45d509; color: rgba(255, 255, 255, 0.8);">
+                <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Los estudiantes pueden tener múltiples docentes y materias. 
+                Esta información se registra durante el proceso de préstamos.
               </div>
             ` : ''}
           </form>
@@ -5263,9 +5223,6 @@ async function guardarEdicionUsuario() {
     if (pin) {
       data.pin = pin;
     }
-  } else {
-    data.docente = formData.get('docente')?.trim() || null;
-    data.materia = formData.get('materia')?.trim() || null;
   }
   
   console.log('Datos a actualizar:', data);

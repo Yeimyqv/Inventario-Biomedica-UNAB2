@@ -919,6 +919,27 @@ def admin_crear_usuario():
         db.session.rollback()
         return jsonify({'error': f'Error creando usuario: {str(e)}'}), 500
 
+@app.route('/api/admin/usuarios/<int:usuario_id>', methods=['GET'])
+def admin_obtener_usuario(usuario_id):
+    """Obtener usuario por ID."""
+    try:
+        usuario = Usuario.query.get_or_404(usuario_id)
+        return jsonify({
+            'usuario': {
+                'id': usuario.id,
+                'tipo': usuario.tipo,
+                'nombre': usuario.nombre,
+                'identificacion': usuario.identificacion,
+                'correo': usuario.correo,
+                'pin': usuario.pin,
+                'docente': usuario.docente,
+                'materia': usuario.materia
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Error obteniendo usuario: {str(e)}'}), 500
+
 @app.route('/api/admin/usuarios/<int:usuario_id>', methods=['PUT'])
 def admin_actualizar_usuario(usuario_id):
     """Actualizar usuario existente."""

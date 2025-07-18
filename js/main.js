@@ -4709,28 +4709,82 @@ async function guardarMateria() {
 }
 
 async function eliminarUsuario(id, nombre) {
-  if (confirm(`¿Está seguro que desea eliminar al usuario "${nombre}"?`)) {
-    try {
-      const response = await fetch(`/api/admin/usuarios/${id}`, {
-        method: 'DELETE'
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
-        mostrarNotificacion('Éxito', result.mensaje, 'success');
-        // Recargar la sección actual
-        const activeTab = document.querySelector('#admin-section .btn-group .btn.active');
-        if (activeTab) {
-          const seccion = activeTab.id.replace('admin-nav-', '');
-          cambiarSeccionAdmin(seccion);
-        }
-      } else {
-        mostrarNotificacion('Error', result.error, 'error');
+  console.log(`Eliminando usuario: ${nombre} (ID: ${id})`);
+  
+  // Crear modal de confirmación personalizado
+  const modal = document.createElement('div');
+  modal.className = 'modal fade';
+  modal.id = 'modal-confirmar-eliminacion';
+  modal.innerHTML = `
+    <div class="modal-dialog">
+      <div class="modal-content" style="background-color: rgba(0, 0, 0, 0.9); color: white; border: 1px solid #FF6600;">
+        <div class="modal-header" style="border-bottom: 2px solid #FF6600;">
+          <h5 class="modal-title" style="color: #FF6600; font-weight: 600;">
+            <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="padding: 25px;">
+          <p style="font-size: 1.1rem; margin-bottom: 20px;">
+            ¿Está seguro que desea eliminar al usuario?
+          </p>
+          <div class="alert alert-warning" style="background-color: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; color: #ffc107;">
+            <strong>Nombre:</strong> ${nombre}<br>
+            <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+          </div>
+        </div>
+        <div class="modal-footer" style="border-top: 2px solid #FF6600; padding: 20px;">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" 
+                  style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-danger" onclick="confirmarEliminacion(${id}, '${nombre.replace(/'/g, "\\'")}')">
+            <i class="fas fa-trash"></i> Eliminar Usuario
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  const bootstrapModal = new bootstrap.Modal(modal);
+  bootstrapModal.show();
+  
+  modal.addEventListener('hidden.bs.modal', () => {
+    document.body.removeChild(modal);
+  });
+}
+
+async function confirmarEliminacion(id, nombre) {
+  console.log(`Confirmando eliminación de usuario: ${nombre} (ID: ${id})`);
+  
+  // Cerrar modal de confirmación
+  const modal = bootstrap.Modal.getInstance(document.getElementById('modal-confirmar-eliminacion'));
+  if (modal) {
+    modal.hide();
+  }
+  
+  try {
+    const response = await fetch(`/api/admin/usuarios/${id}`, {
+      method: 'DELETE'
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      mostrarNotificacion('Éxito', result.mensaje || 'Usuario eliminado exitosamente', 'success');
+      // Recargar la sección actual
+      const activeTab = document.querySelector('#admin-section .btn-group .btn.active');
+      if (activeTab) {
+        const seccion = activeTab.id.replace('admin-nav-', '');
+        cambiarSeccionAdmin(seccion);
       }
-    } catch (error) {
-      mostrarNotificacion('Error', 'Error al eliminar el usuario', 'error');
+    } else {
+      mostrarNotificacion('Error', result.error || 'Error al eliminar el usuario', 'error');
     }
+  } catch (error) {
+    console.error('Error al eliminar usuario:', error);
+    mostrarNotificacion('Error', 'Error de conexión al eliminar el usuario', 'error');
   }
 }
 
@@ -4755,12 +4809,176 @@ async function eliminarMateria(id, nombre) {
   }
 }
 
-function editarUsuario(id) {
-  mostrarNotificacion('Información', 'Función de edición en desarrollo', 'info');
+async function editarUsuario(id) {
+  console.log(`Editando usuario con ID: ${id}`);
+  
+  try {
+    // Obtener datos del usuario
+    const response = await fetch(`/api/admin/usuarios/${id}`);
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Datos del usuario a editar:', data);
+    
+    if (!data.usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+    
+    const usuario = data.usuario;
+    mostrarFormularioEdicion(usuario);
+    
+  } catch (error) {
+    console.error('Error al obtener datos del usuario:', error);
+    mostrarNotificacion('Error', 'Error al cargar los datos del usuario', 'error');
+  }
 }
 
 function editarMateria(id) {
   mostrarNotificacion('Información', 'Función de edición en desarrollo', 'info');
+}
+
+function mostrarFormularioEdicion(usuario) {
+  console.log(`Mostrando formulario de edición para usuario:`, usuario);
+  
+  // Eliminar modal existente si existe
+  const existingModal = document.getElementById('modal-editar-usuario');
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal fade';
+  modal.id = 'modal-editar-usuario';
+  modal.tabIndex = -1;
+  modal.innerHTML = `
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="background-color: rgba(0, 0, 0, 0.9); color: white; border: 1px solid #45d509;">
+        <div class="modal-header" style="border-bottom: 2px solid #45d509;">
+          <h5 class="modal-title" style="color: #45d509; font-weight: 600;">
+            <i class="fas fa-user-edit"></i> Editar ${usuario.tipo.charAt(0).toUpperCase() + usuario.tipo.slice(1)}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="padding: 25px;">
+          <form id="form-editar-usuario">
+            <input type="hidden" name="id" value="${usuario.id}">
+            <input type="hidden" name="tipo" value="${usuario.tipo}">
+            
+            <div class="mb-4">
+              <label class="form-label" style="color: white; font-weight: 600;">
+                <i class="fas fa-user"></i> Nombre Completo <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control" name="nombre" required 
+                     style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                     value="${usuario.nombre || ''}" placeholder="Ingrese el nombre completo">
+            </div>
+            
+            <div class="mb-4">
+              <label class="form-label" style="color: white; font-weight: 600;">
+                <i class="fas fa-id-card"></i> Identificación <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control" name="identificacion" required 
+                     style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                     value="${usuario.identificacion || ''}" placeholder="${usuario.tipo === 'estudiante' ? 'U00123456' : 'Identificación'}">
+              <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
+                ${usuario.tipo === 'estudiante' ? 'Formato: U00 seguido de 6 dígitos' : 'Identificación única del usuario'}
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label class="form-label" style="color: white; font-weight: 600;">
+                <i class="fas fa-envelope"></i> Correo Electrónico <span class="text-danger">*</span>
+              </label>
+              <input type="email" class="form-control" name="correo" required 
+                     style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                     value="${usuario.correo || ''}" placeholder="usuario@unab.edu.co">
+            </div>
+            
+            ${usuario.tipo !== 'estudiante' ? `
+              <div class="mb-4">
+                <label class="form-label" style="color: white; font-weight: 600;">
+                  <i class="fas fa-key"></i> PIN de Acceso
+                </label>
+                <input type="password" class="form-control" name="pin" 
+                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                       value="${usuario.pin || ''}" placeholder="Dejar vacío para mantener el PIN actual">
+                <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
+                  Dejar vacío para mantener el PIN actual
+                </div>
+              </div>
+            ` : ''}
+            
+            ${usuario.tipo === 'estudiante' ? `
+              <div class="mb-4">
+                <label class="form-label" style="color: white; font-weight: 600;">
+                  <i class="fas fa-chalkboard-teacher"></i> Docente Asignado
+                </label>
+                <input type="text" class="form-control" name="docente" 
+                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                       value="${usuario.docente || ''}" placeholder="Nombre del docente (opcional)">
+              </div>
+              
+              <div class="mb-4">
+                <label class="form-label" style="color: white; font-weight: 600;">
+                  <i class="fas fa-book"></i> Materia
+                </label>
+                <input type="text" class="form-control" name="materia" 
+                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                       value="${usuario.materia || ''}" placeholder="Nombre de la materia (opcional)">
+              </div>
+            ` : ''}
+          </form>
+        </div>
+        <div class="modal-footer" style="border-top: 2px solid #45d509; padding: 20px;">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" 
+                  style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-success" onclick="guardarEdicionUsuario()" 
+                  style="background-color: #45d509; border-color: #45d509; color: #000; font-weight: 600;">
+            <i class="fas fa-save"></i> Guardar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  const bootstrapModal = new bootstrap.Modal(modal);
+  bootstrapModal.show();
+  
+  // Agregar validación en tiempo real
+  if (usuario.tipo === 'estudiante') {
+    const identificacionInput = modal.querySelector('input[name="identificacion"]');
+    identificacionInput.addEventListener('input', function() {
+      const value = this.value.toUpperCase();
+      this.value = value;
+      
+      const regex = /^U00\d{6}$/;
+      if (value && !regex.test(value)) {
+        this.style.borderColor = '#FF6600';
+      } else {
+        this.style.borderColor = '#45d509';
+      }
+    });
+  }
+  
+  // Validación de correo
+  const correoInput = modal.querySelector('input[name="correo"]');
+  correoInput.addEventListener('input', function() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (this.value && !emailRegex.test(this.value)) {
+      this.style.borderColor = '#FF6600';
+    } else {
+      this.style.borderColor = '#45d509';
+    }
+  });
+  
+  modal.addEventListener('hidden.bs.modal', () => {
+    document.body.removeChild(modal);
+  });
 }
 
 function filtrarTabla(tablaId, filtro) {
@@ -4792,5 +5010,100 @@ function filtrarTabla(tablaId, filtro) {
     }
     
     fila.style.display = mostrarFila ? '' : 'none';
+  }
+}
+
+async function guardarEdicionUsuario() {
+  console.log('Guardando edición de usuario...');
+  
+  const form = document.getElementById('form-editar-usuario');
+  const formData = new FormData(form);
+  
+  // Validar campos obligatorios
+  const nombre = formData.get('nombre')?.trim();
+  const identificacion = formData.get('identificacion')?.trim();
+  const correo = formData.get('correo')?.trim();
+  const id = formData.get('id');
+  const tipo = formData.get('tipo');
+  
+  if (!nombre || !identificacion || !correo) {
+    mostrarNotificacion('Error', 'Por favor complete todos los campos obligatorios (nombre, identificación y correo)', 'error');
+    return;
+  }
+  
+  // Validar formato de identificación para estudiantes
+  if (tipo === 'estudiante') {
+    const regex = /^U00\d{6}$/;
+    if (!regex.test(identificacion)) {
+      mostrarNotificacion('Error', 'El formato de identificación debe ser U00 seguido de 6 dígitos (ej: U00123456)', 'error');
+      return;
+    }
+  }
+  
+  // Validar formato de correo
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(correo)) {
+    mostrarNotificacion('Error', 'Por favor ingrese un correo electrónico válido', 'error');
+    return;
+  }
+  
+  const data = {
+    nombre: nombre,
+    identificacion: identificacion,
+    correo: correo
+  };
+  
+  if (tipo !== 'estudiante') {
+    const pin = formData.get('pin')?.trim();
+    if (pin) {
+      data.pin = pin;
+    }
+  } else {
+    data.docente = formData.get('docente')?.trim() || null;
+    data.materia = formData.get('materia')?.trim() || null;
+  }
+  
+  console.log('Datos a actualizar:', data);
+  
+  // Mostrar indicador de carga
+  const saveBtn = document.querySelector('#modal-editar-usuario .btn-success');
+  const originalText = saveBtn.innerHTML;
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+  saveBtn.disabled = true;
+  
+  try {
+    const response = await fetch(`/api/admin/usuarios/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    const result = await response.json();
+    console.log('Respuesta del servidor:', result);
+    
+    if (response.ok) {
+      mostrarNotificacion('Éxito', result.mensaje || 'Usuario actualizado exitosamente', 'success');
+      bootstrap.Modal.getInstance(document.getElementById('modal-editar-usuario')).hide();
+      
+      // Recargar la sección actual
+      const activeTab = document.querySelector('#admin-section .btn-group .btn.active');
+      if (activeTab) {
+        const seccion = activeTab.id.replace('admin-nav-', '');
+        cambiarSeccionAdmin(seccion);
+      }
+    } else {
+      mostrarNotificacion('Error', result.error || 'Error al actualizar el usuario', 'error');
+      // Restaurar botón
+      saveBtn.innerHTML = originalText;
+      saveBtn.disabled = false;
+    }
+  } catch (error) {
+    console.error('Error al actualizar usuario:', error);
+    mostrarNotificacion('Error', 'Error de conexión al actualizar el usuario', 'error');
+    // Restaurar botón
+    saveBtn.innerHTML = originalText;
+    saveBtn.disabled = false;
   }
 }

@@ -298,6 +298,110 @@ body {
   color: #fff !important;
 }
 
+/* Estilos para módulo administrativo */
+#admin-section {
+  color: white;
+}
+
+#admin-section .table {
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  overflow: hidden;
+  color: white;
+}
+
+#admin-section .table th {
+  background-color: rgba(69, 213, 9, 0.8);
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+}
+
+#admin-section .table td {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  vertical-align: middle;
+}
+
+#admin-section .table tbody tr:hover {
+  background-color: rgba(69, 213, 9, 0.1);
+}
+
+#admin-section .table tbody tr:hover td {
+  background-color: rgba(69, 213, 9, 0.1);
+}
+
+#admin-section .text-muted {
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-style: italic;
+}
+
+#admin-section .btn-group .btn {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+#admin-section .btn-group .btn.active {
+  background-color: #45d509;
+  border-color: #45d509;
+  color: #000;
+  font-weight: 600;
+}
+
+#admin-section .btn-group .btn:hover {
+  background-color: rgba(69, 213, 9, 0.2);
+  border-color: rgba(69, 213, 9, 0.5);
+}
+
+#admin-section .btn-success {
+  background-color: #45d509;
+  border-color: #45d509;
+  color: #000;
+  font-weight: 600;
+}
+
+#admin-section .btn-success:hover {
+  background-color: #3ab507;
+  border-color: #3ab507;
+}
+
+#admin-section .btn-outline-primary {
+  color: #45d509;
+  border-color: #45d509;
+  background-color: transparent;
+}
+
+#admin-section .btn-outline-primary:hover {
+  background-color: #45d509;
+  border-color: #45d509;
+  color: #000;
+}
+
+#admin-section .btn-outline-danger {
+  color: #FF6600;
+  border-color: #FF6600;
+  background-color: transparent;
+}
+
+#admin-section .btn-outline-danger:hover {
+  background-color: #FF6600;
+  border-color: #FF6600;
+  color: white;
+}
+
+#admin-section h3 {
+  color: white;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
 /* Responsividad */
 @media (max-width: 768px) {
   .panel-title {

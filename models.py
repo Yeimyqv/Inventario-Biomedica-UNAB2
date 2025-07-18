@@ -92,6 +92,7 @@ class Usuario(db.Model):
     correo = db.Column(db.String(100), nullable=True)  # Correo institucional
     docente = db.Column(db.String(100), nullable=True)  # Docente asociado (solo para estudiantes)
     materia = db.Column(db.String(100), nullable=True)  # Materia o curso (solo para estudiantes)
+    activo = db.Column(db.Boolean, default=True)  # Campo para activar/inactivar usuarios
     prestamos = db.relationship('Prestamo', backref='usuario', lazy=True)
     
     def __repr__(self):
@@ -104,7 +105,8 @@ class Usuario(db.Model):
             'tipo': self.tipo,
             'nombre': self.nombre,
             'identificacion': self.identificacion,
-            'correo': self.correo
+            'correo': self.correo,
+            'activo': self.activo
         }
         
         # Agregar campos adicionales solo si son relevantes para el tipo de usuario

@@ -854,11 +854,20 @@ def admin_obtener_usuarios():
     """Obtener todos los usuarios por tipo."""
     try:
         tipo = request.args.get('tipo', 'todos')
+        incluir_inactivos = request.args.get('incluir_inactivos', 'false').lower() == 'true'
         
-        if tipo == 'todos':
-            usuarios = Usuario.query.order_by(Usuario.identificacion.desc()).all()
-        else:
-            usuarios = Usuario.query.filter_by(tipo=tipo).order_by(Usuario.identificacion.desc()).all()
+        # Construir query base
+        query = Usuario.query
+        
+        # Filtrar por tipo si se especifica
+        if tipo != 'todos':
+            query = query.filter_by(tipo=tipo)
+        
+        # Filtrar por estado activo si no se incluyen inactivos
+        if not incluir_inactivos:
+            query = query.filter_by(activo=True)
+        
+        usuarios = query.order_by(Usuario.identificacion.desc()).all()
         
         usuarios_data = []
         for usuario in usuarios:
@@ -870,7 +879,8 @@ def admin_obtener_usuarios():
                 'correo': usuario.correo,
                 'pin': usuario.pin,
                 'docente': usuario.docente,
-                'materia': usuario.materia
+                'materia': usuario.materia,
+                'activo': usuario.activo
             })
         
         return jsonify({'usuarios': usuarios_data})
@@ -981,26 +991,28 @@ def admin_actualizar_usuario(usuario_id):
         db.session.rollback()
         return jsonify({'error': f'Error actualizando usuario: {str(e)}'}), 500
 
-@app.route('/api/admin/usuarios/<int:usuario_id>', methods=['DELETE'])
-def admin_eliminar_usuario(usuario_id):
-    """Eliminar usuario."""
+@app.route('/api/admin/usuarios/<int:usuario_id>/toggle-activo', methods=['PATCH'])
+def admin_toggle_activo_usuario(usuario_id):
+    """Activar/Inactivar usuario."""
     try:
         usuario = Usuario.query.get_or_404(usuario_id)
         
-        # Verificar si el usuario tiene préstamos activos
-        prestamos_activos = Prestamo.query.filter_by(usuario_id=usuario_id, estado='prestado').count()
-        if prestamos_activos > 0:
-            return jsonify({'error': 'No se puede eliminar el usuario porque tiene préstamos activos. Debe devolver todos los préstamos antes de eliminar el usuario.'}), 400
+        # Verificar si el usuario tiene préstamos activos antes de inactivar
+        if usuario.activo:  # Si está activo y queremos inactivarlo
+            prestamos_activos = Prestamo.query.filter_by(usuario_id=usuario_id, estado='prestado').count()
+            if prestamos_activos > 0:
+                return jsonify({'error': 'No se puede inactivar el usuario porque tiene préstamos activos. Debe devolver todos los préstamos antes de inactivar el usuario.'}), 400
         
-        nombre_usuario = usuario.nombre
-        db.session.delete(usuario)
+        # Cambiar el estado activo
+        usuario.activo = not usuario.activo
         db.session.commit()
         
-        return jsonify({'mensaje': f'Usuario {nombre_usuario} eliminado exitosamente'})
+        estado_str = "activado" if usuario.activo else "inactivado"
+        return jsonify({'mensaje': f'Usuario {usuario.nombre} {estado_str} exitosamente'})
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': f'Error eliminando usuario: {str(e)}'}), 500
+        return jsonify({'error': f'Error actualizando estado del usuario: {str(e)}'}), 500
 
 @app.route('/api/admin/materias', methods=['GET'])
 def admin_obtener_materias():

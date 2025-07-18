@@ -4122,11 +4122,12 @@ async function cargarSeccionEstudiantes(container) {
             <th>Correo</th>
             <th>Docente</th>
             <th>Materia</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="tabla-estudiantes">
-          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
+          <tr><td colspan="7" class="text-center">Cargando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -4164,11 +4165,12 @@ async function cargarSeccionDocentes(container) {
             <th>Identificación</th>
             <th>Correo</th>
             <th>PIN</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="tabla-docentes">
-          <tr><td colspan="5" class="text-center">Cargando...</td></tr>
+          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -4206,11 +4208,12 @@ async function cargarSeccionLaboratoristas(container) {
             <th>Identificación</th>
             <th>Correo</th>
             <th>PIN</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="tabla-laboratoristas">
-          <tr><td colspan="5" class="text-center">Cargando...</td></tr>
+          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -4296,33 +4299,44 @@ async function cargarUsuarios(tipo, tablaId) {
           `;
         }
         
+        const estadoBadge = usuario.activo 
+          ? '<span class="badge bg-success">Activo</span>' 
+          : '<span class="badge bg-secondary">Inactivo</span>';
+        
+        const toggleAction = usuario.activo 
+          ? `<button class="btn btn-sm btn-outline-warning ms-1" onclick="toggleUsuarioActivo(${usuario.id}, '${usuario.nombre.replace(/'/g, "\\'")}', false)" title="Inactivar usuario">
+               <i class="fas fa-user-slash"></i>
+             </button>`
+          : `<button class="btn btn-sm btn-outline-success ms-1" onclick="toggleUsuarioActivo(${usuario.id}, '${usuario.nombre.replace(/'/g, "\\'")}', true)" title="Activar usuario">
+               <i class="fas fa-user-check"></i>
+             </button>`;
+        
         return `
-          <tr>
+          <tr${usuario.activo ? '' : ' class="table-secondary"'}>
             <td>${usuario.nombre}</td>
             <td>${usuario.identificacion}</td>
             <td>${usuario.correo || '<span class="text-muted">No definido</span>'}</td>
             ${columnasEspecificas}
+            <td>${estadoBadge}</td>
             <td>
               <button class="btn btn-sm btn-outline-primary" onclick="editarUsuario(${usuario.id})">
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarUsuario(${usuario.id}, '${usuario.nombre.replace(/'/g, "\\'")}')">
-                <i class="fas fa-trash"></i>
-              </button>
+              ${toggleAction}
             </td>
           </tr>
         `;
       }).join('');
       console.log(`Tabla ${tablaId} actualizada con ${data.usuarios.length} registros`);
     } else {
-      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '6' : '5'}" class="text-center">No hay ${tipo}s registrados</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center">No hay ${tipo}s registrados</td></tr>`;
       console.log(`No se encontraron ${tipo}s`);
     }
   } catch (error) {
     console.error(`Error cargando ${tipo}s:`, error);
     const tbody = document.getElementById(tablaId);
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '6' : '5'}" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
     }
   }
 }
@@ -4708,39 +4722,43 @@ async function guardarMateria() {
   }
 }
 
-async function eliminarUsuario(id, nombre) {
-  console.log(`Eliminando usuario: ${nombre} (ID: ${id})`);
+// Función eliminada - ahora se usa toggleUsuarioActivo
+
+async function toggleUsuarioActivo(id, nombre, activar) {
+  console.log(`${activar ? 'Activando' : 'Inactivando'} usuario: ${nombre} (ID: ${id})`);
+  
+  const accion = activar ? 'activar' : 'inactivar';
+  const color = activar ? '#28a745' : '#ffc107';
   
   // Crear modal de confirmación personalizado
   const modal = document.createElement('div');
   modal.className = 'modal fade';
-  modal.id = 'modal-confirmar-eliminacion';
+  modal.id = 'modal-confirmar-toggle';
   modal.innerHTML = `
     <div class="modal-dialog">
-      <div class="modal-content" style="background-color: rgba(0, 0, 0, 0.9); color: white; border: 1px solid #FF6600;">
-        <div class="modal-header" style="border-bottom: 2px solid #FF6600;">
-          <h5 class="modal-title" style="color: #FF6600; font-weight: 600;">
-            <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+      <div class="modal-content" style="background-color: rgba(0, 0, 0, 0.9); color: white; border: 1px solid ${color};">
+        <div class="modal-header" style="border-bottom: 2px solid ${color};">
+          <h5 class="modal-title" style="color: ${color}; font-weight: 600;">
+            <i class="fas fa-user-${activar ? 'check' : 'slash'}"></i> ${activar ? 'Activar' : 'Inactivar'} Usuario
           </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body" style="padding: 25px;">
           <p style="font-size: 1.1rem; margin-bottom: 20px;">
-            ¿Está seguro que desea eliminar al usuario?
+            ¿Está seguro que desea ${accion} al usuario?
           </p>
-          <div class="alert alert-warning" style="background-color: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; color: #ffc107;">
+          <div class="alert alert-info" style="background-color: rgba(${activar ? '40, 167, 69' : '255, 193, 7'}, 0.1); border: 1px solid ${color}; color: ${color};">
             <strong>Nombre:</strong> ${nombre}<br>
-            <strong>Advertencia:</strong> Esta acción no se puede deshacer.<br>
-            <strong>Nota:</strong> No se pueden eliminar usuarios con préstamos activos. Todos los préstamos deben estar devueltos.
+            <strong>Acción:</strong> ${activar ? 'El usuario podrá acceder y aparecer en las listas' : 'El usuario no podrá acceder y se ocultará de las listas'}
           </div>
         </div>
-        <div class="modal-footer" style="border-top: 2px solid #FF6600; padding: 20px;">
+        <div class="modal-footer" style="border-top: 2px solid ${color}; padding: 20px;">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" 
                   style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);">
             <i class="fas fa-times"></i> Cancelar
           </button>
-          <button type="button" class="btn btn-danger" onclick="confirmarEliminacion(${id}, '${nombre.replace(/'/g, "\\'")}')">
-            <i class="fas fa-trash"></i> Eliminar Usuario
+          <button type="button" class="btn btn-${activar ? 'success' : 'warning'}" onclick="confirmarToggleUsuario(${id}, '${nombre.replace(/'/g, "\\'")}', ${activar})">
+            <i class="fas fa-user-${activar ? 'check' : 'slash'}"></i> ${activar ? 'Activar' : 'Inactivar'} Usuario
           </button>
         </div>
       </div>
@@ -4756,24 +4774,24 @@ async function eliminarUsuario(id, nombre) {
   });
 }
 
-async function confirmarEliminacion(id, nombre) {
-  console.log(`Confirmando eliminación de usuario: ${nombre} (ID: ${id})`);
+async function confirmarToggleUsuario(id, nombre, activar) {
+  console.log(`Confirmando ${activar ? 'activación' : 'inactivación'} de usuario: ${nombre} (ID: ${id})`);
   
   // Cerrar modal de confirmación
-  const modal = bootstrap.Modal.getInstance(document.getElementById('modal-confirmar-eliminacion'));
+  const modal = bootstrap.Modal.getInstance(document.getElementById('modal-confirmar-toggle'));
   if (modal) {
     modal.hide();
   }
   
   try {
-    const response = await fetch(`/api/admin/usuarios/${id}`, {
-      method: 'DELETE'
+    const response = await fetch(`/api/admin/usuarios/${id}/toggle-activo`, {
+      method: 'PATCH'
     });
     
     const result = await response.json();
     
     if (response.ok) {
-      mostrarNotificacion('Éxito', result.mensaje || 'Usuario eliminado exitosamente', 'success');
+      mostrarNotificacion('Éxito', result.mensaje || `Usuario ${activar ? 'activado' : 'inactivado'} exitosamente`, 'success');
       // Recargar la sección actual
       const activeTab = document.querySelector('#admin-section .btn-group .btn.active');
       if (activeTab) {
@@ -4781,11 +4799,11 @@ async function confirmarEliminacion(id, nombre) {
         cambiarSeccionAdmin(seccion);
       }
     } else {
-      mostrarNotificacion('Error', result.error || 'Error al eliminar el usuario', 'error');
+      mostrarNotificacion('Error', result.error || `Error al ${activar ? 'activar' : 'inactivar'} el usuario`, 'error');
     }
   } catch (error) {
-    console.error('Error al eliminar usuario:', error);
-    mostrarNotificacion('Error', 'Error de conexión al eliminar el usuario', 'error');
+    console.error(`Error al ${activar ? 'activar' : 'inactivar'} usuario:`, error);
+    mostrarNotificacion('Error', `Error de conexión al ${activar ? 'activar' : 'inactivar'} el usuario`, 'error');
   }
 }
 

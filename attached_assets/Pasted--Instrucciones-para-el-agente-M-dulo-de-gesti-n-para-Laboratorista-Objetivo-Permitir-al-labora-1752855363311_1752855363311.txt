@@ -1,0 +1,57 @@
+🔧 Instrucciones para el agente – Módulo de gestión para Laboratorista
+
+Objetivo: Permitir al laboratorista agregar, eliminar y editar datos en las entidades: estudiantes, docentes, laboratoristas y materias.
+
+1️⃣ Estudiantes:
+- Funcionalidad: Agregar, eliminar y editar registros.
+- Campos a editar:
+  • Nombre completo
+  • IDD (identificación)
+  • Correo electrónico
+- El sistema debe interactuar directamente con la base de datos actual (no crear estructuras nuevas), validando unicidad de IDD y formato de correo.
+
+2️⃣ Docentes:
+- Funcionalidad: Agregar, eliminar y editar registros.
+- Campos a editar:
+  • Nombre completo
+  • IDD
+  • Correo electrónico
+- Administrar desde el mismo módulo, aunque estos datos fueron creados dentro del código. Implementar una capa de persistencia (e.g. almacenarlos en BD en lugar de variables en memoria) para permitir edición dinámica.
+
+3️⃣ Laboratoristas:
+- Funcionalidad: Agregar, eliminar y editar.
+- Campos:
+  • Nombre completo (si aplica)
+  • IDD
+  • Correo electrónico
+- Igual que docentes: asegurar persistencia editable.
+
+4️⃣ Materias:
+- Funcionalidad: Agregar, eliminar y editar.
+- Campo: Nombre de la materia (y código si aplica).
+- Garantizar que al eliminar una materia no se pierdan datos de préstamos históricos.
+
+5️⃣ Reglas generales:
+- Validaciones:
+  • IDD único en cada entidad.
+  • Correo en formato válido.
+- Opciones en interfaz:
+  • Listado completo de la entidad.
+  • Botones para 'Agregar', 'Editar', 'Eliminar'.
+  • Confirmaciones antes de eliminar.
+- Persistencia:
+  • Estudiantes: modificar directamente en base de datos actual.
+  • Docentes, laboratoristas, materias: migrar de variables a base de datos o archivo de configuración editable para que los cambios sean permanentes y no requieran modificación de código.
+
+6️⃣ Accesibilidad:
+- Solo usuarios con rol "laboratorista" pueden acceder a este módulo.
+- Registrar en el log de actividad cualquier agregación/eliminación/edición.
+
+---
+
+📂 Integración en Replit:
+- Crear archivo `modulo_gestion_personal.txt` con estas instrucciones.
+- Preparar script en el agente tipo:
+```python
+instructions = open('modulo_gestion_personal.txt').read()
+run_agent(instructions)

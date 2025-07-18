@@ -52,6 +52,13 @@ The application uses four main models:
 - **Subject Analysis**: Most active subjects and materials
 - **Export Capabilities**: PDF and Excel export functionality
 
+### Administrative Module
+- **User Management**: Full CRUD operations for students, teachers, and laboratory staff
+- **Subject Management**: Create, edit, and manage academic subjects with codes and active status
+- **Data Validation**: Unique identification numbers, email format validation, and referential integrity
+- **Laboratory Staff Access**: Administrative functions restricted to authenticated laboratory personnel
+- **Audit Trail**: Activity logging for all administrative operations
+
 ## Data Flow
 
 1. **User Authentication**: Users select type and authenticate (PIN for staff)
@@ -113,6 +120,10 @@ The application uses four main models:
 - July 16, 2025: Fixed teacher dropdown mismatch - synchronized teacher list with database entries, removed non-existent teachers
 - July 16, 2025: Implemented automatic teacher creation - system now creates database entries for any teacher, supports all teachers not just those in database
 - July 16, 2025: Completed full student database import - successfully imported all 337 students from CSV file to reach 342 total students in database
+- July 18, 2025: Implemented comprehensive administrative module for laboratory staff - added full CRUD operations for managing students, teachers, laboratory technicians, and subjects
+- July 18, 2025: Added Subject/Materia model to database schema with proper relationships and validation
+- July 18, 2025: Created complete administrative interface with tabbed navigation for managing all user types and academic subjects
+- July 18, 2025: Initialized database with 15 sample biomedical engineering subjects including proper codes and active status tracking
 
 ## User Preferences
 

@@ -61,6 +61,27 @@ class Elemento(db.Model):
         cantidad_prestada = sum(prestamo.cantidad for prestamo in prestamos_activos)
         return self.cantidad - cantidad_prestada
 
+class Materia(db.Model):
+    """Modelo para materias/asignaturas."""
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False, unique=True)
+    codigo = db.Column(db.String(20), nullable=True)
+    activa = db.Column(db.Boolean, default=True)
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Materia {self.codigo} - {self.nombre}>'
+    
+    def to_dict(self):
+        """Convertir objeto a diccionario."""
+        return {
+            'id': self.id,
+            'nombre': self.nombre,
+            'codigo': self.codigo,
+            'activa': self.activa,
+            'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None
+        }
+
 class Usuario(db.Model):
     """Modelo para usuarios del sistema."""
     id = db.Column(db.Integer, primary_key=True)

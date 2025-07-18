@@ -29,7 +29,7 @@ db.init_app(app)
 
 # Importación tardía para evitar dependencia circular
 with app.app_context():
-    from models import Categoria, Elemento, Usuario, Prestamo
+    from models import Categoria, Elemento, Usuario, Prestamo, Materia
     db.create_all()
     
     # Inicializar inventario automáticamente
@@ -844,6 +844,226 @@ def reporte_productos():
         
     except Exception as e:
         return jsonify({'error': f'Error generando reporte de productos: {str(e)}'}), 500
+
+# =============================================================================
+# MÓDULO DE GESTIÓN ADMINISTRATIVA (Solo para laboratoristas)
+# =============================================================================
+
+@app.route('/api/admin/usuarios', methods=['GET'])
+def admin_obtener_usuarios():
+    """Obtener todos los usuarios por tipo."""
+    try:
+        tipo = request.args.get('tipo', 'todos')
+        
+        if tipo == 'todos':
+            usuarios = Usuario.query.all()
+        else:
+            usuarios = Usuario.query.filter_by(tipo=tipo).all()
+        
+        usuarios_data = []
+        for usuario in usuarios:
+            usuarios_data.append({
+                'id': usuario.id,
+                'tipo': usuario.tipo,
+                'nombre': usuario.nombre,
+                'identificacion': usuario.identificacion,
+                'correo': usuario.correo,
+                'pin': usuario.pin,
+                'docente': usuario.docente,
+                'materia': usuario.materia
+            })
+        
+        return jsonify({'usuarios': usuarios_data})
+        
+    except Exception as e:
+        return jsonify({'error': f'Error obteniendo usuarios: {str(e)}'}), 500
+
+@app.route('/api/admin/usuarios', methods=['POST'])
+def admin_crear_usuario():
+    """Crear nuevo usuario."""
+    try:
+        data = request.json
+        
+        # Validar datos requeridos
+        if not all(k in data for k in ('tipo', 'nombre', 'identificacion')):
+            return jsonify({'error': 'Datos incompletos'}), 400
+        
+        # Validar que la identificación no exista
+        if Usuario.query.filter_by(identificacion=data['identificacion']).first():
+            return jsonify({'error': 'La identificación ya existe'}), 400
+        
+        # Validar email si se proporciona
+        if data.get('correo'):
+            import re
+            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(email_pattern, data['correo']):
+                return jsonify({'error': 'Formato de correo inválido'}), 400
+        
+        # Crear usuario
+        usuario = Usuario(
+            tipo=data['tipo'],
+            nombre=data['nombre'],
+            identificacion=data['identificacion'],
+            correo=data.get('correo'),
+            pin=data.get('pin'),
+            docente=data.get('docente'),
+            materia=data.get('materia')
+        )
+        
+        db.session.add(usuario)
+        db.session.commit()
+        
+        return jsonify({'mensaje': 'Usuario creado exitosamente', 'usuario': usuario.to_dict()})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Error creando usuario: {str(e)}'}), 500
+
+@app.route('/api/admin/usuarios/<int:usuario_id>', methods=['PUT'])
+def admin_actualizar_usuario(usuario_id):
+    """Actualizar usuario existente."""
+    try:
+        usuario = Usuario.query.get_or_404(usuario_id)
+        data = request.json
+        
+        # Validar identificación única si se cambió
+        if 'identificacion' in data and data['identificacion'] != usuario.identificacion:
+            if Usuario.query.filter_by(identificacion=data['identificacion']).first():
+                return jsonify({'error': 'La identificación ya existe'}), 400
+        
+        # Validar email si se proporciona
+        if data.get('correo'):
+            import re
+            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(email_pattern, data['correo']):
+                return jsonify({'error': 'Formato de correo inválido'}), 400
+        
+        # Actualizar campos
+        if 'nombre' in data:
+            usuario.nombre = data['nombre']
+        if 'identificacion' in data:
+            usuario.identificacion = data['identificacion']
+        if 'correo' in data:
+            usuario.correo = data['correo']
+        if 'pin' in data:
+            usuario.pin = data['pin']
+        if 'docente' in data:
+            usuario.docente = data['docente']
+        if 'materia' in data:
+            usuario.materia = data['materia']
+        
+        db.session.commit()
+        
+        return jsonify({'mensaje': 'Usuario actualizado exitosamente', 'usuario': usuario.to_dict()})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Error actualizando usuario: {str(e)}'}), 500
+
+@app.route('/api/admin/usuarios/<int:usuario_id>', methods=['DELETE'])
+def admin_eliminar_usuario(usuario_id):
+    """Eliminar usuario."""
+    try:
+        usuario = Usuario.query.get_or_404(usuario_id)
+        
+        # Verificar si el usuario tiene préstamos activos
+        prestamos_activos = Prestamo.query.filter_by(usuario_id=usuario_id, estado='prestado').count()
+        if prestamos_activos > 0:
+            return jsonify({'error': 'No se puede eliminar el usuario porque tiene préstamos activos'}), 400
+        
+        nombre_usuario = usuario.nombre
+        db.session.delete(usuario)
+        db.session.commit()
+        
+        return jsonify({'mensaje': f'Usuario {nombre_usuario} eliminado exitosamente'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Error eliminando usuario: {str(e)}'}), 500
+
+@app.route('/api/admin/materias', methods=['GET'])
+def admin_obtener_materias():
+    """Obtener todas las materias."""
+    try:
+        materias = Materia.query.all()
+        return jsonify({'materias': [materia.to_dict() for materia in materias]})
+        
+    except Exception as e:
+        return jsonify({'error': f'Error obteniendo materias: {str(e)}'}), 500
+
+@app.route('/api/admin/materias', methods=['POST'])
+def admin_crear_materia():
+    """Crear nueva materia."""
+    try:
+        data = request.json
+        
+        # Validar datos requeridos
+        if not data.get('nombre'):
+            return jsonify({'error': 'El nombre de la materia es requerido'}), 400
+        
+        # Validar que el nombre no exista
+        if Materia.query.filter_by(nombre=data['nombre']).first():
+            return jsonify({'error': 'Ya existe una materia con este nombre'}), 400
+        
+        # Crear materia
+        materia = Materia(
+            nombre=data['nombre'],
+            codigo=data.get('codigo'),
+            activa=data.get('activa', True)
+        )
+        
+        db.session.add(materia)
+        db.session.commit()
+        
+        return jsonify({'mensaje': 'Materia creada exitosamente', 'materia': materia.to_dict()})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Error creando materia: {str(e)}'}), 500
+
+@app.route('/api/admin/materias/<int:materia_id>', methods=['PUT'])
+def admin_actualizar_materia(materia_id):
+    """Actualizar materia existente."""
+    try:
+        materia = Materia.query.get_or_404(materia_id)
+        data = request.json
+        
+        # Validar nombre único si se cambió
+        if 'nombre' in data and data['nombre'] != materia.nombre:
+            if Materia.query.filter_by(nombre=data['nombre']).first():
+                return jsonify({'error': 'Ya existe una materia con este nombre'}), 400
+        
+        # Actualizar campos
+        if 'nombre' in data:
+            materia.nombre = data['nombre']
+        if 'codigo' in data:
+            materia.codigo = data['codigo']
+        if 'activa' in data:
+            materia.activa = data['activa']
+        
+        db.session.commit()
+        
+        return jsonify({'mensaje': 'Materia actualizada exitosamente', 'materia': materia.to_dict()})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Error actualizando materia: {str(e)}'}), 500
+
+@app.route('/api/admin/materias/<int:materia_id>', methods=['DELETE'])
+def admin_eliminar_materia(materia_id):
+    """Eliminar materia (marcar como inactiva para preservar historial)."""
+    try:
+        materia = Materia.query.get_or_404(materia_id)
+        
+        # En lugar de eliminar, marcar como inactiva para preservar historial
+        materia.activa = False
+        db.session.commit()
+        
+        return jsonify({'mensaje': f'Materia {materia.nombre} desactivada exitosamente'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Error eliminando materia: {str(e)}'}), 500
 
 # Punto de entrada
 if __name__ == '__main__':

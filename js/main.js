@@ -559,11 +559,18 @@ function cargarInterfazPrincipal() {
             </div>
           </div>
           <div class="row">
-            <div class="col-md-12 mb-3">
+            <div class="col-md-6 mb-3">
               <div class="panel-module">
                 <h3 class="module-title">REPORTES Y ESTADÍSTICAS</h3>
                 <p class="module-desc">Generar reportes detallados del laboratorio</p>
                 <button class="btn btn-success" onclick="mostrarModuloReportes()">GENERAR REPORTES</button>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="panel-module">
+                <h3 class="module-title">ADMINISTRAR USUARIOS</h3>
+                <p class="module-desc">Gestionar estudiantes, docentes y materias</p>
+                <button class="btn btn-warning" onclick="mostrarModuloAdmin()">ADMINISTRAR SISTEMA</button>
               </div>
             </div>
           </div>
@@ -3957,4 +3964,550 @@ function actualizarReportesEnTiempoReal() {
   } else {
     console.log('No se encontró reporte activo para actualizar');
   }
+}
+
+// =============================================================================
+// MÓDULO DE ADMINISTRACIÓN DE USUARIOS Y MATERIAS
+// =============================================================================
+
+function mostrarModuloAdmin() {
+  // Ocultar interfaz principal
+  document.getElementById('interface').style.display = 'none';
+  
+  // Crear sección de administración
+  const adminSection = document.createElement('section');
+  adminSection.id = 'admin-section';
+  adminSection.className = 'my-5';
+  
+  adminSection.innerHTML = `
+    <div class="panel-container">
+      <div class="panel-header d-flex justify-content-between align-items-center">
+        <h2 class="panel-title">ADMINISTRACIÓN DEL SISTEMA</h2>
+        <button class="btn btn-sm btn-outline-light" onclick="volverDesdeAdmin()">Volver</button>
+      </div>
+      <div class="panel-content">
+        <!-- Navegación entre secciones -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="btn-group w-100" role="group">
+              <button class="btn btn-outline-light active" id="admin-nav-estudiantes" onclick="cambiarSeccionAdmin('estudiantes')">
+                Estudiantes
+              </button>
+              <button class="btn btn-outline-light" id="admin-nav-docentes" onclick="cambiarSeccionAdmin('docentes')">
+                Docentes
+              </button>
+              <button class="btn btn-outline-light" id="admin-nav-laboratoristas" onclick="cambiarSeccionAdmin('laboratoristas')">
+                Laboratoristas
+              </button>
+              <button class="btn btn-outline-light" id="admin-nav-materias" onclick="cambiarSeccionAdmin('materias')">
+                Materias
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Área de contenido dinámico -->
+        <div id="admin-content">
+          <!-- El contenido se carga dinámicamente -->
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Agregar a la página
+  document.getElementById('interface').insertAdjacentElement('afterend', adminSection);
+  
+  // Cargar sección inicial
+  cambiarSeccionAdmin('estudiantes');
+}
+
+function volverDesdeAdmin() {
+  // Eliminar sección de administración
+  const adminSection = document.getElementById('admin-section');
+  if (adminSection) {
+    adminSection.remove();
+  }
+  
+  // Mostrar interfaz principal
+  document.getElementById('interface').style.display = 'block';
+}
+
+function cambiarSeccionAdmin(seccion) {
+  // Actualizar botones de navegación
+  document.querySelectorAll('#admin-section .btn-group .btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.getElementById(`admin-nav-${seccion}`).classList.add('active');
+  
+  // Cargar contenido de la sección
+  const contentDiv = document.getElementById('admin-content');
+  
+  switch(seccion) {
+    case 'estudiantes':
+      cargarSeccionEstudiantes(contentDiv);
+      break;
+    case 'docentes':
+      cargarSeccionDocentes(contentDiv);
+      break;
+    case 'laboratoristas':
+      cargarSeccionLaboratoristas(contentDiv);
+      break;
+    case 'materias':
+      cargarSeccionMaterias(contentDiv);
+      break;
+  }
+}
+
+async function cargarSeccionEstudiantes(container) {
+  container.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3>Gestión de Estudiantes</h3>
+      <button class="btn btn-success" onclick="mostrarFormularioUsuario('estudiante')">
+        <i class="fas fa-plus"></i> Agregar Estudiante
+      </button>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Identificación</th>
+            <th>Correo</th>
+            <th>Docente</th>
+            <th>Materia</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-estudiantes">
+          <tr><td colspan="7" class="text-center">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  // Cargar datos
+  await cargarUsuarios('estudiante', 'tabla-estudiantes');
+}
+
+async function cargarSeccionDocentes(container) {
+  container.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3>Gestión de Docentes</h3>
+      <button class="btn btn-success" onclick="mostrarFormularioUsuario('docente')">
+        <i class="fas fa-plus"></i> Agregar Docente
+      </button>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Identificación</th>
+            <th>Correo</th>
+            <th>PIN</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-docentes">
+          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  // Cargar datos
+  await cargarUsuarios('docente', 'tabla-docentes');
+}
+
+async function cargarSeccionLaboratoristas(container) {
+  container.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3>Gestión de Laboratoristas</h3>
+      <button class="btn btn-success" onclick="mostrarFormularioUsuario('laboratorista')">
+        <i class="fas fa-plus"></i> Agregar Laboratorista
+      </button>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Identificación</th>
+            <th>Correo</th>
+            <th>PIN</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-laboratoristas">
+          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  // Cargar datos
+  await cargarUsuarios('laboratorista', 'tabla-laboratoristas');
+}
+
+async function cargarSeccionMaterias(container) {
+  container.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3>Gestión de Materias</h3>
+      <button class="btn btn-success" onclick="mostrarFormularioMateria()">
+        <i class="fas fa-plus"></i> Agregar Materia
+      </button>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Código</th>
+            <th>Estado</th>
+            <th>Fecha Creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-materias">
+          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  // Cargar datos
+  await cargarMaterias();
+}
+
+async function cargarUsuarios(tipo, tablaId) {
+  try {
+    const response = await fetch(`/api/admin/usuarios?tipo=${tipo}`);
+    const data = await response.json();
+    
+    const tbody = document.getElementById(tablaId);
+    
+    if (data.usuarios && data.usuarios.length > 0) {
+      tbody.innerHTML = data.usuarios.map(usuario => {
+        let columnasEspecificas = '';
+        
+        if (tipo === 'estudiante') {
+          columnasEspecificas = `
+            <td>${usuario.docente || 'N/A'}</td>
+            <td>${usuario.materia || 'N/A'}</td>
+          `;
+        } else {
+          columnasEspecificas = `
+            <td>${usuario.pin || 'N/A'}</td>
+          `;
+        }
+        
+        return `
+          <tr>
+            <td>${usuario.id}</td>
+            <td>${usuario.nombre}</td>
+            <td>${usuario.identificacion}</td>
+            <td>${usuario.correo || 'N/A'}</td>
+            ${columnasEspecificas}
+            <td>
+              <button class="btn btn-sm btn-outline-primary" onclick="editarUsuario(${usuario.id})">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarUsuario(${usuario.id}, '${usuario.nombre}')">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    } else {
+      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center">No hay ${tipo}s registrados</td></tr>`;
+    }
+  } catch (error) {
+    console.error(`Error cargando ${tipo}s:`, error);
+    const tbody = document.getElementById(tablaId);
+    tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center text-danger">Error al cargar datos</td></tr>`;
+  }
+}
+
+async function cargarMaterias() {
+  try {
+    const response = await fetch('/api/admin/materias');
+    const data = await response.json();
+    
+    const tbody = document.getElementById('tabla-materias');
+    
+    if (data.materias && data.materias.length > 0) {
+      tbody.innerHTML = data.materias.map(materia => `
+        <tr>
+          <td>${materia.id}</td>
+          <td>${materia.nombre}</td>
+          <td>${materia.codigo || 'N/A'}</td>
+          <td>
+            <span class="badge ${materia.activa ? 'bg-success' : 'bg-secondary'}">
+              ${materia.activa ? 'Activa' : 'Inactiva'}
+            </span>
+          </td>
+          <td>${materia.fecha_creacion ? new Date(materia.fecha_creacion).toLocaleDateString() : 'N/A'}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary" onclick="editarMateria(${materia.id})">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarMateria(${materia.id}, '${materia.nombre}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay materias registradas</td></tr>';
+    }
+  } catch (error) {
+    console.error('Error cargando materias:', error);
+    const tbody = document.getElementById('tabla-materias');
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar datos</td></tr>';
+  }
+}
+
+function mostrarFormularioUsuario(tipo) {
+  const modal = document.createElement('div');
+  modal.className = 'modal fade';
+  modal.id = 'modal-usuario';
+  modal.tabIndex = -1;
+  modal.innerHTML = `
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="form-usuario">
+            <div class="mb-3">
+              <label class="form-label">Nombre Completo</label>
+              <input type="text" class="form-control" name="nombre" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Identificación</label>
+              <input type="text" class="form-control" name="identificacion" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Correo Electrónico</label>
+              <input type="email" class="form-control" name="correo">
+            </div>
+            ${tipo !== 'estudiante' ? `
+              <div class="mb-3">
+                <label class="form-label">PIN</label>
+                <input type="text" class="form-control" name="pin">
+              </div>
+            ` : `
+              <div class="mb-3">
+                <label class="form-label">Docente</label>
+                <input type="text" class="form-control" name="docente">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Materia</label>
+                <input type="text" class="form-control" name="materia">
+              </div>
+            `}
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" onclick="guardarUsuario('${tipo}')">Guardar</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  const bootstrapModal = new bootstrap.Modal(modal);
+  bootstrapModal.show();
+  
+  modal.addEventListener('hidden.bs.modal', () => {
+    document.body.removeChild(modal);
+  });
+}
+
+function mostrarFormularioMateria() {
+  const modal = document.createElement('div');
+  modal.className = 'modal fade';
+  modal.id = 'modal-materia';
+  modal.tabIndex = -1;
+  modal.innerHTML = `
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar Materia</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="form-materia">
+            <div class="mb-3">
+              <label class="form-label">Nombre de la Materia</label>
+              <input type="text" class="form-control" name="nombre" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Código</label>
+              <input type="text" class="form-control" name="codigo">
+            </div>
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="activa" checked>
+                <label class="form-check-label">Materia Activa</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" onclick="guardarMateria()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  const bootstrapModal = new bootstrap.Modal(modal);
+  bootstrapModal.show();
+  
+  modal.addEventListener('hidden.bs.modal', () => {
+    document.body.removeChild(modal);
+  });
+}
+
+async function guardarUsuario(tipo) {
+  const form = document.getElementById('form-usuario');
+  const formData = new FormData(form);
+  
+  const data = {
+    tipo: tipo,
+    nombre: formData.get('nombre'),
+    identificacion: formData.get('identificacion'),
+    correo: formData.get('correo')
+  };
+  
+  if (tipo !== 'estudiante') {
+    data.pin = formData.get('pin');
+  } else {
+    data.docente = formData.get('docente');
+    data.materia = formData.get('materia');
+  }
+  
+  try {
+    const response = await fetch('/api/admin/usuarios', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      mostrarNotificacion('Éxito', result.mensaje, 'success');
+      bootstrap.Modal.getInstance(document.getElementById('modal-usuario')).hide();
+      cambiarSeccionAdmin(tipo + 's');
+    } else {
+      mostrarNotificacion('Error', result.error, 'error');
+    }
+  } catch (error) {
+    mostrarNotificacion('Error', 'Error al guardar el usuario', 'error');
+  }
+}
+
+async function guardarMateria() {
+  const form = document.getElementById('form-materia');
+  const formData = new FormData(form);
+  
+  const data = {
+    nombre: formData.get('nombre'),
+    codigo: formData.get('codigo'),
+    activa: formData.has('activa')
+  };
+  
+  try {
+    const response = await fetch('/api/admin/materias', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      mostrarNotificacion('Éxito', result.mensaje, 'success');
+      bootstrap.Modal.getInstance(document.getElementById('modal-materia')).hide();
+      cambiarSeccionAdmin('materias');
+    } else {
+      mostrarNotificacion('Error', result.error, 'error');
+    }
+  } catch (error) {
+    mostrarNotificacion('Error', 'Error al guardar la materia', 'error');
+  }
+}
+
+async function eliminarUsuario(id, nombre) {
+  if (confirm(`¿Está seguro que desea eliminar al usuario "${nombre}"?`)) {
+    try {
+      const response = await fetch(`/api/admin/usuarios/${id}`, {
+        method: 'DELETE'
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        mostrarNotificacion('Éxito', result.mensaje, 'success');
+        // Recargar la sección actual
+        const activeTab = document.querySelector('#admin-section .btn-group .btn.active');
+        if (activeTab) {
+          const seccion = activeTab.id.replace('admin-nav-', '');
+          cambiarSeccionAdmin(seccion);
+        }
+      } else {
+        mostrarNotificacion('Error', result.error, 'error');
+      }
+    } catch (error) {
+      mostrarNotificacion('Error', 'Error al eliminar el usuario', 'error');
+    }
+  }
+}
+
+async function eliminarMateria(id, nombre) {
+  if (confirm(`¿Está seguro que desea eliminar la materia "${nombre}"?`)) {
+    try {
+      const response = await fetch(`/api/admin/materias/${id}`, {
+        method: 'DELETE'
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        mostrarNotificacion('Éxito', result.mensaje, 'success');
+        cambiarSeccionAdmin('materias');
+      } else {
+        mostrarNotificacion('Error', result.error, 'error');
+      }
+    } catch (error) {
+      mostrarNotificacion('Error', 'Error al eliminar la materia', 'error');
+    }
+  }
+}
+
+function editarUsuario(id) {
+  mostrarNotificacion('Información', 'Función de edición en desarrollo', 'info');
+}
+
+function editarMateria(id) {
+  mostrarNotificacion('Información', 'Función de edición en desarrollo', 'info');
 }

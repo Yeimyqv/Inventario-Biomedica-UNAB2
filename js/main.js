@@ -592,18 +592,25 @@ function cargarInterfazPrincipal() {
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
               <div class="panel-module">
                 <h3 class="module-title">REPORTES Y ESTADÍSTICAS</h3>
                 <p class="module-desc">Generar reportes detallados del laboratorio</p>
                 <button class="btn btn-success" onclick="mostrarModuloReportes()">GENERAR REPORTES</button>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
               <div class="panel-module">
                 <h3 class="module-title">ADMINISTRAR USUARIOS</h3>
                 <p class="module-desc">Gestionar estudiantes, docentes y materias</p>
                 <button class="btn btn-warning" onclick="mostrarModuloAdmin()">ADMINISTRAR SISTEMA</button>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="panel-module">
+                <h3 class="module-title">REINICIAR PRÉSTAMOS</h3>
+                <p class="module-desc">Eliminar todos los préstamos y empezar de cero</p>
+                <button class="btn btn-danger" onclick="reiniciarPrestamos()">REINICIAR SISTEMA</button>
               </div>
             </div>
           </div>
@@ -617,6 +624,153 @@ function cargarInterfazPrincipal() {
   }
   
   interfaz.innerHTML = contenido;
+}
+
+// Función para reiniciar todos los préstamos (solo laboratoristas)
+async function reiniciarPrestamos() {
+  if (currentUser.tipo !== 'laboratorista') {
+    mostrarNotificacion('Error', 'Solo los laboratoristas pueden reiniciar el sistema de préstamos', 'error');
+    return;
+  }
+  
+  // Primero obtener estadísticas actuales
+  try {
+    const response = await fetch('/api/reportes/prestamos');
+    const data = await response.json();
+    const totalPrestamos = data.prestamos ? data.prestamos.length : 0;
+    const prestamosActivos = data.prestamos ? data.prestamos.filter(p => p.estado === 'prestado').length : 0;
+    
+    // Crear modal de confirmación
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'custom-modal-overlay';
+    
+    const modal = document.createElement('div');
+    modal.className = 'custom-modal';
+    
+    modal.innerHTML = `
+      <div class="custom-modal-header danger">
+        <h3>⚠️ REINICIAR SISTEMA DE PRÉSTAMOS</h3>
+      </div>
+      <div class="custom-modal-body">
+        <div class="alert alert-danger mb-3">
+          <strong>¡ATENCIÓN!</strong> Esta acción eliminará TODOS los registros de préstamos del sistema.
+        </div>
+        <div class="mb-3">
+          <p><strong>Estadísticas actuales:</strong></p>
+          <ul>
+            <li>Total de préstamos en el sistema: <strong>${totalPrestamos}</strong></li>
+            <li>Préstamos activos (no devueltos): <strong>${prestamosActivos}</strong></li>
+            <li>Préstamos devueltos: <strong>${totalPrestamos - prestamosActivos}</strong></li>
+          </ul>
+        </div>
+        <div class="mb-3">
+          <p><strong>Esta acción:</strong></p>
+          <ul>
+            <li>❌ Eliminará todos los registros de préstamos</li>
+            <li>❌ Eliminará todo el historial de devoluciones</li>
+            <li>❌ Reiniciará todas las estadísticas</li>
+            <li>✅ Mantendrá el inventario y usuarios intactos</li>
+            <li>✅ Restaurará todas las cantidades disponibles</li>
+          </ul>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Para confirmar, escribe <strong>REINICIAR</strong> en el campo:</label>
+          <input type="text" class="form-control" id="confirmar-reinicio" placeholder="Escribe REINICIAR para confirmar">
+        </div>
+      </div>
+      <div class="custom-modal-footer">
+        <button class="custom-btn custom-btn-secondary" id="cancelar-reinicio-btn">Cancelar</button>
+        <button class="custom-btn custom-btn-danger" id="confirmar-reinicio-btn" disabled>REINICIAR SISTEMA</button>
+      </div>
+    `;
+    
+    modalOverlay.appendChild(modal);
+    document.getElementById('custom-modal-container').appendChild(modalOverlay);
+    
+    // Animar entrada
+    setTimeout(() => {
+      modalOverlay.classList.add('active');
+      modal.classList.add('active');
+    }, 10);
+    
+    // Habilitar botón de confirmación solo si se escribe "REINICIAR"
+    const confirmarInput = document.getElementById('confirmar-reinicio');
+    const confirmarBtn = document.getElementById('confirmar-reinicio-btn');
+    
+    confirmarInput.addEventListener('input', function() {
+      confirmarBtn.disabled = this.value.trim().toUpperCase() !== 'REINICIAR';
+    });
+    
+    // Manejar cancelación
+    document.getElementById('cancelar-reinicio-btn').addEventListener('click', function() {
+      modalOverlay.classList.remove('active');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modalOverlay.remove();
+      }, 300);
+    });
+    
+    // Manejar confirmación
+    confirmarBtn.addEventListener('click', async function() {
+      try {
+        // Deshabilitar botón para evitar múltiples clics
+        confirmarBtn.disabled = true;
+        confirmarBtn.textContent = 'Procesando...';
+        
+        // Llamar a la API para reiniciar préstamos
+        const resetResponse = await fetch('/api/admin/reiniciar-prestamos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            laboratorista_id: currentUser.id,
+            laboratorista_nombre: currentUser.nombre
+          })
+        });
+        
+        if (resetResponse.ok) {
+          const resultado = await resetResponse.json();
+          
+          // Cerrar modal
+          modalOverlay.classList.remove('active');
+          modal.classList.remove('active');
+          setTimeout(() => {
+            modalOverlay.remove();
+          }, 300);
+          
+          // Mostrar notificación de éxito
+          mostrarNotificacion(
+            'Éxito', 
+            `Sistema reiniciado exitosamente. Se eliminaron ${resultado.prestamos_eliminados} préstamos y se restauraron ${resultado.elementos_restaurados} elementos.`, 
+            'success', 
+            8000
+          );
+          
+          // Recargar la página para actualizar todos los datos
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+          
+        } else {
+          const error = await resetResponse.json();
+          throw new Error(error.message || 'Error al reiniciar el sistema');
+        }
+        
+      } catch (error) {
+        console.error('Error reiniciando sistema:', error);
+        mostrarNotificacion('Error', `Error al reiniciar el sistema: ${error.message}`, 'error');
+        
+        // Reactivar botón
+        confirmarBtn.disabled = false;
+        confirmarBtn.textContent = 'REINICIAR SISTEMA';
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error obteniendo estadísticas:', error);
+    mostrarNotificacion('Error', 'Error al obtener estadísticas del sistema', 'error');
+  }
 }
 
 // Iniciar proceso de préstamo

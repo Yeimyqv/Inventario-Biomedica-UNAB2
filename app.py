@@ -1121,6 +1121,59 @@ def admin_eliminar_materia(materia_id):
         db.session.rollback()
         return jsonify({'error': f'Error eliminando materia: {str(e)}'}), 500
 
+@app.route('/api/admin/reiniciar-prestamos', methods=['POST'])
+def admin_reiniciar_prestamos():
+    """Reiniciar sistema de préstamos - eliminar todos los préstamos y restaurar cantidades."""
+    try:
+        data = request.json
+        laboratorista_id = data.get('laboratorista_id')
+        laboratorista_nombre = data.get('laboratorista_nombre')
+        
+        # Verificar que solo laboratoristas pueden ejecutar esta acción
+        laboratorista = Usuario.query.filter_by(id=laboratorista_id, tipo='laboratorista', activo=True).first()
+        if not laboratorista:
+            return jsonify({'error': 'Solo los laboratoristas pueden reiniciar el sistema'}), 403
+        
+        # Obtener estadísticas antes de la eliminación
+        total_prestamos = Prestamo.query.count()
+        prestamos_activos = Prestamo.query.filter_by(estado='prestado').count()
+        
+        # Obtener todos los préstamos activos para restaurar cantidades
+        prestamos_activos_data = Prestamo.query.filter_by(estado='prestado').all()
+        
+        # Restaurar cantidades de elementos prestados
+        elementos_restaurados = 0
+        for prestamo in prestamos_activos_data:
+            elemento = Elemento.query.get(prestamo.elemento_id)
+            if elemento:
+                # Restaurar la cantidad prestada
+                elemento.cantidad += prestamo.cantidad
+                elementos_restaurados += 1
+        
+        # Eliminar TODOS los préstamos (activos y devueltos)
+        Prestamo.query.delete()
+        
+        # Commit todas las transacciones
+        db.session.commit()
+        
+        # Log de la operación
+        print(f"REINICIO DE SISTEMA ejecutado por {laboratorista_nombre} (ID: {laboratorista_id})")
+        print(f"- Préstamos eliminados: {total_prestamos}")
+        print(f"- Elementos restaurados: {elementos_restaurados}")
+        
+        return jsonify({
+            'mensaje': 'Sistema de préstamos reiniciado exitosamente',
+            'prestamos_eliminados': total_prestamos,
+            'elementos_restaurados': elementos_restaurados,
+            'prestamos_activos_restaurados': prestamos_activos,
+            'ejecutado_por': laboratorista_nombre
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error reiniciando sistema: {str(e)}")
+        return jsonify({'error': f'Error reiniciando sistema: {str(e)}'}), 500
+
 # Punto de entrada
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

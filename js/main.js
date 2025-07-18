@@ -4730,7 +4730,8 @@ async function eliminarUsuario(id, nombre) {
           </p>
           <div class="alert alert-warning" style="background-color: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; color: #ffc107;">
             <strong>Nombre:</strong> ${nombre}<br>
-            <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+            <strong>Advertencia:</strong> Esta acción no se puede deshacer.<br>
+            <strong>Nota:</strong> No se pueden eliminar usuarios con historial de préstamos en el sistema.
           </div>
         </div>
         <div class="modal-footer" style="border-top: 2px solid #FF6600; padding: 20px;">

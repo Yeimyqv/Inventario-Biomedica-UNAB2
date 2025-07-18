@@ -402,6 +402,50 @@ body {
   margin-bottom: 20px;
 }
 
+/* Estilos para formularios modales */
+.modal-content .form-control:focus {
+  border-color: #45d509;
+  box-shadow: 0 0 0 0.2rem rgba(69, 213, 9, 0.25);
+}
+
+.modal-content .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.modal-content .form-control:focus::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.modal-content .form-text {
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+.modal-content .form-label {
+  margin-bottom: 8px;
+  display: block;
+}
+
+.modal-content .form-label i {
+  margin-right: 8px;
+  width: 16px;
+  text-align: center;
+}
+
+.modal-content .text-danger {
+  color: #FF6600 !important;
+}
+
+.modal-content .btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.modal-content .btn-success:disabled {
+  background-color: #45d509 !important;
+  border-color: #45d509 !important;
+}
+
 /* Responsividad */
 @media (max-width: 768px) {
   .panel-title {

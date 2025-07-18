@@ -4344,51 +4344,115 @@ async function cargarMaterias() {
 }
 
 function mostrarFormularioUsuario(tipo) {
+  console.log(`Mostrando formulario para: ${tipo}`);
+  
+  // Eliminar modal existente si existe
+  const existingModal = document.getElementById('modal-usuario');
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
   const modal = document.createElement('div');
   modal.className = 'modal fade';
   modal.id = 'modal-usuario';
   modal.tabIndex = -1;
   modal.innerHTML = `
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Agregar ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="background-color: rgba(0, 0, 0, 0.9); color: white; border: 1px solid #45d509;">
+        <div class="modal-header" style="border-bottom: 2px solid #45d509;">
+          <h5 class="modal-title" style="color: #45d509; font-weight: 600;">
+            <i class="fas fa-user-plus"></i> Agregar ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" style="padding: 25px;">
           <form id="form-usuario">
-            <div class="mb-3">
-              <label class="form-label">Nombre Completo</label>
-              <input type="text" class="form-control" name="nombre" required>
+            <div class="mb-4">
+              <label class="form-label" style="color: white; font-weight: 600;">
+                <i class="fas fa-user"></i> Nombre Completo <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control" name="nombre" required 
+                     style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                     placeholder="Ingrese el nombre completo">
+              <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
+                Ejemplo: GARCÍA MARTÍNEZ JUAN CARLOS
+              </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Identificación</label>
-              <input type="text" class="form-control" name="identificacion" required>
+            
+            <div class="mb-4">
+              <label class="form-label" style="color: white; font-weight: 600;">
+                <i class="fas fa-id-card"></i> Identificación <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control" name="identificacion" required 
+                     style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                     placeholder="${tipo === 'estudiante' ? 'U00123456' : 'Identificación'}">
+              <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
+                ${tipo === 'estudiante' ? 'Formato: U00 seguido de 6 dígitos' : 'Identificación única del usuario'}
+              </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Correo Electrónico</label>
-              <input type="email" class="form-control" name="correo">
+            
+            <div class="mb-4">
+              <label class="form-label" style="color: white; font-weight: 600;">
+                <i class="fas fa-envelope"></i> Correo Electrónico <span class="text-danger">*</span>
+              </label>
+              <input type="email" class="form-control" name="correo" required 
+                     style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                     placeholder="usuario@unab.edu.co">
+              <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
+                Correo electrónico institucional
+              </div>
             </div>
+            
             ${tipo !== 'estudiante' ? `
-              <div class="mb-3">
-                <label class="form-label">PIN</label>
-                <input type="text" class="form-control" name="pin">
+              <div class="mb-4">
+                <label class="form-label" style="color: white; font-weight: 600;">
+                  <i class="fas fa-key"></i> PIN de Acceso
+                </label>
+                <input type="password" class="form-control" name="pin" 
+                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                       placeholder="PIN de 4 dígitos">
+                <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
+                  PIN numérico para autenticación (opcional)
+                </div>
               </div>
-            ` : `
-              <div class="mb-3">
-                <label class="form-label">Docente</label>
-                <input type="text" class="form-control" name="docente">
+            ` : ''}
+            
+            ${tipo === 'estudiante' ? `
+              <div class="mb-4">
+                <label class="form-label" style="color: white; font-weight: 600;">
+                  <i class="fas fa-chalkboard-teacher"></i> Docente Asignado
+                </label>
+                <input type="text" class="form-control" name="docente" 
+                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                       placeholder="Nombre del docente (opcional)">
+                <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
+                  Docente responsable del estudiante
+                </div>
               </div>
-              <div class="mb-3">
-                <label class="form-label">Materia</label>
-                <input type="text" class="form-control" name="materia">
+              
+              <div class="mb-4">
+                <label class="form-label" style="color: white; font-weight: 600;">
+                  <i class="fas fa-book"></i> Materia
+                </label>
+                <input type="text" class="form-control" name="materia" 
+                       style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid #45d509; color: white;"
+                       placeholder="Nombre de la materia (opcional)">
+                <div class="form-text" style="color: rgba(255, 255, 255, 0.7);">
+                  Materia en la que está inscrito el estudiante
+                </div>
               </div>
-            `}
+            ` : ''}
           </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" onclick="guardarUsuario('${tipo}')">Guardar</button>
+        <div class="modal-footer" style="border-top: 2px solid #45d509; padding: 20px;">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" 
+                  style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-success" onclick="guardarUsuario('${tipo}')" 
+                  style="background-color: #45d509; border-color: #45d509; color: #000; font-weight: 600;">
+            <i class="fas fa-save"></i> Guardar ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+          </button>
         </div>
       </div>
     </div>
@@ -4397,6 +4461,38 @@ function mostrarFormularioUsuario(tipo) {
   document.body.appendChild(modal);
   const bootstrapModal = new bootstrap.Modal(modal);
   bootstrapModal.show();
+  
+  // Agregar validación en tiempo real para el formato de identificación
+  if (tipo === 'estudiante') {
+    const identificacionInput = modal.querySelector('input[name="identificacion"]');
+    identificacionInput.addEventListener('input', function() {
+      const value = this.value.toUpperCase();
+      this.value = value;
+      
+      // Validar formato U00 seguido de 6 dígitos
+      const regex = /^U00\d{6}$/;
+      if (value && !regex.test(value)) {
+        this.style.borderColor = '#FF6600';
+        this.nextElementSibling.style.color = '#FF6600';
+        this.nextElementSibling.textContent = 'Formato inválido. Debe ser U00 seguido de 6 dígitos (ej: U00123456)';
+      } else {
+        this.style.borderColor = '#45d509';
+        this.nextElementSibling.style.color = 'rgba(255, 255, 255, 0.7)';
+        this.nextElementSibling.textContent = 'Formato: U00 seguido de 6 dígitos';
+      }
+    });
+  }
+  
+  // Agregar validación de correo electrónico
+  const correoInput = modal.querySelector('input[name="correo"]');
+  correoInput.addEventListener('input', function() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (this.value && !emailRegex.test(this.value)) {
+      this.style.borderColor = '#FF6600';
+    } else {
+      this.style.borderColor = '#45d509';
+    }
+  });
   
   modal.addEventListener('hidden.bs.modal', () => {
     document.body.removeChild(modal);
@@ -4451,22 +4547,58 @@ function mostrarFormularioMateria() {
 }
 
 async function guardarUsuario(tipo) {
+  console.log(`Guardando usuario de tipo: ${tipo}`);
+  
   const form = document.getElementById('form-usuario');
   const formData = new FormData(form);
   
+  // Validar campos obligatorios
+  const nombre = formData.get('nombre')?.trim();
+  const identificacion = formData.get('identificacion')?.trim();
+  const correo = formData.get('correo')?.trim();
+  
+  if (!nombre || !identificacion || !correo) {
+    mostrarNotificacion('Error', 'Por favor complete todos los campos obligatorios (nombre, identificación y correo)', 'error');
+    return;
+  }
+  
+  // Validar formato de identificación para estudiantes
+  if (tipo === 'estudiante') {
+    const regex = /^U00\d{6}$/;
+    if (!regex.test(identificacion)) {
+      mostrarNotificacion('Error', 'El formato de identificación debe ser U00 seguido de 6 dígitos (ej: U00123456)', 'error');
+      return;
+    }
+  }
+  
+  // Validar formato de correo
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(correo)) {
+    mostrarNotificacion('Error', 'Por favor ingrese un correo electrónico válido', 'error');
+    return;
+  }
+  
   const data = {
     tipo: tipo,
-    nombre: formData.get('nombre'),
-    identificacion: formData.get('identificacion'),
-    correo: formData.get('correo')
+    nombre: nombre,
+    identificacion: identificacion,
+    correo: correo
   };
   
   if (tipo !== 'estudiante') {
-    data.pin = formData.get('pin');
+    data.pin = formData.get('pin')?.trim() || null;
   } else {
-    data.docente = formData.get('docente');
-    data.materia = formData.get('materia');
+    data.docente = formData.get('docente')?.trim() || null;
+    data.materia = formData.get('materia')?.trim() || null;
   }
+  
+  console.log('Datos a enviar:', data);
+  
+  // Mostrar indicador de carga
+  const saveBtn = document.querySelector('#modal-usuario .btn-success');
+  const originalText = saveBtn.innerHTML;
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+  saveBtn.disabled = true;
   
   try {
     const response = await fetch('/api/admin/usuarios', {
@@ -4478,16 +4610,30 @@ async function guardarUsuario(tipo) {
     });
     
     const result = await response.json();
+    console.log('Respuesta del servidor:', result);
     
     if (response.ok) {
-      mostrarNotificacion('Éxito', result.mensaje, 'success');
+      mostrarNotificacion('Éxito', result.mensaje || `${tipo.charAt(0).toUpperCase() + tipo.slice(1)} creado exitosamente`, 'success');
       bootstrap.Modal.getInstance(document.getElementById('modal-usuario')).hide();
-      cambiarSeccionAdmin(tipo + 's');
+      
+      // Recargar la sección actual
+      const activeTab = document.querySelector('#admin-section .btn-group .btn.active');
+      if (activeTab) {
+        const seccion = activeTab.id.replace('admin-nav-', '');
+        cambiarSeccionAdmin(seccion);
+      }
     } else {
-      mostrarNotificacion('Error', result.error, 'error');
+      mostrarNotificacion('Error', result.error || 'Error al guardar el usuario', 'error');
+      // Restaurar botón
+      saveBtn.innerHTML = originalText;
+      saveBtn.disabled = false;
     }
   } catch (error) {
-    mostrarNotificacion('Error', 'Error al guardar el usuario', 'error');
+    console.error('Error al guardar usuario:', error);
+    mostrarNotificacion('Error', 'Error de conexión al guardar el usuario', 'error');
+    // Restaurar botón
+    saveBtn.innerHTML = originalText;
+    saveBtn.disabled = false;
   }
 }
 

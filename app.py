@@ -1031,7 +1031,7 @@ def obtener_docentes_activos():
 def obtener_materias_activas():
     """Obtener lista de materias activas para dropdown."""
     try:
-        materias = Materia.query.filter_by(activo=True).order_by(Materia.nombre).all()
+        materias = Materia.query.filter_by(activa=True).order_by(Materia.nombre).all()
         materias_list = [{'id': m.id, 'nombre': m.nombre} for m in materias]
         return jsonify({'materias': materias_list})
     except Exception as e:

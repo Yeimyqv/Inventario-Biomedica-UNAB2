@@ -62,6 +62,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Inicializar modales personalizados
   initCustomModals();
   
+  // Cargar dropdowns dinámicos
+  cargarDocentesActivos();
+  cargarMateriasActivas();
+  
   // Mostrar directamente la selección de usuario (ya no hay sección lab-selection)
   document.getElementById('user-selection').style.display = 'block';
   
@@ -1962,7 +1966,101 @@ async function cargarCategorias() {
     
   } catch (error) {
     console.error('Error al cargar categorías:', error);
-    mostrarNotificacion('Error', 'No se pudieron cargar las categorías', 'error');
+    mostrarNotificación('Error', 'No se pudieron cargar las categorías', 'error');
+  }
+}
+
+// Cargar docentes activos desde la API
+async function cargarDocentesActivos() {
+  try {
+    console.log('Cargando docentes activos...');
+    const docenteSelect = document.getElementById('estudiante-docente');
+    
+    if (!docenteSelect) {
+      console.log('No se encontró el elemento estudiante-docente');
+      return;
+    }
+    
+    const response = await fetch('/api/docentes-activos');
+    
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Docentes activos recibidos:', data);
+    
+    // Limpiar opciones existentes manteniendo la primera opción
+    docenteSelect.innerHTML = '<option value="" selected>Seleccione un docente</option>';
+    
+    if (data.docentes && data.docentes.length > 0) {
+      data.docentes.forEach(docente => {
+        const option = document.createElement('option');
+        option.value = docente.nombre;
+        option.textContent = docente.nombre;
+        docenteSelect.appendChild(option);
+      });
+      
+      // Agregar opción "Otro" al final
+      const otroOption = document.createElement('option');
+      otroOption.value = 'Otro';
+      otroOption.textContent = 'Otro';
+      docenteSelect.appendChild(otroOption);
+      
+      console.log(`Se cargaron ${data.docentes.length} docentes activos`);
+    } else {
+      console.log('No se encontraron docentes activos');
+    }
+  } catch (error) {
+    console.error('Error al cargar docentes activos:', error);
+    // No mostrar notificación para evitar spam, solo log
+  }
+}
+
+// Cargar materias activas desde la API
+async function cargarMateriasActivas() {
+  try {
+    console.log('Cargando materias activas...');
+    const materiaSelect = document.getElementById('estudiante-materia');
+    
+    if (!materiaSelect) {
+      console.log('No se encontró el elemento estudiante-materia');
+      return;
+    }
+    
+    const response = await fetch('/api/materias-activas');
+    
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Materias activas recibidas:', data);
+    
+    // Limpiar opciones existentes manteniendo la primera opción
+    materiaSelect.innerHTML = '<option value="" selected>Seleccione una materia</option>';
+    
+    if (data.materias && data.materias.length > 0) {
+      data.materias.forEach(materia => {
+        const option = document.createElement('option');
+        option.value = materia.nombre;
+        option.textContent = materia.nombre;
+        materiaSelect.appendChild(option);
+      });
+      
+      // Agregar opción "Otra" al final
+      const otraOption = document.createElement('option');
+      otraOption.value = 'Otra';
+      otraOption.textContent = 'Otra';
+      materiaSelect.appendChild(otraOption);
+      
+      console.log(`Se cargaron ${data.materias.length} materias activas`);
+    } else {
+      console.log('No se encontraron materias activas');
+    }
+  } catch (error) {
+    console.error('Error al cargar materias activas:', error);
+    // No mostrar notificación para evitar spam, solo log
   }
 }
 

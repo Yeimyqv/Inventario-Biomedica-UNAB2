@@ -1017,6 +1017,26 @@ def admin_toggle_activo_usuario(usuario_id):
         db.session.rollback()
         return jsonify({'error': f'Error actualizando estado del usuario: {str(e)}'}), 500
 
+@app.route('/api/docentes-activos', methods=['GET'])
+def obtener_docentes_activos():
+    """Obtener lista de docentes activos para dropdown."""
+    try:
+        docentes = Usuario.query.filter_by(tipo='docente', activo=True).order_by(Usuario.nombre).all()
+        docentes_list = [{'id': d.id, 'nombre': d.nombre} for d in docentes]
+        return jsonify({'docentes': docentes_list})
+    except Exception as e:
+        return jsonify({'error': f'Error obteniendo docentes: {str(e)}'}), 500
+
+@app.route('/api/materias-activas', methods=['GET'])
+def obtener_materias_activas():
+    """Obtener lista de materias activas para dropdown."""
+    try:
+        materias = Materia.query.filter_by(activo=True).order_by(Materia.nombre).all()
+        materias_list = [{'id': m.id, 'nombre': m.nombre} for m in materias]
+        return jsonify({'materias': materias_list})
+    except Exception as e:
+        return jsonify({'error': f'Error obteniendo materias: {str(e)}'}), 500
+
 @app.route('/api/admin/materias', methods=['GET'])
 def admin_obtener_materias():
     """Obtener todas las materias."""

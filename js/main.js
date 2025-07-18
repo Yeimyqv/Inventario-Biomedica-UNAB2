@@ -2108,8 +2108,9 @@ function volverAInterfazPrincipal() {
     reportesSection.style.display = 'none';
   }
   
-  // Mostrar la interfaz principal
+  // Mostrar la interfaz principal y recargar el contenido
   document.getElementById('interface').style.display = 'block';
+  cargarInterfazPrincipal();
 }
 
 // Cargar categorías desde la API

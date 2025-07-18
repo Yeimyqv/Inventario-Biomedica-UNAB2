@@ -129,6 +129,7 @@ The application uses four main models:
 - July 18, 2025: Replaced user deletion with activation/deactivation system - users can now be marked as inactive instead of deleted, providing better data integrity and audit trails
 - July 18, 2025: Updated all user queries to filter for active users only - inactive users are hidden from lending interfaces, autocomplete, and user selection dropdowns while remaining visible in administrative interface
 - July 18, 2025: Completed individual PIN authentication system - replaced hardcoded PINs (DOC1234/LAB5678) with database-stored individual PINs for each user, resolved system blocking issues during authentication, implemented asynchronous PIN verification against user database records
+- July 18, 2025: Fixed student subject loading issue - corrected API endpoint from "activo" to "activa" field, removed incorrect sample subjects, added 5 temporary subjects to ensure system functionality
 
 ## User Preferences
 

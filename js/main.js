@@ -14,11 +14,7 @@ let currentLaboratory = null; // Para almacenar el laboratorio seleccionado
 // Reemplazar variable INVENTARIO estática con datos de la API
 let INVENTARIO = []; // Será llenado dinámicamente desde la base de datos
 
-// Objeto para almacenar los PINes de docentes y laboratoristas
-const PINES = {
-  'docente': 'DOC1234',
-  'laboratorista': 'LAB5678'
-};
+// PINes ahora se manejan individualmente desde la base de datos
 
 // Función para determinar la clase CSS según el estado de devolución
 function getEstadoObservacionClass(observacion) {
@@ -322,10 +318,21 @@ function autenticarUsuario() {
       return;
     }
     
-    if (PINES[currentUser.tipo] !== pin) {
-      mostrarNotificacion('Error', `PIN incorrecto. Para ${currentUser.tipo === 'docente' ? 'docentes' : 'laboratoristas'} el PIN correcto es: ${PINES[currentUser.tipo]}`, 'error');
-      return;
-    }
+    // Verificar PIN contra la base de datos
+    verificarPinUsuario(currentUser.tipo, currentUser.nombre, pin)
+      .then(esValido => {
+        if (esValido) {
+          // PIN correcto, continuar con la autenticación
+          continuarAutenticacion();
+        } else {
+          mostrarNotificacion('Error', 'PIN incorrecto', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error verificando PIN:', error);
+        mostrarNotificacion('Error', 'Error al verificar credenciales', 'error');
+      });
+    return; // Salir de la función para esperar la verificación asíncrona
   } 
   // Verificar datos adicionales para estudiantes
   else if (currentUser.tipo === 'estudiante') {
@@ -380,6 +387,36 @@ function autenticarUsuario() {
     currentUser.correo = estudianteCorreo;
   }
   
+  // Continuar con el resto de la autenticación (estudiantes y después de verificar PIN)
+  continuarAutenticacion();
+}
+
+// Verificar PIN del usuario contra la base de datos
+async function verificarPinUsuario(tipo, nombre, pin) {
+  try {
+    const response = await fetch(`/api/admin/usuarios?tipo=${tipo}`);
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const usuario = data.usuarios.find(u => u.nombre === nombre && u.activo);
+    
+    if (!usuario) {
+      console.error(`Usuario ${tipo} "${nombre}" no encontrado o inactivo`);
+      return false;
+    }
+    
+    // Verificar si el PIN coincide
+    return usuario.pin === pin;
+  } catch (error) {
+    console.error('Error verificando PIN:', error);
+    return false;
+  }
+}
+
+// Continuar con la autenticación después de verificar PIN o para estudiantes
+function continuarAutenticacion() {
   // Para laboratoristas y docentes, buscar el ID real de la base de datos
   if (currentUser.tipo === 'laboratorista' || currentUser.tipo === 'docente') {
     console.log(`Autenticando ${currentUser.tipo} con nombre: "${currentUser.nombre}"`);

@@ -4268,7 +4268,7 @@ async function cargarSeccionMaterias(container) {
 async function cargarUsuarios(tipo, tablaId) {
   try {
     console.log(`Cargando usuarios de tipo: ${tipo}`);
-    const response = await fetch(`/api/admin/usuarios?tipo=${tipo}`);
+    const response = await fetch(`/api/admin/usuarios?tipo=${tipo}&incluir_inactivos=true`);
     
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);

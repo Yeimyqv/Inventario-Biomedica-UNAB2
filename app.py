@@ -388,17 +388,19 @@ def buscar_estudiante(identificacion):
     # Log para depuración
     print(f"Buscando estudiante con ID: {identificacion_upper}")
     
-    # Buscar primero con coincidencia exacta
+    # Buscar primero con coincidencia exacta - solo usuarios activos
     estudiante = Usuario.query.filter_by(
         identificacion=identificacion_upper,
-        tipo='estudiante'
+        tipo='estudiante',
+        activo=True
     ).first()
     
     if not estudiante:
-        # Si no se encuentra, intentar búsqueda parcial (para IDs que podrían estar truncados)
+        # Si no se encuentra, intentar búsqueda parcial (para IDs que podrían estar truncados) - solo usuarios activos
         estudiante = Usuario.query.filter(
             Usuario.identificacion.like(f"{identificacion_upper}%"),
-            Usuario.tipo == 'estudiante'
+            Usuario.tipo == 'estudiante',
+            Usuario.activo == True
         ).first()
     
     if not estudiante:
@@ -419,7 +421,8 @@ def buscar_usuario_por_tipo_y_nombre(tipo, nombre):
     
     usuario = Usuario.query.filter_by(
         tipo=tipo,
-        nombre=nombre_decoded
+        nombre=nombre_decoded,
+        activo=True
     ).first()
     
     if not usuario:
@@ -440,7 +443,7 @@ def crear_usuario_docente():
     
     nombre = data['nombre'].strip()
     
-    # Verificar si ya existe
+    # Verificar si ya existe (verificar tanto activos como inactivos)
     usuario_existente = Usuario.query.filter_by(
         tipo='docente',
         nombre=nombre

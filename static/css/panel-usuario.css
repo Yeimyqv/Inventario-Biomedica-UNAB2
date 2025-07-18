@@ -446,6 +446,37 @@ body {
   border-color: #45d509 !important;
 }
 
+/* Estilos para campos de búsqueda */
+#admin-section .input-group-text {
+  background-color: rgba(69, 213, 9, 0.1);
+  border-color: #45d509;
+  color: white;
+}
+
+#admin-section .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#admin-section .form-control:focus {
+  border-color: #45d509;
+  box-shadow: 0 0 0 0.2rem rgba(69, 213, 9, 0.25);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+#admin-section .form-control:focus::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Animación para filas filtradas */
+#admin-section .table tbody tr {
+  transition: all 0.3s ease;
+}
+
+#admin-section .table tbody tr[style*="display: none"] {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
 /* Responsividad */
 @media (max-width: 768px) {
   .panel-title {

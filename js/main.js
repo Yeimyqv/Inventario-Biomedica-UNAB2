@@ -4102,11 +4102,21 @@ async function cargarSeccionEstudiantes(container) {
       </button>
     </div>
     
+    <div class="mb-3">
+      <div class="input-group">
+        <span class="input-group-text" style="background-color: rgba(69, 213, 9, 0.1); border-color: #45d509; color: white;">
+          <i class="fas fa-search"></i>
+        </span>
+        <input type="text" class="form-control" id="buscar-estudiantes" placeholder="Buscar por nombre o identificación..." 
+               style="background-color: rgba(255, 255, 255, 0.1); border-color: #45d509; color: white;"
+               onkeyup="filtrarTabla('tabla-estudiantes', this.value)">
+      </div>
+    </div>
+    
     <div class="table-responsive">
       <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Identificación</th>
             <th>Correo</th>
@@ -4116,7 +4126,7 @@ async function cargarSeccionEstudiantes(container) {
           </tr>
         </thead>
         <tbody id="tabla-estudiantes">
-          <tr><td colspan="7" class="text-center">Cargando...</td></tr>
+          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -4135,11 +4145,21 @@ async function cargarSeccionDocentes(container) {
       </button>
     </div>
     
+    <div class="mb-3">
+      <div class="input-group">
+        <span class="input-group-text" style="background-color: rgba(69, 213, 9, 0.1); border-color: #45d509; color: white;">
+          <i class="fas fa-search"></i>
+        </span>
+        <input type="text" class="form-control" id="buscar-docentes" placeholder="Buscar por nombre o identificación..." 
+               style="background-color: rgba(255, 255, 255, 0.1); border-color: #45d509; color: white;"
+               onkeyup="filtrarTabla('tabla-docentes', this.value)">
+      </div>
+    </div>
+    
     <div class="table-responsive">
       <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Identificación</th>
             <th>Correo</th>
@@ -4148,7 +4168,7 @@ async function cargarSeccionDocentes(container) {
           </tr>
         </thead>
         <tbody id="tabla-docentes">
-          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
+          <tr><td colspan="5" class="text-center">Cargando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -4167,11 +4187,21 @@ async function cargarSeccionLaboratoristas(container) {
       </button>
     </div>
     
+    <div class="mb-3">
+      <div class="input-group">
+        <span class="input-group-text" style="background-color: rgba(69, 213, 9, 0.1); border-color: #45d509; color: white;">
+          <i class="fas fa-search"></i>
+        </span>
+        <input type="text" class="form-control" id="buscar-laboratoristas" placeholder="Buscar por nombre o identificación..." 
+               style="background-color: rgba(255, 255, 255, 0.1); border-color: #45d509; color: white;"
+               onkeyup="filtrarTabla('tabla-laboratoristas', this.value)">
+      </div>
+    </div>
+    
     <div class="table-responsive">
       <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Identificación</th>
             <th>Correo</th>
@@ -4180,7 +4210,7 @@ async function cargarSeccionLaboratoristas(container) {
           </tr>
         </thead>
         <tbody id="tabla-laboratoristas">
-          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
+          <tr><td colspan="5" class="text-center">Cargando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -4199,11 +4229,21 @@ async function cargarSeccionMaterias(container) {
       </button>
     </div>
     
+    <div class="mb-3">
+      <div class="input-group">
+        <span class="input-group-text" style="background-color: rgba(69, 213, 9, 0.1); border-color: #45d509; color: white;">
+          <i class="fas fa-search"></i>
+        </span>
+        <input type="text" class="form-control" id="buscar-materias" placeholder="Buscar por nombre o código..." 
+               style="background-color: rgba(255, 255, 255, 0.1); border-color: #45d509; color: white;"
+               onkeyup="filtrarTabla('tabla-materias', this.value)">
+      </div>
+    </div>
+    
     <div class="table-responsive">
       <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Código</th>
             <th>Estado</th>
@@ -4212,7 +4252,7 @@ async function cargarSeccionMaterias(container) {
           </tr>
         </thead>
         <tbody id="tabla-materias">
-          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
+          <tr><td colspan="5" class="text-center">Cargando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -4258,7 +4298,6 @@ async function cargarUsuarios(tipo, tablaId) {
         
         return `
           <tr>
-            <td>${usuario.id}</td>
             <td>${usuario.nombre}</td>
             <td>${usuario.identificacion}</td>
             <td>${usuario.correo || '<span class="text-muted">No definido</span>'}</td>
@@ -4276,14 +4315,14 @@ async function cargarUsuarios(tipo, tablaId) {
       }).join('');
       console.log(`Tabla ${tablaId} actualizada con ${data.usuarios.length} registros`);
     } else {
-      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center">No hay ${tipo}s registrados</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '6' : '5'}" class="text-center">No hay ${tipo}s registrados</td></tr>`;
       console.log(`No se encontraron ${tipo}s`);
     }
   } catch (error) {
     console.error(`Error cargando ${tipo}s:`, error);
     const tbody = document.getElementById(tablaId);
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '6' : '5'}" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
     }
   }
 }
@@ -4310,7 +4349,6 @@ async function cargarMaterias() {
     if (data.materias && data.materias.length > 0) {
       tbody.innerHTML = data.materias.map(materia => `
         <tr>
-          <td>${materia.id}</td>
           <td>${materia.nombre}</td>
           <td>${materia.codigo || 'N/A'}</td>
           <td>
@@ -4331,14 +4369,14 @@ async function cargarMaterias() {
       `).join('');
       console.log(`Tabla de materias actualizada con ${data.materias.length} registros`);
     } else {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay materias registradas</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay materias registradas</td></tr>';
       console.log('No se encontraron materias');
     }
   } catch (error) {
     console.error('Error cargando materias:', error);
     const tbody = document.getElementById('tabla-materias');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
     }
   }
 }
@@ -4723,4 +4761,36 @@ function editarUsuario(id) {
 
 function editarMateria(id) {
   mostrarNotificacion('Información', 'Función de edición en desarrollo', 'info');
+}
+
+function filtrarTabla(tablaId, filtro) {
+  const tabla = document.getElementById(tablaId);
+  if (!tabla) return;
+  
+  const filas = tabla.getElementsByTagName('tr');
+  const filtroLower = filtro.toLowerCase().trim();
+  
+  for (let i = 0; i < filas.length; i++) {
+    const fila = filas[i];
+    const celdas = fila.getElementsByTagName('td');
+    
+    if (celdas.length === 0) continue; // Skip header row
+    
+    let mostrarFila = false;
+    
+    // Buscar en las primeras dos columnas (Nombre e Identificación/Código)
+    for (let j = 0; j < Math.min(2, celdas.length); j++) {
+      const textoCelda = celdas[j].textContent.toLowerCase();
+      if (textoCelda.includes(filtroLower)) {
+        mostrarFila = true;
+        break;
+      }
+    }
+    
+    if (filtroLower === '') {
+      mostrarFila = true;
+    }
+    
+    fila.style.display = mostrarFila ? '' : 'none';
+  }
 }

@@ -130,6 +130,7 @@ The application uses four main models:
 - July 18, 2025: Updated all user queries to filter for active users only - inactive users are hidden from lending interfaces, autocomplete, and user selection dropdowns while remaining visible in administrative interface
 - July 18, 2025: Completed individual PIN authentication system - replaced hardcoded PINs (DOC1234/LAB5678) with database-stored individual PINs for each user, resolved system blocking issues during authentication, implemented asynchronous PIN verification against user database records
 - July 18, 2025: Fixed student subject loading issue - corrected API endpoint from "activo" to "activa" field, removed incorrect sample subjects, added 5 temporary subjects to ensure system functionality
+- July 18, 2025: Implemented real academic subjects - replaced sample subjects with 12 authentic biomedical engineering subjects from UNAB program including TELE-ROBÓTICA, INSTRUMENTACIÓN, ELECTRÓNICA ANÁLOGA, ELECTRÓNICA DE POTENCIA, SISTEMAS EMBEBIDOS, SISTEMAS DIGITALES, PROYECTO INTEGRADOR, PROYECTO DE GRADO, CIRCUITOS ELÉCTRICOS, BIOMECÁNICA CLÍNICA, PROCESAMIENTO DE SEÑALES, and OTRA
 
 ## User Preferences
 

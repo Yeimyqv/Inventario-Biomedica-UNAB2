@@ -10,23 +10,20 @@ from models import Materia
 def init_sample_subjects():
     """Inicializar materias de ejemplo en la base de datos."""
     
-    # Lista de materias comunes en Ingeniería Biomédica
+    # Lista de materias reales de Ingeniería Biomédica UNAB
     materias_ejemplo = [
-        {"nombre": "Bioinstrumentación", "codigo": "BIO001"},
-        {"nombre": "Procesamiento de Señales Biomédicas", "codigo": "BIO002"},
-        {"nombre": "Sistemas de Imágenes Médicas", "codigo": "BIO003"},
-        {"nombre": "Electrónica Médica", "codigo": "BIO004"},
-        {"nombre": "Biomateriales", "codigo": "BIO005"},
-        {"nombre": "Biomecánica", "codigo": "BIO006"},
-        {"nombre": "Telemedicina", "codigo": "BIO007"},
-        {"nombre": "Instrumentación Quirúrgica", "codigo": "BIO008"},
-        {"nombre": "Bioética", "codigo": "BIO009"},
-        {"nombre": "Gestión de Tecnología Médica", "codigo": "BIO010"},
-        {"nombre": "Análisis de Imágenes Médicas", "codigo": "BIO011"},
-        {"nombre": "Dispositivos Médicos", "codigo": "BIO012"},
-        {"nombre": "Fisiología Aplicada", "codigo": "BIO013"},
-        {"nombre": "Rehabilitación y Ortopedia", "codigo": "BIO014"},
-        {"nombre": "Ingeniería Clínica", "codigo": "BIO015"}
+        {"nombre": "TELE - ROBÓTICA", "codigo": "TR001"},
+        {"nombre": "INSTRUMENTACIÓN", "codigo": "INS001"},
+        {"nombre": "ELECTRÓNICA ANÁLOGA", "codigo": "EA001"},
+        {"nombre": "ELECTRÓNICA DE POTENCIA", "codigo": "EP001"},
+        {"nombre": "SISTEMAS EMBEBIDOS", "codigo": "SE001"},
+        {"nombre": "SISTEMAS DIGITALES", "codigo": "SD001"},
+        {"nombre": "PROYECTO INTEGRADOR", "codigo": "PI001"},
+        {"nombre": "PROYECTO DE GRADO", "codigo": "PG001"},
+        {"nombre": "CIRCUITOS ELÉCTRICOS", "codigo": "CE001"},
+        {"nombre": "BIOMECÁNICA CLÍNICA", "codigo": "BC001"},
+        {"nombre": "PROCESAMIENTO DE SEÑALES", "codigo": "PS001"},
+        {"nombre": "OTRA", "codigo": "OTR001"}
     ]
     
     with app.app_context():
@@ -54,7 +51,7 @@ def init_sample_subjects():
             
             try:
                 db.session.commit()
-                print(f"✓ Se han inicializado {len(materias_ejemplo)} materias de ejemplo.")
+                print(f"✓ Se han inicializado {len(materias_ejemplo)} materias reales de Ingeniería Biomédica UNAB.")
             except Exception as e:
                 db.session.rollback()
                 print(f"✗ Error al guardar materias: {e}")

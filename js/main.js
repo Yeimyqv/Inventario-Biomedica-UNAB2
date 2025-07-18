@@ -3971,8 +3971,16 @@ function actualizarReportesEnTiempoReal() {
 // =============================================================================
 
 function mostrarModuloAdmin() {
+  console.log('Mostrando módulo de administración...');
+  
   // Ocultar interfaz principal
   document.getElementById('interface').style.display = 'none';
+  
+  // Eliminar sección de administración existente si existe
+  const existingAdmin = document.getElementById('admin-section');
+  if (existingAdmin) {
+    existingAdmin.remove();
+  }
   
   // Crear sección de administración
   const adminSection = document.createElement('section');
@@ -4015,10 +4023,19 @@ function mostrarModuloAdmin() {
   `;
   
   // Agregar a la página
-  document.getElementById('interface').insertAdjacentElement('afterend', adminSection);
+  const interfaceElement = document.getElementById('interface');
+  if (interfaceElement) {
+    interfaceElement.insertAdjacentElement('afterend', adminSection);
+    console.log('Sección de administración creada');
+  } else {
+    console.error('No se pudo encontrar el elemento interface');
+    return;
+  }
   
-  // Cargar sección inicial
-  cambiarSeccionAdmin('estudiantes');
+  // Cargar sección inicial con un pequeño delay para asegurar que el DOM esté listo
+  setTimeout(() => {
+    cambiarSeccionAdmin('estudiantes');
+  }, 100);
 }
 
 function volverDesdeAdmin() {
@@ -4033,28 +4050,46 @@ function volverDesdeAdmin() {
 }
 
 function cambiarSeccionAdmin(seccion) {
+  console.log(`Cambiando a sección: ${seccion}`);
+  
   // Actualizar botones de navegación
   document.querySelectorAll('#admin-section .btn-group .btn').forEach(btn => {
     btn.classList.remove('active');
   });
-  document.getElementById(`admin-nav-${seccion}`).classList.add('active');
+  
+  const navButton = document.getElementById(`admin-nav-${seccion}`);
+  if (navButton) {
+    navButton.classList.add('active');
+  } else {
+    console.error(`No se encontró el botón de navegación para: ${seccion}`);
+  }
   
   // Cargar contenido de la sección
   const contentDiv = document.getElementById('admin-content');
+  if (!contentDiv) {
+    console.error('No se encontró el contenedor admin-content');
+    return;
+  }
   
-  switch(seccion) {
-    case 'estudiantes':
-      cargarSeccionEstudiantes(contentDiv);
-      break;
-    case 'docentes':
-      cargarSeccionDocentes(contentDiv);
-      break;
-    case 'laboratoristas':
-      cargarSeccionLaboratoristas(contentDiv);
-      break;
-    case 'materias':
-      cargarSeccionMaterias(contentDiv);
-      break;
+  try {
+    switch(seccion) {
+      case 'estudiantes':
+        cargarSeccionEstudiantes(contentDiv);
+        break;
+      case 'docentes':
+        cargarSeccionDocentes(contentDiv);
+        break;
+      case 'laboratoristas':
+        cargarSeccionLaboratoristas(contentDiv);
+        break;
+      case 'materias':
+        cargarSeccionMaterias(contentDiv);
+        break;
+      default:
+        console.error(`Sección desconocida: ${seccion}`);
+    }
+  } catch (error) {
+    console.error(`Error al cargar la sección ${seccion}:`, error);
   }
 }
 
@@ -4189,10 +4224,22 @@ async function cargarSeccionMaterias(container) {
 
 async function cargarUsuarios(tipo, tablaId) {
   try {
+    console.log(`Cargando usuarios de tipo: ${tipo}`);
     const response = await fetch(`/api/admin/usuarios?tipo=${tipo}`);
+    
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    
     const data = await response.json();
+    console.log(`Datos recibidos para ${tipo}:`, data);
     
     const tbody = document.getElementById(tablaId);
+    
+    if (!tbody) {
+      console.error(`No se encontró el elemento con ID: ${tablaId}`);
+      return;
+    }
     
     if (data.usuarios && data.usuarios.length > 0) {
       tbody.innerHTML = data.usuarios.map(usuario => {
@@ -4220,29 +4267,45 @@ async function cargarUsuarios(tipo, tablaId) {
               <button class="btn btn-sm btn-outline-primary" onclick="editarUsuario(${usuario.id})">
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarUsuario(${usuario.id}, '${usuario.nombre}')">
+              <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarUsuario(${usuario.id}, '${usuario.nombre.replace(/'/g, "\\'")}')">
                 <i class="fas fa-trash"></i>
               </button>
             </td>
           </tr>
         `;
       }).join('');
+      console.log(`Tabla ${tablaId} actualizada con ${data.usuarios.length} registros`);
     } else {
       tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center">No hay ${tipo}s registrados</td></tr>`;
+      console.log(`No se encontraron ${tipo}s`);
     }
   } catch (error) {
     console.error(`Error cargando ${tipo}s:`, error);
     const tbody = document.getElementById(tablaId);
-    tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center text-danger">Error al cargar datos</td></tr>`;
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="${tipo === 'estudiante' ? '7' : '6'}" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
+    }
   }
 }
 
 async function cargarMaterias() {
   try {
+    console.log('Cargando materias...');
     const response = await fetch('/api/admin/materias');
+    
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    
     const data = await response.json();
+    console.log('Datos de materias recibidos:', data);
     
     const tbody = document.getElementById('tabla-materias');
+    
+    if (!tbody) {
+      console.error('No se encontró el elemento tabla-materias');
+      return;
+    }
     
     if (data.materias && data.materias.length > 0) {
       tbody.innerHTML = data.materias.map(materia => `
@@ -4260,19 +4323,23 @@ async function cargarMaterias() {
             <button class="btn btn-sm btn-outline-primary" onclick="editarMateria(${materia.id})">
               <i class="fas fa-edit"></i>
             </button>
-            <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarMateria(${materia.id}, '${materia.nombre}')">
+            <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarMateria(${materia.id}, '${materia.nombre.replace(/'/g, "\\'")}')">
               <i class="fas fa-trash"></i>
             </button>
           </td>
         </tr>
       `).join('');
+      console.log(`Tabla de materias actualizada con ${data.materias.length} registros`);
     } else {
       tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay materias registradas</td></tr>';
+      console.log('No se encontraron materias');
     }
   } catch (error) {
     console.error('Error cargando materias:', error);
     const tbody = document.getElementById('tabla-materias');
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar datos</td></tr>';
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error al cargar datos: ${error.message}</td></tr>`;
+    }
   }
 }
 

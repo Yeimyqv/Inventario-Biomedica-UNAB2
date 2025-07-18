@@ -990,12 +990,7 @@ def admin_eliminar_usuario(usuario_id):
         # Verificar si el usuario tiene préstamos activos
         prestamos_activos = Prestamo.query.filter_by(usuario_id=usuario_id, estado='prestado').count()
         if prestamos_activos > 0:
-            return jsonify({'error': 'No se puede eliminar el usuario porque tiene préstamos activos'}), 400
-        
-        # Verificar si el usuario tiene historial de préstamos (activos o devueltos)
-        total_prestamos = Prestamo.query.filter_by(usuario_id=usuario_id).count()
-        if total_prestamos > 0:
-            return jsonify({'error': 'No se puede eliminar el usuario porque tiene historial de préstamos en el sistema'}), 400
+            return jsonify({'error': 'No se puede eliminar el usuario porque tiene préstamos activos. Debe devolver todos los préstamos antes de eliminar el usuario.'}), 400
         
         nombre_usuario = usuario.nombre
         db.session.delete(usuario)

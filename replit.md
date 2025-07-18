@@ -125,7 +125,7 @@ The application uses four main models:
 - July 18, 2025: Created complete administrative interface with tabbed navigation for managing all user types and academic subjects
 - July 18, 2025: Initialized database with 15 sample biomedical engineering subjects including proper codes and active status tracking
 - July 18, 2025: Enhanced administrative module with complete edit and delete functionality - added professional modal forms with validation, search functionality, and proper foreign key constraint handling
-- July 18, 2025: Implemented data integrity protection - users with loan history cannot be deleted to maintain referential integrity
+- July 18, 2025: Implemented data integrity protection - users with active loans cannot be deleted, but users with only returned loans can be safely deleted
 
 ## User Preferences
 

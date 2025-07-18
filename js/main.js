@@ -65,6 +65,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Cargar dropdowns dinámicos
   cargarDocentesActivos();
   cargarMateriasActivas();
+  cargarDocentesAuth();
+  cargarLaboratoristasAuth();
   
   // Mostrar directamente la selección de usuario (ya no hay sección lab-selection)
   document.getElementById('user-selection').style.display = 'block';
@@ -2061,6 +2063,92 @@ async function cargarMateriasActivas() {
   } catch (error) {
     console.error('Error al cargar materias activas:', error);
     // No mostrar notificación para evitar spam, solo log
+  }
+}
+
+// Cargar docentes activos para autenticación
+async function cargarDocentesAuth() {
+  try {
+    console.log('Cargando docentes para autenticación...');
+    const docenteAuthSelect = document.getElementById('docente-select');
+    
+    if (!docenteAuthSelect) {
+      console.log('No se encontró el elemento docente-select');
+      return;
+    }
+    
+    const response = await fetch('/api/docentes-activos');
+    
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Docentes para autenticación recibidos:', data);
+    
+    // Limpiar opciones existentes
+    docenteAuthSelect.innerHTML = '<option value="" selected>Seleccione su nombre</option>';
+    
+    if (data.docentes && data.docentes.length > 0) {
+      data.docentes.forEach(docente => {
+        const option = document.createElement('option');
+        option.value = docente.nombre;
+        option.textContent = docente.nombre;
+        docenteAuthSelect.appendChild(option);
+      });
+      
+      // Agregar opción "Otro" al final
+      const otroOption = document.createElement('option');
+      otroOption.value = 'Otro';
+      otroOption.textContent = 'Otro';
+      docenteAuthSelect.appendChild(otroOption);
+      
+      console.log(`Se cargaron ${data.docentes.length} docentes para autenticación`);
+    } else {
+      console.log('No se encontraron docentes para autenticación');
+    }
+  } catch (error) {
+    console.error('Error al cargar docentes para autenticación:', error);
+  }
+}
+
+// Cargar laboratoristas activos para autenticación
+async function cargarLaboratoristasAuth() {
+  try {
+    console.log('Cargando laboratoristas para autenticación...');
+    const labAuthSelect = document.getElementById('laboratorista-select');
+    
+    if (!labAuthSelect) {
+      console.log('No se encontró el elemento laboratorista-select');
+      return;
+    }
+    
+    const response = await fetch('/api/admin/usuarios?tipo=laboratorista');
+    
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Laboratoristas para autenticación recibidos:', data);
+    
+    // Limpiar opciones existentes
+    labAuthSelect.innerHTML = '<option value="" selected>Seleccione su nombre</option>';
+    
+    if (data.usuarios && data.usuarios.length > 0) {
+      data.usuarios.forEach(laboratorista => {
+        const option = document.createElement('option');
+        option.value = laboratorista.nombre;
+        option.textContent = laboratorista.nombre;
+        labAuthSelect.appendChild(option);
+      });
+      
+      console.log(`Se cargaron ${data.usuarios.length} laboratoristas para autenticación`);
+    } else {
+      console.log('No se encontraron laboratoristas para autenticación');
+    }
+  } catch (error) {
+    console.error('Error al cargar laboratoristas para autenticación:', error);
   }
 }
 

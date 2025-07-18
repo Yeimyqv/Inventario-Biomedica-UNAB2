@@ -318,12 +318,31 @@ function autenticarUsuario() {
       return;
     }
     
-    // Verificar PIN contra la base de datos
+    // Verificar PIN contra la base de datos de forma asíncrona
     verificarPinUsuario(currentUser.tipo, currentUser.nombre, pin)
       .then(esValido => {
+        console.log(`PIN verification result for ${currentUser.nombre}: ${esValido}`);
         if (esValido) {
-          // PIN correcto, continuar con la autenticación
-          continuarAutenticacion();
+          // PIN correcto, buscar datos del usuario y cargar interfaz
+          console.log('PIN correcto, buscando datos del usuario...');
+          buscarUsuarioPorTipoYNombre(currentUser.tipo, currentUser.nombre)
+            .then(usuarioData => {
+              if (usuarioData) {
+                currentUser.id = usuarioData.id;
+                currentUser.identificacion = usuarioData.identificacion;
+                currentUser.correo = usuarioData.correo;
+                console.log(`Usuario autenticado exitosamente - ID: ${currentUser.id}`);
+              } else {
+                currentUser.id = Date.now();
+                console.warn(`Usuario "${currentUser.nombre}" no encontrado, usando ID temporal`);
+              }
+              cargarInterfazPrincipal();
+            })
+            .catch(error => {
+              console.error('Error buscando usuario:', error);
+              currentUser.id = Date.now();
+              cargarInterfazPrincipal();
+            });
         } else {
           mostrarNotificacion('Error', 'PIN incorrecto', 'error');
         }
@@ -387,8 +406,10 @@ function autenticarUsuario() {
     currentUser.correo = estudianteCorreo;
   }
   
-  // Continuar con el resto de la autenticación (estudiantes y después de verificar PIN)
-  continuarAutenticacion();
+  // Solo llamar a continuarAutenticacion para estudiantes
+  if (currentUser.tipo === 'estudiante') {
+    continuarAutenticacion();
+  }
 }
 
 // Verificar PIN del usuario contra la base de datos
@@ -415,61 +436,30 @@ async function verificarPinUsuario(tipo, nombre, pin) {
   }
 }
 
-// Continuar con la autenticación después de verificar PIN o para estudiantes
+// Continuar con la autenticación para estudiantes
 function continuarAutenticacion() {
-  // Para laboratoristas y docentes, buscar el ID real de la base de datos
-  if (currentUser.tipo === 'laboratorista' || currentUser.tipo === 'docente') {
-    console.log(`Autenticando ${currentUser.tipo} con nombre: "${currentUser.nombre}"`);
-    
-    // Buscar el usuario en la base de datos para obtener su ID real
-    buscarUsuarioPorTipoYNombre(currentUser.tipo, currentUser.nombre)
-      .then(usuarioData => {
-        if (usuarioData) {
-          currentUser.id = usuarioData.id; // Usar el ID real de la base de datos
-          currentUser.identificacion = usuarioData.identificacion;
-          currentUser.correo = usuarioData.correo;
-          console.log(`Usuario ${currentUser.tipo} autenticado exitosamente - ID: ${currentUser.id}`);
+  // Para estudiantes, buscar el ID real en la base de datos
+  if (currentUser.tipo === 'estudiante' && currentUser.id_estudiante) {
+    buscarEstudiante(currentUser.id_estudiante)
+      .then(estudianteData => {
+        if (estudianteData) {
+          currentUser.id = estudianteData.id;
+          console.log('Estudiante autenticado con ID real:', currentUser.id);
         } else {
-          // Fallback: usar timestamp si no se encuentra el usuario
           currentUser.id = Date.now();
-          console.warn(`Usuario ${currentUser.tipo} "${currentUser.nombre}" no encontrado en la base de datos, usando ID temporal`);
+          console.warn('Estudiante no encontrado en la base de datos, usando ID temporal');
         }
-        
-        // Cargar la interfaz según el tipo de usuario
         cargarInterfazPrincipal();
       })
       .catch(error => {
-        console.error('Error buscando usuario:', error);
+        console.error('Error buscando estudiante:', error);
         currentUser.id = Date.now();
         cargarInterfazPrincipal();
       });
   } else {
-    // Para estudiantes, buscar el ID real en la base de datos
-    if (currentUser.tipo === 'estudiante' && currentUser.id_estudiante) {
-      buscarEstudiante(currentUser.id_estudiante)
-        .then(estudianteData => {
-          if (estudianteData) {
-            currentUser.id = estudianteData.id; // Usar el ID real de la base de datos
-            console.log('Estudiante autenticado con ID real:', currentUser.id);
-          } else {
-            // Fallback: usar timestamp si no se encuentra el estudiante
-            currentUser.id = Date.now();
-            console.warn('Estudiante no encontrado en la base de datos, usando ID temporal');
-          }
-          
-          // Cargar la interfaz según el tipo de usuario
-          cargarInterfazPrincipal();
-        })
-        .catch(error => {
-          console.error('Error buscando estudiante:', error);
-          currentUser.id = Date.now();
-          cargarInterfazPrincipal();
-        });
-    } else {
-      // Para otros tipos de usuario, usar timestamp temporal
-      currentUser.id = Date.now();
-      cargarInterfazPrincipal();
-    }
+    // Para otros tipos de usuario, usar timestamp temporal
+    currentUser.id = Date.now();
+    cargarInterfazPrincipal();
   }
 }
 
